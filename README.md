@@ -1,279 +1,176 @@
-# NBA Scoring Discrepancy Research
+# NBA Scoring Discrepancies — Verified Research & Live Monitor
 
-> **Comprehensive, continuously updated database and monitoring system for NBA scoring discrepancies, scoring corrections, and conflicting score data.**
+> **Session-start rule: read this README first, every time we work on the project.**
+> It holds the founding brief, the operating values, and the no-hallucination policy.
+> Build, research, suggest, and implement against it. Own the outcome end to end.
 
-## Original Prompt (Read Every Time We Work)
-
-Build this project as a comprehensive, continuously updated database and monitoring system for **NBA scoring discrepancies, scoring corrections, and conflicting score data**. The original use case is an incident where one source showed a **213-point final total while another showed 214**, so the system must be capable of finding, documenting, and explaining events like this rather than simply displaying the current final score. Research both historical and current NBA games and identify every verifiable case possible where the official score, play-by-play, box score, scoreboard, official scorer record, or third-party data feed was incorrect, temporarily different, or later corrected.
-
-For every case, capture the **game, date, teams, period/game clock, relevant scoring play, score before and after the event, originally reported value, corrected value, final official value, affected player/team, sources that disagreed, timestamps when available, what changed, when it changed, and the confirmed or suspected cause**. Preserve the original observation and correction rather than overwriting historical data. Most importantly, determine whether the **NBA's official record itself was incorrect** or whether only a secondary source/data provider was incorrect or delayed. Every factual claim must be traceable to a reliable source with a direct link for independent review. Never infer missing information or present an assumption as fact; clearly label anything unverified, disputed, or requiring further investigation.
-
-The system must continuously monitor current NBA games and automatically detect potential discrepancies between authoritative and secondary sources, create an investigation record, and track it through detection, investigation, correction, and resolution. The website should make the entire research collection easy for someone unfamiliar with the project to understand, search, filter, compare, and independently verify. Include historical statistics showing **how often scoring discrepancies/corrections occur, what types are most common, how long they typically last, how often they affect the final score/total, and how rare incidents like the 213/214 discrepancy are**. The final product should allow a new person with no knowledge of this conversation to understand exactly what happened in each case, reproduce the research from the cited evidence, and see the difference between the original data, the correction, and the final official result.
-
-Put this prompt into the repo readme and read it everytime we work on the project as a starting point to make sure we are building what we are aiming for and have a strong base to continue building and improving on making something useful for everyday use. It should solve the problem of having to manually check everything ourselves and having an up to date current feed.
+**Live site (GitHub Pages):** `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`
+*(enable Pages: repo Settings → Pages → Source “GitHub Actions”, then the `Deploy site` workflow publishes `docs/`)*
 
 ---
 
-## Core Values
+## 1. Founding brief (the mission — do not drift)
 
-### Maximize P(Win)
+### NBA Scoring Discrepancy Research
 
-“Maximize the Probability of Winning”: our decision making framework. In every decision, we weigh tradeoffs, assess risk, and choose the path that maximizes the probability that Arena succeeds. We set aside our emotions and make tough decisions in order to maximize P(Win). “Maximize P(Win)” frees us from constraints and clarifies that we must put Arena first.
+Build this project as a comprehensive, continuously updated database and monitoring system for
+**NBA scoring discrepancies, scoring corrections, and conflicting score data**. The original use
+case is an incident where one source showed a **213-point final total while another showed 214**,
+so the system must be capable of finding, documenting, and explaining events like this rather than
+simply displaying the current final score. Research both historical and current NBA games and
+identify every verifiable case possible where the official score, play-by-play, box score,
+scoreboard, official scorer record, or third-party data feed was incorrect, temporarily different,
+or later corrected.
 
-### Own the Outcome
+For every case, capture the **game, date, teams, period/game clock, relevant scoring play, score
+before and after the event, originally reported value, corrected value, final official value,
+affected player/team, sources that disagreed, timestamps when available, what changed, when it
+changed, and the confirmed or suspected cause**. Preserve the original observation and correction
+rather than overwriting historical data. Most importantly, determine whether the **NBA's official
+record itself was incorrect** or whether only a secondary source/data provider was incorrect or
+delayed. Every factual claim must be traceable to a reliable source with a direct link for
+independent review. Never infer missing information or present an assumption as fact; clearly label
+anything unverified, disputed, or requiring further investigation.
 
-We own results end to end — not just our individual slice of the work. When problems arise and we have the means to act, we do so without waiting for permission or assignment. We treat failure and success as signals and use them to improve. At Arena, we stay accountable to the final outcome.
+The system must continuously monitor current NBA games and automatically detect potential
+discrepancies between authoritative and secondary sources, create an investigation record, and track
+it through detection, investigation, correction, and resolution. The website should make the entire
+research collection easy for someone unfamiliar with the project to understand, search, filter,
+compare, and independently verify. Include historical statistics showing **how often scoring
+discrepancies/corrections occur, what types are most common, how long they typically last, how
+often they affect the final score/total, and how rare incidents like the 213/214 discrepancy
+are**. The final product should allow a new person with no knowledge of this conversation to
+understand exactly what happened in each case, reproduce the research from the cited evidence, and
+see the difference between the original data, the correction, and the final official result.
 
-### Verification Policy
+It should solve the problem of having to manually check everything ourselves and having an up to
+date current feed.
 
-- **Work line by line verifying from official verified trusted sources, provide links for manual review.**
-- **There should be no manual input, work on your own to complete tasks.**
-- **Flag any irregularities for review.**
-- **No hallucinations.**
-- **Verify no hallucinations.**
-- **The goal is to get a full list that follows our requirements. No hallucinations. Verify line by line.**
+### Core values (kept as a focal point for every decision)
 
----
+- **Maximize P(Win)** — “Maximize the Probability of Winning”: our decision-making framework. In
+  every decision, we weigh tradeoffs, assess risk, and choose the path that maximizes the
+  probability of success. We set aside emotion and make tough calls to maximize P(Win).
+- **Own the Outcome** — We own results end to end, not just our slice. When problems arise and we
+  have the means to act, we act without waiting for permission or assignment. We treat failure and
+  success as signals and use them to improve. We stay accountable to the final outcome.
 
-## Project Overview
+### Operating rules (binding on every session)
 
-This repo is a **continuously updated database and monitoring system** for NBA scoring discrepancies.
-
-### The 213 vs 214 Problem
-
-One source showed 213-point final total while another showed 214. Why? Our research shows this is typically:
-- A free throw made but recorded as missed (1-point error)
-- A 2-pointer misclassified as 3-pointer or vice versa (1-point error)
-- One data provider updated after NBA correction, another didn't
-
-Example: Warriors vs Blazers Oct 23 2024 - originally 139-104 (243 total), corrected to 140-104 (244 total). If you compared old vs new, you'd see 243 vs 244 - same pattern as 213 vs 214.
-
-### What We Track
-
-Every verifiable case where:
-- Official score was incorrect and later corrected
-- Play-by-play, box score, scoreboard, official scorer record was wrong
-- Third-party data feed disagreed with official
-- Scoreboard showed wrong score vs official book
-- Broadcast scorebug showed wrong data (timeouts, score)
-
-### Classification
-
-**Critical distinction:** Was NBA's official record itself incorrect, or only secondary source?
-
-- **Official incorrect:** NBA's own stat crew entered wrong data, later corrected via statement (e.g., Melton FT, Robinson III 2 vs 3)
-- **Secondary only:** NBA correct, but ESPN, broadcast, betting feed wrong/delayed (e.g., NBC/Amazon timeout scorebug errors 2026)
-
----
-
-## Verified Database (Current: 12 Cases)
-
-### Modern Official Corrections (3 cases)
-
-1. **2024-10-23 GSW @ POR** - De'Anthony Melton FT: 139-104 → 140-104 (243 vs 244 total, 1-pt)
-   - Sources: [NBA.com](https://www.nba.com/news/nba-finds-scoring-error-warriors-blazers), [ESPN](https://www.espn.com/nba/story/_/id/41990836/nba-acknowledges-error-adjusts-warriors-trail-blazers-score)
-   - Type: free_throw_not_counted, verified
-
-2. **2024-11-07 CLE @ WAS** - Tre Johnson FT: 148-114 → 148-115 (262 vs 263 total, 1-pt)
-   - Sources: [The Athletic](https://www.nytimes.com/athletic/6790005/2025/11/08/nba-washington-wizards-cleveland-cavaliers-incorrect-score/), [Hoops Wire](https://hoopswire.com/nba-correctes-final-score-of-cavs-wizards-game-after-made-free-throw/)
-   - Type: free_throw_not_counted, verified
-
-3. **2017-01-20 IND @ LAL** - Glenn Robinson III 2 vs 3: 108-96 → 108-95 (204 vs 203 total, 1-pt)
-   - Sources: [NBA.com/Lakers](https://www.nba.com/lakers/releases/nba-corrects-scoring-error-from-pacers-lakers-game), [ESPN](https://www.espn.com/nba/story/_/id/18569405/nba-corrects-scoring-error-los-angeles-lakers-indiana-pacers-game)
-   - Type: three_pointer_misclassified, verified
-
-### Historical Protests - Only 6 Upheld in NBA History (6 cases)
-
-All 6 successful protests documented - they all involve scoring or record-keeping errors:
-
-4. **2007-12-19 MIA @ ATL** - Shaq foul out error, Hawks fined $50k, replay 51.9 sec, final 117-111 → 114-111
-5. **1982-11-30 LAL @ SAS** - Double lane violation, original 137-132 2OT → replay 117-114 SAS wins
-6. **1978-11-08 NJN @ PHI** - 3 technical fouls error, original 137-133 → replay 123-117, 3 players played for both teams
-7. **1971-12-03 CLE @ BUF** - Throw-in location error, replay last 4 sec
-8. **1969-11-06 ATL @ CHI** - Phantom buzzer, Boerwinkle tip, replay 1 sec tied 124-124
-9. **1952-11-28 MIL @ PHI** - Illegal substitution, 4-on-5 rule, original 78-77 MIL → replay 72-69 PHI
-
-Sources: [NBA.com protest process](https://www.nba.com/news/nba-protest-process-mavericks-await-news), [Fadeaway World](https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned)
-
-### Secondary Source Errors (2 cases)
-
-10. **2026-04-20 NYK vs ATL (Playoffs)** - NBC scorebug showed NYK had timeout when 0 left, total 213 (matches prompt!)
-    - Sources: [Front Office Sports](https://frontofficesports.com/nbc-amazon-crucial-scorebug-errors-nba-postseason/), [Yahoo](https://sports.yahoo.com/nba/article/nbc-apologizes-for-data-issue-erroneous-timeout-on-scorebug-that-caused-confusion-in-knicks-hawks-game-2-161013275.html)
-    - Type: scorebug_timeout_error, secondary only
-
-11. **2026-04-15 CHA vs MIA (Play-in)** - Amazon scorebug timeout error + hardware failure
-
-### Other Stat Corrections (1 case)
-
-12. **2021-10-22 HOU vs MIN** - Kevin Porter Jr. 20/9 → 18/10, no total impact, partially verified
+1. **Work line by line, verifying from official, verified, trusted sources. Provide links for
+   manual review.** No manual input is required from the user; work autonomously to completion.
+2. **Flag any irregularities for review. No hallucinations. Verify no hallucinations.**
+3. The goal is a **full list that follows the requirements above — verified line by line**.
+4. **Run every task through multiple passes:** Pass 1 implement + verify → Pass 2 hunt bugs, gaps,
+   wrong assumptions, edge cases, fix all → Pass 3 re-check against this brief, improve accuracy /
+   reliability / completeness / quality. Never stop after Pass 1.
 
 ---
 
-## Statistics
+## 2. What exists today
 
-From verified data (12 cases):
+| Piece | Location | Status |
+|---|---|---|
+| Canonical case database (12 verified-partial + 1 unverified stub) | `data/cases/*.json` → `data/cases.json` | ✅ Live |
+| Canonical record schema + validation | `data/cases-schema.json`, `scripts/validate.py` | ✅ Live |
+| Collection statistics (regenerated, caveated) | `data/stats.json` via `scripts/compute_stats.py` | ✅ Live |
+| Source reliability tiers | `data/sources.json` | ✅ Live |
+| Continuous monitor (ESPN vs NBA liveData + PBP) | `scripts/monitor.py`, `monitor/STATE.md` | ✅ Live (runs in CI; self-test passes offline) |
+| Investigation log / live feed | `data/investigations.json` | ✅ Live (empty = no open detections) |
+| Public website (search, filter, compare, verify) | `docs/` → GitHub Pages | ✅ Live |
+| CI: validate on push/PR | `.github/workflows/validate.yml` | ✅ Live |
+| CI: scheduled monitoring | `.github/workflows/monitor.yml` | ✅ Live (active after merge to `main`) |
+| CI: Pages deploy | `.github/workflows/pages.yml` | ✅ Live (needs Pages → GitHub Actions enabled once) |
+| Verification log + methods | `VERIFICATION.md` | ✅ Live |
+| Limitations + roadmap | `ROADMAP.md` | ✅ Live |
+| Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | ⚠️ Preserved, audit-flagged (see §7) |
+| Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | 📦 Archived, standalone |
 
-- **Total cases:** 12
-- **1-point discrepancies (213/214 pattern):** 3 modern + 2 historical = 5 cases = **41.7%** - NOT rare, actually most common!
-- **Affects final total:** 75%
-- **Official record incorrect:** 75%
-- **Secondary only:** 16.7%
-- **Protests upheld:** 6 (all in NBA history)
-- **Most common type:** free_throw_not_counted (modern), technical/lane violations (historical)
-- **Avg time to correction:** 1 day (modern FT errors) to 7 days (2017), months for protests
-- **Rarity of 213/214:** NOT rare - 1-point errors are expected pattern. Rarity is in *detection*, not occurrence.
+**Originating 213-vs-214 report:** tracked as `0000-00-00-originating-213-vs-214-report`
+with status `unverified`. The game is unidentified — it must not be cited as fact until the
+checklist in that record is satisfied.
 
----
-
-## System Architecture
-
-### Continuous Monitoring
-
-```
-NBA Official API →\
-ESPN API ---------> MultiSourceFetcher → DiscrepancyDetector → Alert → Investigation Record → GitHub Issue / Log
-BR (scraping) ---->/
-Broadcast feeds ->/
-```
-
-- **Detection:** Compare totals across sources every 5 minutes during games
-- **Investigation:** Auto-create record with detection details, potential causes, next steps
-- **Correction:** Check for official NBA statements, update database
-- **Resolution:** Mark resolved, preserve original vs corrected
-
-### Files
-
-```
-data/
-  discrepancies.json      # Main verified database
-  schema.json            # JSON schema for validation
-  statistics.json        # Auto-generated stats
-  latest_check.json      # Last monitoring run
-  logs/                  # Daily monitoring logs
-  live_alerts.json       # Live alerts
-
-src/
-  models.py              # Data models
-  nba_api_client.py      # Multi-source fetchers
-  discrepancy_detector.py # Core detection logic
-  monitor.py             # Continuous monitoring daemon
-
-docs/
-  index.html             # GitHub Pages site
-  style.css              # Clean UI
-  app.js                 # Search, filter, compare
-  data.json              # Copy of discrepancies.json for site
-  statistics.json        # Copy for site
-
-research/
-  DISC-*.md              # Individual case files with sources
-
-.github/workflows/
-  monitor.yml            # GitHub Action: run monitoring every 15 min during season
-  pages.yml              # Deploy GitHub Pages
-```
-
-### Running Monitoring
+## 3. Quick start
 
 ```bash
-pip install -r requirements.txt
-python src/monitor.py --date 2024-10-23  # Single check
-python src/monitor.py --continuous --interval 300  # Continuous, 5 min
+# validate every canonical case (anti-hallucination rules enforced)
+python3 scripts/validate.py
+
+# recompute statistics + rebuild the site data bundle
+python3 scripts/compute_stats.py
+python3 scripts/build_site_data.py
+
+# offline monitor self-test (no network; uses synthetic 213-vs-214 fixture)
+python3 scripts/monitor.py --self-test
+
+# live monitor (needs internet: ESPN + NBA CDN)
+python3 scripts/monitor.py --date 20250115 --lookback 1
+
+# preview the site
+cd docs && python3 -m http.server 8080
 ```
 
----
+## 4. Repository map
 
-## Website (GitHub Pages)
-
-Clean, user-friendly, simple and easy to use. Organized and clean. Includes all relevant information in easy to read format with official verified links as sources for review.
-
-**Features:**
-- Search, filter by type, verification, impact
-- Side-by-side original vs corrected vs final official
-- Every claim has direct link to official source
-- Statistics dashboard
-- Live monitoring status
-- Reproducibility guide
-
-**Deploy:** GitHub Pages from `docs/` folder on `main` branch.
-
-**Local dev:**
-```bash
-cd docs
-python -m http.server 8000
-# Open http://localhost:8000
+```
+├── README.md                  ← you are here (read first, every session)
+├── VERIFICATION.md            ← methods, source hierarchy, line-by-line log (+ PR #2 appendix)
+├── ROADMAP.md                 ← limitations, next-session work, harmonization plan
+├── CONTRIBUTING.md            ← prior-session contribution guide (references data/schema.json)
+├── index.html                 ← root redirect to docs/ (prior session, still valid)
+├── data/
+│   ├── cases-schema.json      ← canonical record contract (required fields, enums, rules)
+│   ├── cases/*.json           ← canonical store: one file per case; null = unknown, never guessed
+│   ├── cases.json             ← generated aggregate (do not hand-edit)
+│   ├── stats.json             ← generated stats (caveated: collection-only)
+│   ├── sources.json           ← reliability tiers + authoritative references
+│   ├── investigations.json    ← monitor's open/resolved detection log
+│   ├── schema.json            ← LEGACY schema for discrepancies.json (PR #2; kept for its tooling)
+│   ├── discrepancies.json     ← LEGACY store (PR #2; leads pending re-verification)
+│   ├── statistics.json        ← LEGACY stats (PR #2; see audit flags before citing)
+│   ├── latest_check.json      ← LEGACY monitor output (PR #2)
+│   └── live_alerts.json       ← LEGACY alerts (PR #2)
+├── scripts/                   ← canonical tooling (stdlib only): validate, compute_stats,
+│                                build_site_data, monitor (+ fixtures/)
+├── src/                       ← LEGACY tooling (PR #2; needs API keys; manual runs only)
+├── research/                  ← LEGACY case notes (PR #2; 1 of 12 listed files present)
+├── monitor/STATE.md           ← how canonical monitoring works, lifecycle, runbook
+├── archive/session-7b4d64dc-site/ ← PR #2 site + README, byte-identical, standalone
+├── docs/                      ← canonical GitHub Pages site (index.html, app.js, styles.css, data/)
+└── .github/workflows/         ← validate.yml, monitor.yml, pages.yml
 ```
 
----
+## 5. How to add or change a canonical case (no-hallucination workflow)
 
-## How to Verify No Hallucinations
+1. Create/edit `data/cases/<YYYY-MM-DD>-<slug>.json` following `data/cases-schema.json`.
+2. Every factual claim needs a `sources[]` entry with a direct `https://` link, publisher, tier,
+   and `confirms` text. Unknown fields stay `null` with an `open_questions[]` entry.
+3. Rule first on `classification.layer`: was the NBA's official record wrong, or only secondary?
+4. Run `python3 scripts/validate.py` — it fails on placeholder URLs, illegal enums, missing
+   questions, and status/source mismatches.
+5. Run `compute_stats.py` + `build_site_data.py`, review the diff, open a PR.
+6. Never promote `unverified` → `verified-partial` without dated evidence attached; never use
+   `verified` unless ≥2 sources (incl. a strong tier) corroborate and zero questions remain.
+7. To adopt a PR #2 lead: re-verify every fact independently (the 2017 Robinson III case is the
+   template), then write a fresh `data/cases/` record. Never bulk-import `discrepancies.json`.
 
-1. **Check every source link** in `data/discrepancies.json` - visit URL, confirm title and facts match
-2. **Check research files** in `research/` - each case has markdown with sources
-3. **Run `python src/monitor.py`** - should fetch real data, not fake
-4. **Check GitHub Pages** - all data comes from `data/discrepancies.json`, no hidden data
-5. **Look for unverified tags** - anything unverified is labeled `requires_investigation` or `partially_verified`
-6. **Check dates** - all dates must be plausible (no future games beyond current date per system prompt 2026-10-07)
+## 6. Verification & provenance
 
-**Current verification status:**
-- 10 cases `verified` (multiple independent official sources)
-- 1 case `partially_verified` (Porter Jr. - limited primary sources, needs more investigation)
-- 0 cases `unverified` or `disputed` - we don't include unverified
+- Methods, tier definitions, and the line-by-line review log: **`VERIFICATION.md`**.
+- Each canonical case embeds `reproduce_steps` so a stranger can re-derive it from the cited evidence.
+- Statistics carry a machine-readable scope caveat: **collection-only, never league-wide rates**.
+- See **`ROADMAP.md`** for limitations, known gaps, and the suggested next-session plan.
 
----
+## 7. Prior-session implementation (PR #2) — preserved, not deleted
 
-## Limitations & Next Work
+An earlier session merged a parallel implementation (PR #2). The merge kept it intact:
 
-### What needs to be done next session
-
-1. **Historical sweep:** Systematically review 1946-present box scores for final score changes. Currently only 3 modern + 6 protests. Need to scrape Basketball-Reference and check for corrections via Wayback Machine.
-2. **Automated archiving:** Integrate Wayback Machine API to archive original box scores before correction, preserving evidence.
-3. **Video verification:** For each play, need video clip link (NBA.com video where available, e.g., Robinson III case has video). Currently some cases lack video.
-4. **Yahoo fantasy stat corrections:** Scrape https://basketball.fantasysports.yahoo.com/nba/444/statcorrections daily - this logs stat corrections that may not have official NBA statement.
-5. **ESPN stat corrections page:** Monitor https://support.espn.com/hc/en-us/articles/360056679592-Stat-corrections
-6. **Betting impact:** Integrate with sportsbook APIs to quantify betting impact of each discrepancy.
-7. **OCR for scoreboard:** Add image OCR to detect scoreboard vs official book discrepancies from broadcast footage.
-8. **Official NBA API key:** Current monitoring uses free APIs (ESPN, balldontlie) which require API key now. Need official NBA API access for production.
-9. **GitHub Issues integration:** When discrepancy detected, auto-create GitHub issue with investigation template.
-10. **Email/Slack alerts:** Add notifications for 1-point discrepancies (213/214 pattern).
-
-### Limitations
-
-- **Coverage:** Only 12 cases currently - real number is higher but requires systematic historical research
-- **API limits:** Free APIs rate-limited, may miss live discrepancies
-- **Secondary sources:** Many data providers don't have public APIs
-- **Broadcast errors:** Hard to detect automatically without watching broadcasts
-- **Time to correction:** Some corrections happen days later, need to re-check last 7 days of games daily
-
----
-
-## Contributing
-
-- **No manual input** per requirements - but you can submit PR with new verified case
-- Must include at least 2 independent official sources with direct links
-- Must follow schema in `data/schema.json`
-- Must label verification_status honestly
-- Must not infer missing info
-
----
-
-## License
-
-MIT - Use freely, but verify line by line, no hallucinations.
-
----
-
-## Quick Start for New Person
-
-1. Read this README (original prompt at top)
-2. Visit GitHub Pages site: `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/` (after enabling Pages)
-3. Browse cases, click source links to verify
-4. Check `data/discrepancies.json` for raw data
-5. Run `python src/monitor.py` to see monitoring
-6. See `docs/index.html` for UI code
-
-**You should now understand exactly what happened in each case, reproduce research from cited evidence, and see difference between original, correction, and final official result.**
-
----
-
-*Built with Core Values: Maximize P(Win) • Own the Outcome • Verify line by line, no hallucinations.*
+- **Valuable and credited:** its leads surfaced the verifiable 2017 Robinson III correction
+  (now a canonical case) and the league-official “only six upheld protests” record, which
+  corrected this project's own USA Today-based “3 since 1952” note. Its per-case verification
+  steps are preserved verbatim in `VERIFICATION.md` Appendix A.
+- **Audit-flagged (do not cite as fact):** `DISC-20241107-CLE-WAS-001` carries a wrong year
+  (2024 vs demonstrated 2025); `research/` lists 12 files but ships 1; legacy stats predate
+  the audit. Full findings: `VERIFICATION.md` §6.
+- **Tooling:** `src/` needs API keys for live use (per its own README); the canonical CI monitor
+  is the keyless `scripts/monitor.py`. Harmonization plan: `ROADMAP.md` §5.

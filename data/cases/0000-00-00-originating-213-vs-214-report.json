@@ -1,0 +1,75 @@
+{
+  "id": "0000-00-00-originating-213-vs-214-report",
+  "title": "UNVERIFIED: Originating report — one source showed a 213-point final total while another showed 214 (game unidentified)",
+  "status": "unverified",
+  "verification_level": "unverified-report",
+  "game_date": null,
+  "season": null,
+  "away_team": null,
+  "home_team": null,
+  "venue": null,
+  "incident_summary": "The project was founded on an incident report in which one source displayed a 213-point combined final total for an NBA game while another source displayed 214. CRITICAL: as of the last review date, the game, date, teams, competing sources, and screenshots for this specific report have NOT been identified or verified. This record exists ONLY as a tracked investigation stub so the report is not lost and not treated as fact. Nothing on this record — no game, no date, no teams, no cause — may be cited as verified until primary evidence is attached.",
+  "classification": {
+    "type": "unknown",
+    "layer": "unresolved",
+    "outcome": "pending"
+  },
+  "period_clock": null,
+  "scoring_play": null,
+  "score_before": null,
+  "affected_player": null,
+  "affected_team": null,
+  "originally_reported": {
+    "value": "One source: 213 combined total; another source: 214 combined total (UNVERIFIED — game and sources unidentified)",
+    "total": null,
+    "basis": "Founder's incident report only. No corroborating source. Do not cite."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction documented — nothing verified to correct."
+  },
+  "final_official": {
+    "value": null,
+    "total": null,
+    "basis": "Unknown — game unidentified."
+  },
+  "sources_disagreed": [],
+  "cause": {
+    "determination": "unknown",
+    "detail": "Unknown. Candidate hypotheses (feed lag, uncorrected missed-FT entry like the 2024/2025 cases, 2-vs-3 reclassification, display caching) are ONLY hypotheses — do not assert any of them."
+  },
+  "official_record_was_wrong": "undetermined",
+  "timeline": [
+    {
+      "date": "2026-10-07",
+      "event": "Project founded; originating 213-vs-214 report logged as UNVERIFIED investigation stub with no game identification.",
+      "source_index": null
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://github.com/buffedlizard55-lab/ScoringDiscrepNBA",
+      "publisher": "Project repository (incident report, not evidence)",
+      "tier": "tertiary-unverified",
+      "confirms": "Only that this report motivated the project. Confirms NOTHING about any game.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Which game? (date, teams — REQUIRED before any other field may be filled)",
+    "Which two sources disagreed, with URLs and access timestamps?",
+    "Screenshots or archived copies of both displayed values?",
+    "Was the disagreement transient (feed lag) or persistent (entry error)?",
+    "What did the official NBA box score show at the time and 24h later?",
+    "RESOLUTION RULE: this record graduates to under-investigation only when game + both sources are identified with dated evidence; to verified-partial only when the cause and final official value are corroborated."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Recover the original observation: game, both sources, timestamps, screenshots.",
+    "Check the official NBA box score and play-by-play for that game now and via archive.",
+    "Classify per schema and attach all evidence links before changing status."
+  ],
+  "last_reviewed": "2026-10-07"
+}

@@ -1,0 +1,95 @@
+{
+  "id": "2025-11-07-cle-was-johnson-ft",
+  "title": "Cavaliers @ Wizards — Tre Johnson made free throw recorded as a miss, final score corrected 148-114 to 148-115 (Nov 7-8, 2025)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2025-11-07",
+  "season": "2025-26",
+  "away_team": "Cleveland Cavaliers",
+  "home_team": "Washington Wizards",
+  "venue": "Washington, D.C. (Wizards home arena)",
+  "incident_summary": "With 8:15 remaining in the second quarter, Wizards rookie Tre Johnson shot two free throws and made both, but the first attempt was incorrectly entered as a miss. The game ended with an announced final of Cavaliers 148, Wizards 114. The next morning (Nov 8, 2025), the NBA acknowledged the error in a statement and updated the official final score to Cavaliers 148, Wizards 115 — a one-point correction that changed the combined total from 262 to 263. Johnson's line was updated to 19 points on 2-of-3 free throws.",
+  "classification": {
+    "type": "free-throw-entry-error",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-next-day"
+  },
+  "period_clock": "Q2, 8:15 remaining",
+  "scoring_play": "Tre Johnson (WAS) first free throw attempt of a two-shot sequence — made, but entered as missed. He made both attempts.",
+  "score_before": "Cavaliers led 50-39 at the time (per Bleacher Report, secondary — not confirmed by other outlets in this pass)",
+  "affected_player": "Tre Johnson (WAS)",
+  "affected_team": "Washington Wizards",
+  "originally_reported": {
+    "value": "Cavaliers 148, Wizards 114",
+    "total": 262,
+    "basis": "Announced final at end of game Nov 7, 2025, before correction (The Athletic, Bleacher Report, HoopsWire)."
+  },
+  "corrected_value": {
+    "value": "Cavaliers 148, Wizards 115 (+1 WAS)",
+    "total": 263,
+    "basis": "NBA statement Nov 8, 2025 as quoted by multiple outlets: Johnson's first FT 'was incorrectly entered as a missed free throw, when in fact he made both' and 'game statistics have been corrected.'"
+  },
+  "final_official": {
+    "value": "Cavaliers 148, Wizards 115",
+    "total": 263,
+    "basis": "Corrected official final per The Athletic, Bleacher Report, HoopsWire, Nov 8-9, 2025."
+  },
+  "sources_disagreed": [
+    "In-arena stat crew game-night entry (first FT missed) vs. corrected league record (both made)",
+    "Secondary outlets briefly carried the 148-114 final before updating to 148-115"
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Human error by the in-arena statistician, who missed the made free throw. NBA SVP of league-operations communications Tim Frank told The Athletic it was 'just a case of human error' and 'not something that happens a lot'; the league's stats auditors missed it in real time and caught it in the full post-game review."
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "2025-11-07",
+      "event": "Cavaliers @ Wizards in D.C.; Johnson's made first free throw with 8:15 left in Q2 is entered as a miss and the scoreboard does not move. Game ends announced as 148-114 Cavaliers.",
+      "source_index": 0
+    },
+    {
+      "date": "2025-11-08",
+      "event": "NBA issues a statement acknowledging the error and the game statistics are corrected to a 148-115 final. Johnson's line becomes 19 points, 2-of-3 FTs.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.nytimes.com/athletic/6790005/2025/11/08/nba-washington-wizards-cleveland-cavaliers-incorrect-score/",
+      "publisher": "The Athletic (NYT)",
+      "tier": "major-sports-media",
+      "confirms": "Full incident: 8:15 Q2, Johnson made both FTs, first entered as miss, 148-114 to 148-115, NBA statement text, Tim Frank 'human error' quote, auditor process, 19 pts / 2-of-3 FTs, records (CLE 6-3, WAS 1-8).",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://bleacherreport.com/articles/25286861-nba-makes-scoring-change-cavaliers-wizards-over-tre-johnson-free-throw",
+      "publisher": "Bleacher Report",
+      "tier": "secondary-digital",
+      "confirms": "Correction 148-114 to 148-115; 50-39 score at time; Johnson to 19 points; notes similar 2024-25 Warriors-Blazers adjustment; rarity note.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://hoopswire.com/nba-correctes-final-score-of-cavs-wizards-game-after-made-free-throw/",
+      "publisher": "HoopsWire",
+      "tier": "secondary-digital",
+      "confirms": "Same core facts; scoreboard did not move; next-morning league acknowledgment; McCollum 25 / Mitchell 24 scoring leaders.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "A direct NBA.com / @NBAOfficial primary-source URL for this correction was not located in this pass — the league statement is quoted secondhand. Priority: find the official release.",
+    "Exact original Johnson FT line before correction (reported as updated to 2-of-3; original 1-of-3 is arithmetic, not directly quoted — treat as derived).",
+    "Betting lines/total for this game were not found in the reviewed sources — do not assert any wagering impact."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Open The Athletic article and confirm the 8:15 Q2 play, the NBA statement quote, the Frank quote, and the 148-114 to 148-115 change.",
+    "Cross-check the corrected 148-115 final on the official NBA box score and Basketball-Reference game page.",
+    "Compare against an archived pre-correction box score from Nov 7 to show the original 148-114 value.",
+    "Attempt to locate the primary NBA statement (NBA.com news / @NBAOfficial, Nov 8, 2025) and record its URL here when found."
+  ],
+  "last_reviewed": "2026-10-07"
+}

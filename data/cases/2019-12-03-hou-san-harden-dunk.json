@@ -1,0 +1,117 @@
+{
+  "id": "2019-12-03-hou-san-harden-dunk",
+  "title": "Rockets @ Spurs — James Harden's made dunk not counted; Rockets protest denied, 135-133 2OT final stands (Dec 3-9, 2019)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2019-12-03",
+  "season": "2019-20",
+  "away_team": "Houston Rockets",
+  "home_team": "San Antonio Spurs",
+  "venue": "San Antonio (Spurs home arena)",
+  "incident_summary": "With 7:50 left in the fourth quarter and Houston leading 102-89, James Harden stole the ball and dunked it with such force that the ball cleared the net, whipped around the rim and bounced upward/out — creating the appearance of a miss. The officiating crew did not count the basket and ruled the ball out of bounds off Harden; the Rockets' attempt to challenge the call was not granted. Houston argued the made basket was worth two points and the score was recorded incorrectly (a misapplication of rules, not a judgment call). The Rockets filed a formal protest within the 48-hour window seeking to replay the final 7:50 from that point. On Dec 9, 2019, Commissioner Adam Silver denied the protest; the league disciplined the three officials for misapplying the Coach's Challenge rule and acknowledged that a properly granted replay would have shown the basket counted. The 135-133 double-overtime Spurs win stands and the two points were never added.",
+  "classification": {
+    "type": "missed-made-basket",
+    "layer": "official-record-wrong-stands",
+    "outcome": "stands-protest-denied"
+  },
+  "period_clock": "Q4, 7:50 remaining",
+  "scoring_play": "James Harden (HOU) steal and dunk — physically a made basket (league later acknowledged replay would show it counted), ruled no-basket on the floor.",
+  "score_before": "Rockets 102, Spurs 89 (7:50 Q4) — per CNBC/USA Today. If counted, Rockets lead grows to 15 (104-89).",
+  "affected_player": "James Harden (HOU)",
+  "affected_team": "Houston Rockets",
+  "originally_reported": {
+    "value": "No basket; play ruled a miss with ball out of bounds off Harden; Rockets lead stays 102-89",
+    "total": null,
+    "basis": "On-floor ruling Dec 3, 2019 (crew chief James Capers postgame explanation; protest reporting via USA Today, NBC Sports)."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction was ever applied — the basket was never added to the score. The league acknowledged the error but denied the protest."
+  },
+  "final_official": {
+    "value": "Spurs 135, Rockets 133 (2OT)",
+    "total": 268,
+    "basis": "Final official result; protest denied Dec 9, 2019 (CNBC, Click2Houston/AP)."
+  },
+  "sources_disagreed": [
+    "On-floor officials' ruling (no basket) vs. video evidence and the league's own post-hoc acknowledgment (basket was good)",
+    "Rockets' position (misapplication of rules: made basket must score) vs. Spurs' position (no misapplication; Rockets had 2OTs to win) — Silver sided with Spurs that a protest replay was not warranted",
+    "Crew chief's postgame account (basket-interference reviewable; challenge not made within 30 seconds) vs. Rockets' account (no basket-interference call was made; D'Antoni not granted a challenge)"
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Two confirmed elements: (1) officials misjudged a made dunk as a miss in real time because of the ball's unusual ricochet; (2) the crew misapplied the Coach's Challenge rule by failing to grant Houston's challenge — the league disciplined all three officials (James Capers, Kevin Scott, John Butler) for this. Whether D'Antoni requested the challenge in time remains disputed between the crew and the team."
+  },
+  "official_record_was_wrong": "yes-stands",
+  "timeline": [
+    {
+      "date": "2019-12-03",
+      "event": "Rockets @ Spurs. Harden's dunk with 7:50 left in Q4 is not counted; Rockets lead 102-89 at the time. Game goes to double overtime; Spurs win 135-133.",
+      "source_index": 3
+    },
+    {
+      "date": "2019-12-05",
+      "event": "Rockets prepare/file formal protest within 48-hour window, citing misapplication of rules (points not awarded for a made basket; challenge not granted). Both teams given five days to submit evidence.",
+      "source_index": 0
+    },
+    {
+      "date": "2019-12-09",
+      "event": "Commissioner Silver denies the protest; league announces the three officials were disciplined for misapplying the Coach's Challenge rule and acknowledges a proper replay would have shown Harden's basket counted.",
+      "source_index": 3
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://eu.usatoday.com/story/sports/nba/rockets/2019/12/06/rockets-protest-spurs-loss-james-harden-uncounted-dunk/2625196001/",
+      "publisher": "USA Today",
+      "tier": "major-sports-media",
+      "confirms": "Protest filed within 48h; replay-from-7:50 request; misapplication-of-rules argument; Capers 30-second explanation vs D'Antoni account; 5+5 day process; ~Dec 15 expected ruling window.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://nba.nbcsports.com/2019/12/05/rockets-to-officially-protest-loss-to-spurs-due-to-disallowed-james-harden-dunk/",
+      "publisher": "NBC Sports (ProBasketballTalk)",
+      "tier": "major-sports-media",
+      "confirms": "Officials admitted postgame the dunk should have counted; Rockets led by 20 with 3:23 left in Q3 and 10 with 3:53 left in Q4; protest bar (misapplication seriously inhibiting win chance); Westbrook backcourt-violation no-call context.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.click2houston.com/sports/2019/12/06/houston-rockets-file-protest-after-james-hardens-tuesday-dunk-against-the-spurs-was-not-counted/",
+      "publisher": "Click2Houston (KPRC/NBC affiliate)",
+      "tier": "team-beat",
+      "confirms": "135-133 2OT final; if counted Rockets would have won in regulation (outlet's characterization); Silver to decide; dunk-through-net-then-out description.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.cnbc.com/2019/12/09/nba-denies-houston-rockets-protest-in-dec-3-loss-to-san-antonio-spurs.html",
+      "publisher": "CNBC",
+      "tier": "major-sports-media",
+      "confirms": "Protest denied Dec 9; officials Capers/Scott/Butler disciplined; league statement on ball clearing net and whipping upward; 102-89 score at 7:50; Spurs response (22-point lead, 2OTs); Silver agreed protest not warranted; replay would have shown basket counted.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [
+    {
+      "claim": "Whether D'Antoni requested a Coach's Challenge within the allowed window",
+      "positions": [
+        "Crew chief Capers (postgame): the initial call was reviewable but Houston did not challenge within 30 seconds.",
+        "D'Antoni/Rockets: officials were unclear about what the call was, so he did not know what to challenge; no basket-interference call was actually made."
+      ]
+    }
+  ],
+  "open_questions": [
+    "Primary NBA press-release URL for the Dec 9, 2019 denial (currently sourced via CNBC/AP-style reporting) — priority to locate.",
+    "Official play-by-play text for the 7:50 Q4 sequence (exact ruling language on the floor).",
+    "Whether any sportsbook voided or adjusted wagers on this game (not found in reviewed sources — do not assert)."
+  ],
+  "betting_notes": "Had the dunk counted at 7:50, the Rockets' regulation total would have been 2 points higher; the game still went to 2OT at 135-133. No verified sportsbook-adjustment reporting was found in this pass — do not assert wagering impact.",
+  "reproduce_steps": [
+    "Confirm the 102-89 / 7:50 setup and 135-133 2OT final via CNBC and Click2Houston.",
+    "Confirm the protest filing, 48-hour rule, and misapplication argument via USA Today and NBC Sports.",
+    "Confirm the Dec 9 denial and officials-disciplined statement via CNBC.",
+    "Watch archived video of the dunk to see the through-the-net ricochet described by the league.",
+    "Locate the primary NBA denial statement and record its URL here."
+  ],
+  "last_reviewed": "2026-10-07"
+}

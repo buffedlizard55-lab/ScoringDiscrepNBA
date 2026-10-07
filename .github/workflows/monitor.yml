@@ -1,106 +1,51 @@
-name: NBA Scoring Discrepancy Monitor
+name: Monitor live scores
 
 on:
   schedule:
-    # Run every 15 minutes during NBA season (Oct-June)
-    # UTC times: 23:00-06:00 UTC covers US evening games (6pm-1am ET)
-    - cron: '*/15 * * * *'
+    # Every 20 min during typical NBA game windows (22:00-05:59 UTC daily)
+    - cron: "*/20 22-23,0-5 * * *"
+    # Nightly backfill sweep (catches next-day corrections)
+    - cron: "17 11 * * *"
   workflow_dispatch:
     inputs:
       date:
-        description: 'Date to check (YYYY-MM-DD), leave empty for today'
+        description: 'Date to check (YYYYMMDD), leave empty for today'
         required: false
         type: string
+
+permissions:
+  contents: write
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run monitoring check
+          python-version: "3.11"
+      # Canonical monitor: stdlib-only, no API keys (ESPN scoreboard vs NBA liveData).
+      # The legacy src/monitor.py (PR #2) remains runnable manually but needs API keys
+      # per its README; see ROADMAP.md harmonization notes before re-enabling in CI.
+      - name: Run discrepancy monitor (target date + 7-day backfill)
         run: |
           if [ -n "${{ inputs.date }}" ]; then
-            python src/monitor.py --date ${{ inputs.date }} --data-dir data
+            python3 scripts/monitor.py --date "${{ inputs.date }}" --lookback 7 || echo "monitor exit=$? (feeds may be unavailable off-season)"
           else
-            python src/monitor.py --data-dir data
+            python3 scripts/monitor.py --lookback 7 || echo "monitor exit=$? (feeds may be unavailable off-season)"
           fi
-
-      - name: Check for alerts
-        id: check_alerts
+      - name: Rebuild site data bundle
         run: |
-          if [ -f data/live_alerts.json ]; then
-            ALERT_COUNT=$(jq length data/live_alerts.json 2>/dev/null || echo 0)
-            echo "alert_count=$ALERT_COUNT" >> $GITHUB_OUTPUT
-            echo "Found $ALERT_COUNT alerts"
-          else
-            echo "alert_count=0" >> $GITHUB_OUTPUT
-          fi
-
-          if [ -f data/latest_check.json ]; then
-            cat data/latest_check.json | jq .
-          fi
-
-      - name: Commit updated data
+          python3 scripts/compute_stats.py
+          python3 scripts/build_site_data.py
+      - name: Commit new detections (if any)
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add data/
-          git add docs/data.json docs/statistics.json 2>/dev/null || true
-          
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
+          git config user.name "scoringdiscrep-monitor"
+          git config user.email "scoringdiscrep-monitor@users.noreply.github.com"
+          git add data/investigations.json data/stats.json data/cases.json docs/data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
           else
-            git commit -m "auto: monitoring update $(date -u +%Y-%m-%dT%H:%M:%SZ) - alerts: ${{ steps.check_alerts.outputs.alert_count }}"
+            git commit -m "monitor: scheduled score-check $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
           fi
-
-      - name: Create issue if alerts found
-        if: steps.check_alerts.outputs.alert_count != '0'
-        uses: peter-evans/create-issue-from-file@v5
-        with:
-          title: "🚨 Scoring Discrepancy Detected - ${{ steps.check_alerts.outputs.alert_count }} alerts"
-          content-filepath: data/latest_check.json
-          labels: "discrepancy, automated, requires-investigation"
-
-  deploy-pages:
-    needs: monitor
-    runs-on: ubuntu-latest
-    if: always()
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

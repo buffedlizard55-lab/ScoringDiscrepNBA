@@ -1,0 +1,9 @@
+{
+  "description": "Monitoring investigation records. The monitor (scripts/monitor.py) appends detections here and the site renders them as the live feed. Lifecycle: detected -> investigating -> correction-observed | explained-no-error -> resolved. Human review is required before any record becomes a case in data/cases/.",
+  "schema": {
+    "required": ["id", "created_utc", "game_date", "away_team", "home_team", "check", "status", "evidence", "history"],
+    "status_values": ["detected", "investigating", "correction-observed", "explained-no-error", "resolved", "escalated-to-case"],
+    "check_values": ["cross-source-total-mismatch", "pbp-recompute-mismatch", "quarter-sum-mismatch", "status-drift", "feed-unavailable"]
+  },
+  "records": []
+}

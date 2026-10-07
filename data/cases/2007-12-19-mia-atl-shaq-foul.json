@@ -1,0 +1,107 @@
+{
+  "id": "2007-12-19-mia-atl-shaq-foul",
+  "title": "Heat @ Hawks — Official scorer wrongly fouls out Shaquille O'Neal; protest upheld, final 51.9s replayed, Hawks win 114-111 (Dec 19, 2007 - Mar 8, 2008)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2007-12-19",
+  "season": "2007-08",
+  "away_team": "Miami Heat",
+  "home_team": "Atlanta Hawks",
+  "venue": "Atlanta (Hawks home arena)",
+  "incident_summary": "The Hawks' official scoring table mistakenly credited a fourth-quarter foul (called on Udonis Haslem with 3:24 left in regulation) to Shaquille O'Neal. As a result, when O'Neal was whistled in overtime with the Hawks leading 112-111, the table ruled it his sixth foul and disqualified him — it was only his fifth. Al Horford's subsequent free throws made it 114-111. Miami protested; on Jan 11, 2008 the NBA upheld the protest (the first granted since December 1982), fined Atlanta $50,000 for 'grossly negligent' failure to follow scoring procedures, and ordered the final 51.9 seconds replayed before the teams' next meeting on March 8, 2008. Neither team scored in the replay; the official final became Hawks 114, Heat 111 in overtime (replacing the original 117-111 result).",
+  "classification": {
+    "type": "official-scorer-book-error",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-via-replay"
+  },
+  "period_clock": "OT, 0:51.9 remaining (disqualification); root error Q4, 3:24 remaining (foul misattribution)",
+  "scoring_play": "Not a scoring play — a foul-attribution error in the official scorer's book that removed Miami's second-leading scorer/rebounder from a one-point overtime game.",
+  "score_before": "Hawks 112, Heat 111 at the time of O'Neal's disqualification (AP via Sun Journal); Hawks 114, Heat 111 after Horford's two free throws — the score from which the March 8 replay started (LA Times, AP).",
+  "affected_player": "Shaquille O'Neal (MIA) — wrongly disqualified; Udonis Haslem (MIA) — actual fouler at Q4 3:24",
+  "affected_team": "Miami Heat",
+  "originally_reported": {
+    "value": "Hawks 117, Heat 111 (OT) — with O'Neal recorded at six fouls",
+    "total": 228,
+    "basis": "Announced final Dec 19, 2007, later struck pending replay (LA Times, Daily Breeze)."
+  },
+  "corrected_value": {
+    "value": "Replay of final 51.9 seconds from Hawks 114, Heat 111 on March 8, 2008; no scoring in replay",
+    "total": null,
+    "basis": "NBA-ordered replay; neither team scored (OpenCourt; SI)."
+  },
+  "final_official": {
+    "value": "Hawks 114, Heat 111 (OT)",
+    "total": 225,
+    "basis": "Post-replay official final per Sports Illustrated's 2014 protest-history recap. FLAG: corroborate against Basketball-Reference/NBA game log — see open questions."
+  },
+  "sources_disagreed": [
+    "Official scorer's book (foul on O'Neal) vs. on-court officiating/stat crew (foul on Haslem) — the stat crew noticed the mistake but the table failed to respond effectively",
+    "Original 117-111 result (struck) vs. replay-decided 114-111 final"
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Confirmed scorer-table error: a Haslem foul was entered under O'Neal's name; the league-mandated timeout coordination between the official scorer and stat crew did not happen, so the mistake survived until after the game (when revised boxes showed O'Neal with six). Commissioner Stern ruled Atlanta 'grossly negligent' and fined the team $50,000."
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "2007-12-19",
+      "event": "Heat @ Hawks; Q4 3:24 Haslem foul is mis-credited to O'Neal; O'Neal wrongly disqualified in OT at 51.9s with Hawks up 112-111; Hawks win announced 117-111 in OT. Miami protests.",
+      "source_index": 0
+    },
+    {
+      "date": "2008-01-11",
+      "event": "NBA upholds Miami's protest (first since Dec 1982), fines Hawks $50,000, orders final 51.9 seconds replayed before the March 8 game in Atlanta from 114-111.",
+      "source_index": 0
+    },
+    {
+      "date": "2008-03-08",
+      "event": "Replay held before the scheduled Hawks-Heat game; neither team scores. Official final becomes Hawks 114, Heat 111 in OT.",
+      "source_index": 3
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.latimes.com/archives/la-xpm-2008-jan-12-sp-replay12-story.html",
+      "publisher": "Los Angeles Times (AP contributed)",
+      "tier": "major-sports-media",
+      "confirms": "Scorer error; Haslem foul at Q4 3:24 on O'Neal; 51.9s replay from 114-111; $50,000 fine; first upheld protest since Dec 1982; original 117-111 OT result.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.sunjournal.com/2008/01/12/heat-hawks-back-court-first-time-since-1982-nba-upholds-protest-requiring-replay-scorer-ruled-incorrectly-oneal-fouled/",
+      "publisher": "Sun Journal (Associated Press)",
+      "tier": "wire-ap",
+      "confirms": "112-111 at disqualification; home-team table personnel; mandated timeout coordination not followed; Horford FTs to 114-111; 'clear competitive disadvantage' league statement; O'Neal second-leading scorer/rebounder.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.dailybreeze.com/2008/01/12/heat-appeal-is-upheld-rare-nba-replay-set/amp/",
+      "publisher": "Daily Breeze (AP)",
+      "tier": "wire-ap",
+      "confirms": "117-111 struck from books pending replay; replay before March 8 game; Stern 'grossly negligent' ruling; stat crew noticed but table failed to respond.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.si.com/nba/2014/11/17/kings-filed-protest-after-loss-grizzlies",
+      "publisher": "Sports Illustrated",
+      "tier": "major-sports-media",
+      "confirms": "Replay held the following March with Hawks winning 114-111 in overtime; $50,000 fine recap.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Primary NBA Jan 11, 2008 ruling statement URL — priority to locate.",
+    "Independent confirmation of the post-replay 114-111 official final (currently single-sourced to SI 2014 recap) via Basketball-Reference or NBA game logs.",
+    "Exact tip time/attendance details of the March 8 replay session (not material to the scoring record; low priority)."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Confirm the foul misattribution, 51.9s replay order, and fine via the LA Times and AP reports.",
+    "Confirm the 112-111/114-111 sequence via the AP (Sun Journal) report.",
+    "Confirm the 114-111 post-replay final via SI, then corroborate on Basketball-Reference.",
+    "Locate the primary NBA ruling statement and record its URL here."
+  ],
+  "last_reviewed": "2026-10-07"
+}

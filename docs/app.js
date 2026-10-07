@@ -1,292 +1,247 @@
-/**
- * NBA Scoring Discrepancy Research - Frontend
- * Clean, user-friendly, no hallucinations
- */
-let allCases = [];
-let filteredCases = [];
-let statistics = {};
+/* ScoringDiscrepNBA site app — vanilla JS, no build step. */
+const TYPE_LABELS = {
+  "missed-made-basket": "Missed made basket",
+  "free-throw-entry-error": "Free-throw entry error",
+  "two-vs-three-point-ruling": "2-pt vs 3-pt ruling",
+  "scoreboard-display-error": "Scoreboard display error",
+  "official-scorer-book-error": "Official scorer book error",
+  "stat-correction-non-scoring": "Stat correction (non-scoring)",
+  "stat-correction-denied": "Correction requested, denied",
+  "timing-buzzer-dispute": "Timing / buzzer dispute",
+  "data-feed-conflict": "Data-feed conflict",
+  "unknown": "Unknown (under investigation)"
+};
+const LAYER_LABELS = {
+  "official-record-wrong-then-corrected": "Official record was wrong, then corrected",
+  "official-record-wrong-stands": "Official record disputed, stands",
+  "official-record-correct-secondary-wrong": "Official record correct; secondary wrong",
+  "unresolved": "Unresolved"
+};
+const OUTCOME_LABELS = {
+  "corrected-next-day": "Corrected next day",
+  "corrected-in-game": "Corrected in game",
+  "corrected-via-replay": "Corrected via replay",
+  "stands-protest-denied": "Stands (protest denied)",
+  "stands-no-review": "Stands (never reviewed)",
+  "stands-ruled-correct": "Stands (ruled correct)",
+  "pending": "Pending",
+  "unknown": "Unknown"
+};
+const STATUS_LABELS = {
+  "verified": "Verified",
+  "verified-partial": "Verified (partial)",
+  "under-investigation": "Under investigation",
+  "unverified": "UNVERIFIED",
+  "disputed": "Disputed",
+  "not-a-discrepancy": "Not a discrepancy"
+};
 
-async function loadData() {
-  try {
-    const res = await fetch('./data.json');
-    if (!res.ok) throw new Error('data.json not found');
-    allCases = await res.json();
-  } catch (e) {
-    console.warn('Failed to load data.json, trying ../data/discrepancies.json', e);
-    try {
-      const res2 = await fetch('../data/discrepancies.json');
-      allCases = await res2.json();
-    } catch (e2) {
-      console.error('Failed to load any data', e2);
-      allCases = [];
-    }
-  }
+let ALL_CASES = [];
 
-  try {
-    const res = await fetch('./statistics.json');
-    if (res.ok) statistics = await res.json();
-  } catch (e) {
-    console.warn('No statistics.json', e);
-  }
-
-  // If no stats, compute from cases
-  if (!statistics.total_cases) {
-    statistics = computeStats(allCases);
-  }
-
-  filteredCases = [...allCases];
-  renderStats();
-  renderCases();
-  setupFilters();
+function el(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function statusChip(s) {
+  const cls = s === "verified" ? "ok" : s === "verified-partial" ? "info"
+    : s === "unverified" ? "bad" : "warn";
+  return `<span class="chip ${cls}">${esc(STATUS_LABELS[s] || s)}</span>`;
+}
+function layerChip(l) {
+  const cls = l === "official-record-wrong-then-corrected" ? "warn"
+    : l === "official-record-wrong-stands" ? "bad"
+    : l === "official-record-correct-secondary-wrong" ? "ok" : "warn";
+  return `<span class="chip ${cls}">${esc(LAYER_LABELS[l] || l)}</span>`;
 }
 
-function computeStats(cases) {
-  const total = cases.length;
-  const byType = {};
-  const officialIncorrect = cases.filter(c => c.nba_official_record_incorrect).length;
-  const secondary = cases.filter(c => c.secondary_source_error).length;
-  const impact = cases.filter(c => c.impact_on_final_total).length;
-  const onePoint = cases.filter(c => Math.abs(c.impact_points || 0) === 1).length;
-  const protestUpheld = cases.filter(c => c.protest_upheld).length;
+async function loadJSON(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
+  return res.json();
+}
 
-  cases.forEach(c => {
-    const t = c.incident_type || 'unknown';
-    byType[t] = (byType[t] || 0) + 1;
-  });
+function renderStats(stats) {
+  el("stat-verified").textContent = stats.verified_count;
+  el("stat-total").textContent = stats.collection_size;
+  el("stat-score-changed").textContent = stats.final_score_changed_ids.length;
+  el("stat-onepoint").textContent = stats.one_point_total_change_ids.length;
+  el("stat-official-wrong").textContent =
+    Math.round(stats.headline.official_record_wrong_share * 100) + "%";
+  el("stat-secondary-only").textContent =
+    Math.round(stats.headline.secondary_only_share * 100) + "%";
+  el("scope-caveat").textContent = stats.scope_caveat;
+  el("stats-generated").textContent = `Collection statistics generated ${stats.generated}.`;
 
-  return {
-    total_cases: total,
-    by_type: byType,
-    official_record_incorrect_count: officialIncorrect,
-    secondary_source_error_count: secondary,
-    impact_on_final_total_count: impact,
-    impact_on_final_total_percent: total ? Math.round(impact/total*1000)/10 : 0,
-    official_incorrect_percent: total ? Math.round(officialIncorrect/total*1000)/10 : 0,
-    one_point_discrepancies: onePoint,
-    one_point_percent: total ? Math.round(onePoint/total*1000)/10 : 0,
-    protest_upheld_count: protestUpheld,
-    rarity_note: `${onePoint} of ${total} cases are 1-point total discrepancies like 213 vs 214`
+  const dist = (counts, mountId) => {
+    const mount = el(mountId);
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+    mount.innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+      const label = TYPE_LABELS[k] || LAYER_LABELS[k] || OUTCOME_LABELS[k] || k;
+      const pct = Math.round((v / total) * 100);
+      return `<div class="dist-row"><div><strong>${esc(label)}</strong> — ${v} case${v === 1 ? "" : "s"} (${pct}%)</div>` +
+        `<div class="bar"><span style="width:${pct}%"></span></div></div>`;
+    }).join("");
   };
+  dist(stats.verified_type_counts, "dist-type");
+  dist(stats.verified_layer_counts, "dist-layer");
+  dist(stats.verified_outcome_counts, "dist-outcome");
+
+  el("rarity-list").innerHTML = stats.rarity_notes.map(n => `<li>${esc(n)}</li>`).join("");
+  el("duration-list").innerHTML = (stats.duration_notes || []).map(n => `<li>${esc(n)}</li>`).join("");
 }
 
-function renderStats() {
-  const grid = document.getElementById('statsGrid');
-  if (!grid) return;
-
-  const stats = [
-    { label: 'Verified Cases', value: statistics.total_cases || 0, sub: `${statistics.official_record_incorrect_count || 0} official errors` },
-    { label: '1-Point Discrepancies', value: statistics.one_point_discrepancies || 0, sub: `${statistics.one_point_percent || 0}% of cases - 213/214 pattern` },
-    { label: 'Affects Final Total', value: `${statistics.impact_on_final_total_percent || 0}%`, sub: `${statistics.impact_on_final_total_count || 0} cases change total` },
-    { label: 'Official Record Wrong', value: `${statistics.official_incorrect_percent || 0}%`, sub: `${statistics.official_record_incorrect_count || 0} cases NBA itself wrong` },
-    { label: 'Secondary Source Only', value: statistics.secondary_source_error_count || 0, sub: 'Data feed / broadcast errors' },
-    { label: 'Protests Upheld', value: statistics.protest_upheld_count || 0, sub: 'Only 6 in NBA history (we have all 6)' },
-  ];
-
-  grid.innerHTML = stats.map(s => `
-    <div class="stat-card">
-      <div class="label">${s.label}</div>
-      <div class="value">${s.value}</div>
-      <div class="sub">${s.sub}</div>
+function caseCard(c) {
+  const teams = [c.away_team, c.home_team].filter(Boolean).join(" @ ") || "Teams TBD (unverified)";
+  return `<article class="case-card" data-id="${esc(c.id)}" tabindex="0" role="button" aria-label="${esc(c.title)}">
+    <h3>${esc(c.title)}</h3>
+    <div class="meta">${esc(c.game_date || "Date unknown")} · ${esc(teams)}${c.season ? " · " + esc(c.season) : ""}</div>
+    <div>${statusChip(c.status)}<span class="chip">${esc(TYPE_LABELS[c.classification.type] || c.classification.type)}</span></div>
+    <div>${layerChip(c.classification.layer)}</div>
+    <div class="score-compare">
+      <div class="score-row"><b>Original</b><span>${esc(c.originally_reported.value || "—")}</span></div>
+      <div class="score-row final"><b>Final official</b><span>${esc(c.final_official.value || "—")}</span></div>
     </div>
-  `).join('');
-
-  // Update hero badge
-  const badge = document.getElementById('heroBadge');
-  if (badge) {
-    badge.textContent = `${statistics.total_cases} verified cases • ${statistics.one_point_discrepancies} 1-point discrepancies • Updated ${new Date().toLocaleDateString()}`;
-  }
+    <div class="meta">${esc(c.sources.length)} source${c.sources.length === 1 ? "" : "s"} · Last reviewed ${esc(c.last_reviewed)}</div>
+  </article>`;
 }
 
-function renderCases() {
-  const container = document.getElementById('casesContainer');
-  const count = document.getElementById('caseCount');
-  if (!container) return;
+function applyFilters() {
+  const q = el("search").value.trim().toLowerCase();
+  const t = el("filter-type").value, l = el("filter-layer").value,
+        o = el("filter-outcome").value, s = el("filter-status").value;
+  const cards = ALL_CASES.filter(c => {
+    if (t && c.classification.type !== t) return false;
+    if (l && c.classification.layer !== l) return false;
+    if (o && c.classification.outcome !== o) return false;
+    if (s && c.status !== s) return false;
+    if (q) {
+      const hay = [c.title, c.incident_summary, c.away_team, c.home_team,
+        c.affected_player, c.game_date, c.id].filter(Boolean).join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  el("case-count").textContent = `${cards.length} of ${ALL_CASES.length} records shown`;
+  el("case-grid").innerHTML = cards.map(caseCard).join("") ||
+    `<div class="feed-empty">No records match these filters. <a href="#" id="clear-filters">Clear filters</a>.</div>`;
+  document.querySelectorAll(".case-card").forEach(card => {
+    card.addEventListener("click", () => openDetail(card.dataset.id));
+    card.addEventListener("keydown", e => { if (e.key === "Enter") openDetail(card.dataset.id); });
+  });
+  const clear = el("clear-filters");
+  if (clear) clear.addEventListener("click", e => {
+    e.preventDefault();
+    el("search").value = ""; el("filter-type").value = ""; el("filter-layer").value = "";
+    el("filter-outcome").value = ""; el("filter-status").value = "";
+    applyFilters();
+  });
+}
 
-  if (count) count.textContent = `${filteredCases.length} cases`;
+function openDetail(id) {
+  const c = ALL_CASES.find(x => x.id === id);
+  if (!c) return;
+  const teams = [c.away_team, c.home_team].filter(Boolean).join(" @ ") || "Unknown (unverified report)";
+  const srcItems = c.sources.map((s, i) =>
+    `<li><strong>[${i}] ${esc(s.publisher)}</strong> <span class="chip">${esc(s.tier)}</span><br>` +
+    `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a><br>` +
+    `<em>Confirms:</em> ${esc(s.confirms)} <span class="meta">(accessed ${esc(s.accessed || "n/a")})</span></li>`
+  ).join("");
+  const timeline = c.timeline.map(t =>
+    `<div><span class="tdate">${esc(t.date)}</span> — ${esc(t.event)}` +
+    (t.source_index != null ? ` <span class="meta">[${t.source_index}]</span>` : "") + `</div>`
+  ).join("");
+  const disputed = (c.disputed_points || []).map(d =>
+    `<li><strong>${esc(d.claim)}</strong><ul>${d.positions.map(p => `<li>${esc(p)}</li>`).join("")}</ul></li>`
+  ).join("");
+  el("detail-body").innerHTML = `
+    <button class="close-btn" id="detail-close">Close ✕</button>
+    <h2>${esc(c.title)}</h2>
+    <div class="meta">${esc(c.game_date || "Date unknown")} · ${esc(teams)}${c.season ? " · " + esc(c.season) : ""}${c.venue ? " · " + esc(c.venue) : ""}</div>
+    <div style="margin:8px 0">${statusChip(c.status)}
+      <span class="chip">${esc(TYPE_LABELS[c.classification.type])}</span>
+      <span class="chip info">${esc(OUTCOME_LABELS[c.classification.outcome])}</span></div>
+    <div>${layerChip(c.classification.layer)}</div>
+    <h4>What happened</h4><p>${esc(c.incident_summary)}</p>
+    <h4>Original vs corrected vs final</h4>
+    <div class="score-compare">
+      <div class="score-row"><b>Originally reported</b><span>${esc(c.originally_reported.value || "—")}${c.originally_reported.total != null ? ` (total ${c.originally_reported.total})` : ""}<br><span class="meta">${esc(c.originally_reported.basis)}</span></span></div>
+      <div class="score-row"><b>Correction</b><span>${esc(c.corrected_value.value || "— none —")}${c.corrected_value.total != null ? ` (total ${c.corrected_value.total})` : ""}<br><span class="meta">${esc(c.corrected_value.basis)}</span></span></div>
+      <div class="score-row final"><b>Final official</b><span>${esc(c.final_official.value || "—")}${c.final_official.total != null ? ` (total ${c.final_official.total})` : ""}<br><span class="meta">${esc(c.final_official.basis)}</span></span></div>
+    </div>
+    <h4>Key facts</h4>
+    <ul>
+      <li><strong>Clock:</strong> ${esc(c.period_clock || "Unknown — not inferred")}</li>
+      <li><strong>Scoring play:</strong> ${esc(c.scoring_play || "Unknown")}</li>
+      <li><strong>Score before:</strong> ${esc(c.score_before || "Unknown")}</li>
+      <li><strong>Affected:</strong> ${esc(c.affected_player || "—")} (${esc(c.affected_team || "—")})</li>
+      <li><strong>Was the NBA's official record wrong?</strong> ${esc(c.official_record_was_wrong)}</li>
+      <li><strong>Cause (${esc(c.cause.determination)}):</strong> ${esc(c.cause.detail)}</li>
+      ${c.duration_note ? `<li><strong>Duration:</strong> ${esc(c.duration_note)}</li>` : ""}
+      ${(c.sources_disagreed || []).length ? `<li><strong>Sources that disagreed:</strong><ul>${c.sources_disagreed.map(s => `<li>${esc(s)}</li>`).join("")}</ul></li>` : ""}
+      ${c.betting_notes ? `<li><strong>Betting notes:</strong> ${esc(c.betting_notes)}</li>` : ""}
+    </ul>
+    <h4>Timeline</h4><div class="timeline">${timeline}</div>
+    ${disputed ? `<h4>Disputed points (flagged, not resolved)</h4><ul>${disputed}</ul>` : ""}
+    <h4>Open questions</h4>
+    <ul>${(c.open_questions || []).map(q => `<li>${esc(q)}</li>`).join("") || "<li>None — fully verified.</li>"}</ul>
+    ${(c.reproduce_steps || []).length ? `<h4>Reproduce this research</h4><ol>${c.reproduce_steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>` : ""}
+    <h4>Sources (${c.sources.length}) — verify every claim yourself</h4>
+    <ul class="src-list">${srcItems}</ul>
+    <p class="meta">Record <code class="inline">${esc(c.id)}</code> · verification: ${esc(c.verification_level)} · last reviewed ${esc(c.last_reviewed)}</p>`;
+  el("detail").classList.add("open");
+  document.body.style.overflow = "hidden";
+  el("detail-close").addEventListener("click", closeDetail);
+}
+function closeDetail() {
+  el("detail").classList.remove("open");
+  document.body.style.overflow = "";
+}
 
-  if (filteredCases.length === 0) {
-    container.innerHTML = `<div class="explain"><p>No cases match your filters. Try clearing filters.</p></div>`;
+function renderFeed(inv) {
+  const mount = el("monitor-feed");
+  const recs = (inv.records || []).filter(r => !["resolved", "escalated-to-case"].includes(r.status));
+  el("feed-count").textContent = recs.length
+    ? `${recs.length} open investigation${recs.length === 1 ? "" : "s"}`
+    : "No open investigations — last checks agreed across sources.";
+  if (!recs.length) {
+    mount.innerHTML = `<div class="feed-empty">The monitor's latest runs found no cross-source disagreements. ` +
+      `Resolved and escalated records remain in <code class="inline">data/investigations.json</code> in the repository. ` +
+      `Note: the originating 213-vs-214 report is tracked as an <strong>unverified</strong> record above, not here, until its game is identified.</div>`;
     return;
   }
-
-  container.innerHTML = filteredCases.map(c => {
-    const original = c.original_value?.final_score || 'N/A';
-    const corrected = c.corrected_value?.final_score || c.final_official_value?.final_score || 'N/A';
-    const origTotal = c.original_value?.total_points ?? '?';
-    const corrTotal = c.corrected_value?.total_points ?? c.final_official_value?.total_points ?? '?';
-    const isOnePoint = Math.abs(c.impact_points || 0) === 1;
-
-    return `
-    <div class="case-card" data-id="${c.id}">
-      <div class="case-header">
-        <div>
-          <div class="case-title">${c.teams?.away_abbr || c.teams?.away} @ ${c.teams?.home_abbr || c.teams?.home} • ${c.date}</div>
-          <div class="case-meta">
-            <span class="tag ${c.verification_status}">${c.verification_status}</span>
-            ${c.nba_official_record_incorrect ? '<span class="tag official_error">NBA official wrong</span>' : ''}
-            ${c.secondary_source_error ? '<span class="tag secondary">secondary only</span>' : ''}
-            ${isOnePoint ? '<span class="tag one_point">1-pt total • 213/214 pattern</span>' : ''}
-            <span class="tag">${c.incident_type?.replace(/_/g,' ')}</span>
-            ${c.protest_upheld ? '<span class="tag">protest upheld</span>' : ''}
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:12px; color:var(--muted)">${c.id}</div>
-          <div style="font-size:11px; color:var(--muted)">${c.period_clock || ''}</div>
-        </div>
-      </div>
-
-      <div class="case-grid">
-        <div class="case-detail">
-          <div class="label">Relevant Play</div>
-          <div class="value">${c.relevant_scoring_play || 'N/A'}</div>
-        </div>
-        <div class="case-detail">
-          <div class="label">Affected</div>
-          <div class="value">${c.affected_player || 'Team'} • ${c.affected_team || ''}</div>
-        </div>
-        <div class="case-detail">
-          <div class="label">Cause</div>
-          <div class="value">${c.cause || ''} <em style="color:var(--muted)">(${c.cause_confidence})</em></div>
-        </div>
-        <div class="case-detail">
-          <div class="label">What Changed</div>
-          <div class="value">${c.what_changed || ''}</div>
-        </div>
-      </div>
-
-      <div class="score-compare">
-        <div class="score-box original">
-          <div class="label">Original</div>
-          <div class="score">${original}</div>
-          <div class="label">Total ${origTotal}</div>
-        </div>
-        <div class="arrow">→</div>
-        <div class="score-box corrected">
-          <div class="label">Corrected / Final Official</div>
-          <div class="score">${corrected}</div>
-          <div class="label">Total ${corrTotal}</div>
-        </div>
-        <div style="text-align:center; min-width:80px">
-          <div class="label">Impact</div>
-          <div style="font-weight:700; color:${c.impact_points > 0 ? 'var(--green)' : 'var(--accent2)'}">${c.impact_points > 0 ? '+' : ''}${c.impact_points ?? 0} pts</div>
-          <div class="label">${c.impact_on_final_total ? 'affects total' : 'no total impact'}</div>
-        </div>
-      </div>
-
-      <div class="case-grid" style="margin-top:12px">
-        <div class="case-detail">
-          <div class="label">Score Before</div>
-          <div class="value">${c.score_before || 'N/A'}</div>
-        </div>
-        <div class="case-detail">
-          <div class="label">When Changed</div>
-          <div class="value">${c.when_changed || ''} • ${c.timestamps?.correction_announced || ''}</div>
-        </div>
-      </div>
-
-      ${c.notes ? `<div style="margin-top:12px; font-size:13px; color:var(--muted); background:#11141b; padding:10px; border-radius:6px; border:1px solid var(--border)"><strong>Notes:</strong> ${c.notes}</div>` : ''}
-
-      <div class="sources">
-        <h4>Verified Sources (${(c.sources||[]).length}) - Click to verify</h4>
-        <div class="source-list">
-          ${(c.sources||[]).map(s => `
-            <div class="source-item">
-              <span class="type">${s.type}</span>
-              <a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>
-              <span style="color:var(--muted); font-size:11px">• ${s.publisher}</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
-        <span style="font-size:11px; color:var(--muted)">Tags:</span>
-        ${(c.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}
-      </div>
-    </div>
-    `;
-  }).join('');
+  mount.innerHTML = `<table class="clean"><tr><th>Detected (UTC)</th><th>Game</th><th>Check</th><th>Status</th><th>Evidence</th></tr>` +
+    recs.map(r => `<tr><td>${esc(r.created_utc)}</td><td>${esc(r.game_date)} ${esc(r.game_key)}</td>` +
+      `<td>${esc(r.check)}</td><td>${esc(r.status)}</td><td>${esc((r.evidence || {}).detail || "")}</td></tr>`).join("") + `</table>`;
 }
 
-function setupFilters() {
-  const search = document.getElementById('searchInput');
-  const typeFilter = document.getElementById('typeFilter');
-  const verificationFilter = document.getElementById('verificationFilter');
-  const impactFilter = document.getElementById('impactFilter');
-
-  function applyFilters() {
-    const q = (search?.value || '').toLowerCase();
-    const type = typeFilter?.value || 'all';
-    const ver = verificationFilter?.value || 'all';
-    const impact = impactFilter?.value || 'all';
-
-    filteredCases = allCases.filter(c => {
-      // Search
-      if (q) {
-        const hay = `${c.id} ${c.date} ${c.teams?.home} ${c.teams?.away} ${c.affected_player} ${c.relevant_scoring_play} ${c.cause}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      if (type !== 'all' && c.incident_type !== type) return false;
-      if (ver !== 'all' && c.verification_status !== ver) return false;
-      if (impact === 'total' && !c.impact_on_final_total) return false;
-      if (impact === 'one_point' && Math.abs(c.impact_points||0) !== 1) return false;
-      if (impact === 'official' && !c.nba_official_record_incorrect) return false;
-      if (impact === 'secondary' && !c.secondary_source_error) return false;
-      return true;
-    });
-
-    // Sort by date descending
-    filteredCases.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    renderCases();
-  }
-
-  search?.addEventListener('input', applyFilters);
-  typeFilter?.addEventListener('change', applyFilters);
-  verificationFilter?.addEventListener('change', applyFilters);
-  impactFilter?.addEventListener('change', applyFilters);
-
-  // Pill filters
-  document.querySelectorAll('.filter-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      const filter = pill.dataset.filter;
-      if (filter === 'all') {
-        if (typeFilter) typeFilter.value = 'all';
-        if (impactFilter) impactFilter.value = 'all';
-      } else if (filter === 'one_point') {
-        if (impactFilter) impactFilter.value = 'one_point';
-      } else if (filter === 'official') {
-        if (impactFilter) impactFilter.value = 'official';
-      } else if (filter === 'secondary') {
-        if (impactFilter) impactFilter.value = 'secondary';
-      } else {
-        if (typeFilter) typeFilter.value = filter;
-      }
-      applyFilters();
-    });
-  });
+function renderMethodology(src) {
+  el("tier-table").innerHTML = `<table class="clean"><tr><th>Tier</th><th>Label</th><th>Use</th></tr>` +
+    src.tiers.map(t => `<tr><td><code class="inline">${esc(t.tier)}</code></td><td>${esc(t.label)}<br><span class="meta">${esc(t.examples.join("; "))}</span></td><td>${esc(t.use)}</td></tr>`).join("") + `</table>`;
+  el("ref-list").innerHTML = src.authoritative_references.map(r =>
+    `<li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a> — ${esc(r.note)}</li>`).join("");
 }
 
-// Live status check
-async function checkLiveStatus() {
+async function init() {
   try {
-    const res = await fetch('./latest_check.json');
-    if (!res.ok) return;
-    const data = await res.json();
-    const el = document.getElementById('liveStatusText');
-    if (el) {
-      el.textContent = `Last check: ${new Date(data.timestamp).toLocaleString()} • ${data.snapshots_collected} snapshots • ${data.alerts_generated} alerts • Sources: ${(data.sources||[]).join(', ')}`;
-    }
-  } catch (e) {
-    // No live data yet
+    const [cases, stats, inv, src] = await Promise.all([
+      loadJSON("data/cases.json"), loadJSON("data/stats.json"),
+      loadJSON("data/investigations.json"), loadJSON("data/sources.json")
+    ]);
+    ALL_CASES = cases.cases || [];
+    renderStats(stats);
+    ["search", "filter-type", "filter-layer", "filter-outcome", "filter-status"]
+      .forEach(id => el(id).addEventListener("input", applyFilters));
+    applyFilters();
+    renderFeed(inv);
+    renderMethodology(src);
+    el("detail").addEventListener("click", e => { if (e.target.id === "detail") closeDetail(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+  } catch (err) {
+    document.querySelector("main").innerHTML =
+      `<div class="wrap"><div class="alert unverified"><strong>Data failed to load.</strong>` +
+      `${esc(err.message)}. If you opened this file directly, serve the <code class="inline">docs/</code> folder ` +
+      `over HTTP (e.g. <code class="inline">python3 -m http.server</code>) or visit the deployed GitHub Pages URL.</div></div>`;
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadData();
-  checkLiveStatus();
-  setInterval(checkLiveStatus, 30000);
-});
+document.addEventListener("DOMContentLoaded", init);
