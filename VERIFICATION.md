@@ -120,7 +120,7 @@ tables above. What was verified instead:
 | `cdn.nba.com/robots.txt` answers with an S3 `AccessDenied` document and the scoreboard object with HTTP 500 to an independent fetch | Direct probes during this pass | Confirmed as probes of this tooling only; **not** a statement about league policy |
 | Yahoo's editorial scoreboard answers for a given NBA date and exposes per-game totals/status/team ids | `https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?leagues=nba&date=2026-10-07` fetched (HTTP 200; games `nba.g.2026100711`, `nba.g.2026100729`, …) | Partially confirmed: the team-id → abbreviation mapping island was **not** read, so no Yahoo adapter exists and no Yahoo value is cited anywhere in this repository |
 | ESPN's box-score components for CLE@WAS (2025-11-07) reproduce the corrected 148-115 arithmetic | Archived fixture `tests/fixtures/espn-summary-401809511.json` used by the arithmetic tests | Confirmed (fixture is the archived provider payload) |
-| Alert detection/notification is implementable and what it cannot do | 76 offline tests + `ALERTING.md` §3 | Confirmed to the extent stated; production delivery explicitly listed as unproven |
+| Alert detection/notification is implementable and what it cannot do | 82 offline tests + `ALERTING.md` §3 | Confirmed to the extent stated; production delivery explicitly listed as unproven |
 
 ## 5. Re-verification checklist (run before any release/PR)
 
@@ -222,6 +222,15 @@ presented as a second active scheduled monitor.
   is configured, but its first successful poll and published timestamp still need verification.
 - Project review date: **2026-10-07 UTC** (2026-10-06 in America/Los_Angeles). Appendix A below
   remains the byte-preserved prior-session guide.
+
+## 8. Current alert/freshness implementation review (2026-10-07)
+
+- GitHub issue alerts remain operational candidate notices only. A cross-feed alert requires two consecutive comparable observations; source outage/invalidity, missing game, or incomplete score is explicitly recorded as a streak-breaking comparison. Any provider's final-score revision is alerted as a feed revision, not a confirmed official-record correction.
+- Alert text retains first/latest observation context and safe source links. Stable issue markers, saved issue numbers/body hashes/status, unchanged-run suppression, marker verification before editing, human-closure preservation, and non-causal resolution comments are covered by Python stub-`gh` regression tests; the Node smoke test covers dashboard rendering. No destination-specific email/mobile/closed-browser delivery is promised.
+- The workflow publishes a Pages artifact on pushes to `main`, manual runs on `main`, and scheduled runs that change tracked data; an unchanged scheduled poll does not create a new artifact or a heartbeat timestamp. The dashboard labels `last_updated_at` as the last material snapshot change and warns that poll freshness cannot be determined from the snapshot alone.
+- Verification performed: **53 Python tests passed**; dashboard and alert smoke tests passed; Python compilation, current and historical data validators, historical monitor self-test, JavaScript syntax checks, updated Pages/CI YAML parsing, deterministic generated-data checks, material-diff check, and `git diff --check` passed.
+- No live poll or external historical-source review was performed in this implementation turn. The committed feed snapshot last reviewed at `2026-10-07T11:50:09Z` was degraded (ESPN `ok`, NBA request unavailable with the prior generic `HTTPError`); do not infer current endpoint health or a successful comparison from the code tests.
+- No new case facts were admitted. The 213/214 report and 2021 Kevin Porter Jr. item remain explicitly unverified; no NBA record error, provider fault, score correction, or cause is inferred from the monitor.
 
 ## Appendix A — prior session (PR #2) verification guide, preserved verbatim
 
@@ -346,3 +355,13 @@ python src/discrepancy_detector.py  # Should generate statistics.json
 # Verify all URLs are reachable (manual)
 # Use fetch_page tool to verify each URL returns expected content
 ```
+
+---
+
+## 7. Operations review — 2026-10-07 (no new NBA case facts admitted)
+
+This pass reviewed monitor freshness, notification behavior, workflow permissions, and stale runbooks; it did not promote or add any NBA incident facts. The saved feed snapshot at `2026-10-07T11:50:09Z` reported `degraded`, with ESPN `ok`, NBA unavailable (`HTTPError`), and an empty game list. The associated scheduled workflow run [37616762038](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37616762038) completed successfully; the result does not establish that both sources were healthy. This recorded observation is not a claim about the status of later polls.
+
+The active implementation records source health, publishable HTTP-attempt diagnostics, investigation history, and deduplicated GitHub issue alerts, but the saved `last_updated_at` is only the last material snapshot change—not a poll heartbeat. The scheduled workflow does not publish a fresh Pages artifact for an unchanged poll; use the Actions run history to check whether a poll ran. Alert contents remain explicitly unverified. Offline tests exercise mismatch persistence, no-fault wording, issue deduplication, material issue refresh, respect for human closure, non-causal resolution comments, and material snapshot timestamp stability. See `ALERTING.md`, `docs/INVESTIGATION_WORKFLOW.md`, and `monitor/STATE.md` for behavior and limitations.
+
+**Still unverified:** no conclusion is made here about whether the NBA feed is healthy after the recorded poll, whether the NBA official record was wrong, whether any public issue notification reached a particular person, or whether the schedule will meet a real-time service guarantee. Confirm the next live poll and issue API permissions in GitHub Actions after deployment.

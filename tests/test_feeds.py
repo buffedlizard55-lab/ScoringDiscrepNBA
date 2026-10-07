@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from urllib.error import HTTPError
 
 from monitor.feeds import (
     FeedError,
     build_observations,
     extract_latest_scoring_play,
+    fetch_json,
     match_scoreboards,
     parse_espn_scoreboard,
     parse_nba_scoreboard,
@@ -21,6 +24,12 @@ def fixture(name: str) -> dict:
 
 
 class FeedParsingTests(unittest.TestCase):
+    def test_http_error_preserves_status_code_for_source_health_diagnostics(self) -> None:
+        error = HTTPError("https://nba.example/scoreboard", 403, "Forbidden", None, None)
+        with patch("monitor.feeds.urlopen", side_effect=error):
+            with self.assertRaisesRegex(FeedError, "HTTP 403"):
+                fetch_json("https://nba.example/scoreboard")
+
     def test_nba_scoreboard_normalizes_teams_and_clock(self) -> None:
         games = parse_nba_scoreboard(fixture("nba-scoreboard.json"))
         self.assertEqual(len(games), 1)

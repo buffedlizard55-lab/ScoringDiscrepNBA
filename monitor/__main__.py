@@ -118,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
             f"Live poll saved: feed={feed.get('status')}, "
             f"games={len(feed.get('games', []))}, "
             f"investigations={len(state.get('investigations', []))}, "
-            f"published_at={feed.get('last_updated_at')}."
+            f"last_material_change={feed.get('last_updated_at')}."
         )
         for source, health in feed.get("source_health", {}).items():
             print(f"  {source}: {health.get('status')} ({health.get('url')})")

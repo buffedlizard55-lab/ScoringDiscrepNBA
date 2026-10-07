@@ -1,29 +1,45 @@
 # Investigation review and resolution workflow
 
-Routine scoreboard comparisons are automated. A feed difference is an unverified source observation, not an accusation and not proof the NBA record is wrong. Only confirmed, source-backed research becomes a canonical case.
+The current monitor compares the NBA public scoreboard feed with ESPN. A feed difference is an unverified observation—not an accusation, not proof the NBA record is wrong, and not automatically a historical case. The monitor preserves observations and opens GitHub issue alerts for persistent candidates; source-backed research still requires evidence review.
 
-## Separate the monitor state from the research conclusion
+## Current data locations
 
-Records live in `data/investigations.json`. The latest published score comparison and feed-health snapshot lives in `data/monitor/current.json` and is mirrored to `docs/data/monitor/current.json` for the Pages site.
+- `data/live-feed.json` — latest saved material score/health snapshot and source diagnostics for the dashboard; it is not rewritten for every unchanged poll.
+- `data/monitor-state.json` — append-only investigation observations, score baselines, and current investigation states.
+- `data/reviewed-cases.json` — two evidence-reviewed root-dashboard examples; separate from the monitor ledger.
+- `data/cases/*.json` and `data/cases.json` — preserved earlier historical collection; see `VERIFICATION.md` for its partial statuses and audit flags.
+- `data/leads.json` — explicitly unverified leads, including the unidentified 213/214 report; excluded from confirmed counts.
 
-- `detected`: the monitor recorded a source disagreement or an internal data check failure.
-- `investigating`: a person is reviewing the source history.
-- `correction-observed`: a later run completed the same scoped check and no longer saw the mismatch. This is an operational convergence, not proof of a correction or an explanation.
-- `explained-no-error`: a person established that the discrepancy was a transient delay, source/parser/game-match issue, or another non-NBA-record error, and documented the evidence.
-- `resolved`: a person has documented the outcome and its source basis.
-- `escalated-to-case`: a person promoted a source-confirmed incident into `data/cases/` and linked the case ID.
+Do not confuse the current root monitor with the retained `scripts/monitor.py` historical/backfill tool or the legacy `data/investigations.json`/`docs/data/monitor/current.json` snapshots.
 
-Feed outages, unmatched games, and missing scores are shown in the latest snapshot, never converted to zeroes or treated as a cleared discrepancy. Each investigation also stores a `check_scope`; a check on one source/team side cannot clear a different scoped check.
+## Automated states
 
-## Review procedure
+- `detected` — first saved, parseable source disagreement.
+- `investigating` — the same source mismatch was present on at least two consecutive comparable polls. A GitHub issue alert is eligible at this point.
+- `monitoring_for_convergence` — one complete matching poll followed the disagreement; the mismatch may have cleared, but the monitor waits for another matching poll.
+- `resolved` — two consecutive comparable polls agreed. This closes only the observed feed-mismatch window; `verification_status` remains `unverified` and the cause is not established.
 
-1. **Confirm the game match.** Check team orientation, date, and NBA game ID. If ambiguous, keep it under investigation; do not infer a match.
-2. **Preserve source observations.** The monitor retains the first evidence and appends timestamped observations when values or severity change. Add manually recovered source URLs, archived responses/screenshots, and capture times without deleting earlier evidence. Repeated identical observations update `last_seen_utc` and a repeat count.
-3. **Check the official record and independent reporting.** Use the NBA correction notice, box score, and play-by-play where available. Compare secondary-provider snapshots separately. Nearby play-by-play is context, not proof of cause.
-4. **Classify the outcome with explicit evidence.** Decide whether the NBA record was wrong, only a secondary source was wrong/delayed, the feeds shared an issue, or the result remains unresolved. Preserve uncertainty and disputed positions.
-5. **Document the human review** in a pull request: reviewer, review timestamp (UTC when known), source URLs, plain-language disposition, and remaining questions. Do not move a record to `resolved` solely because two feeds agree again.
-6. **Promote only supported incidents.** For an NBA correction or confirmed secondary-source error, create a separate `data/cases/<date>-<slug>.json` record with original, corrected, and final values, timeline, direct sources, and limitations. Then mark the investigation `escalated-to-case` and add a case link/ID while retaining its observation history.
+A poll with an unavailable source, an unreturned game, or incomplete scores is recorded as an incomplete comparison and breaks both mismatch and convergence streaks. It cannot count as agreement.
+- `change_observed_unverified` — the NBA scoreboard feed's value changed after a final-score baseline was recorded. This is an immediate alert candidate, not proof of an official-record correction.
 
-## Roles and limits
+A missing score, unparseable feed, source outage, ambiguous game match, or one-poll mismatch never becomes a matching zero or auto-clears an open event. A failed NBA poll preserves the last saved games as stale and makes the feed status degraded.
 
-The monitor performs recurring scoreboard checks and creates/updates investigation records without user data entry. The static Pages site shows the latest committed poll; GitHub Actions schedules may be delayed, so it is not a streaming feed. Human review is reserved for flagged mismatches and is required before a candidate becomes a researched case.
+## GitHub issue alerts
+
+`.github/workflows/pages-and-monitor.yml` runs the poll and alert ledger on a five-minute GitHub Actions schedule. `monitor/alerts.py` records candidate alerts with stable IDs and review evidence; `monitor/dispatch.py` delivers configured severities as GitHub issues and can optionally send a webhook. Delivery attempts and skips are recorded; unchanged alerts are not repeatedly dispatched. Resolution is non-causal and must not automatically close the linked GitHub issue; a person may close it after review. GitHub delivery is subject to watch/notification settings; it is not guaranteed email, SMS, or push. See [`ALERTING.md`](../ALERTING.md) for thresholds, freshness semantics, and limitations.
+
+## Evidence-review procedure
+
+1. **Confirm the game match.** Check date, home/away orientation, NBA game ID, and whether each provider returned the same game. If ambiguous, leave it under investigation; do not guess.
+2. **Open both source responses.** Review the NBA scoreboard, ESPN scoreboard, and the game-specific NBA play-by-play when attached. A nearby/latest play is context only, not proof of cause.
+3. **Preserve observations.** Keep the first and subsequent poll values/timestamps. Add independently recovered URLs, archived responses/screenshots, capture times, and source publication times only when available. Never replace the original value with a corrected one.
+4. **Check the official record and independent evidence.** Look for an NBA correction notice, official box score/gamebook, official play-by-play, or reliable independent reporting. Separate NBA record changes from secondary-provider corrections or delays.
+5. **Classify conservatively.** Record whether the NBA record was wrong, only a secondary feed was wrong/delayed, multiple feeds shared an issue, or the case remains unresolved. State what the evidence proves and what is unknown.
+6. **Document the review** in a pull request with reviewer, UTC review time when known, direct evidence links, disposition, and remaining questions. Feed agreement alone is not a human-confirmed explanation.
+7. **Promote only supported incidents.** Add a source-traceable record to the appropriate research collection under its schema, retaining originally reported, corrected, and final official values. Link the monitor investigation to the case. Do not mark a candidate confirmed merely because it appeared in an issue.
+
+## Operational notes
+
+The monitor's saved timestamps are UTC observation/material-change times, not provider update times. `last_updated_at` marks the last material snapshot change; an unchanged poll does not rewrite it, so it is not a heartbeat. The five-minute schedule can be delayed or skipped. Inspect source-health status, published diagnostics, and the linked Actions run before calling the feed current.
+
+The monitor cannot see arena/TV scorebugs absent from its feeds, detect an error shared by both feeds, recover a discrepancy shorter than its polling interval, or establish the cause of a score change. It does not autonomously convert a candidate into a verified case. See [`ALERTING.md`](ALERTING.md) and [`ROADMAP.md`](../ROADMAP.md).

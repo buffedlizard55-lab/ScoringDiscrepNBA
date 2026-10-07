@@ -133,6 +133,22 @@ def _desired_mismatch_alerts(state: dict[str, Any]) -> dict[str, dict[str, Any]]
         espn_score = details.get("espn_score") or {}
         urls = details.get("source_urls") or {}
         alert_id = _alert_id("cross_source_score_mismatch", str(item.get("game_key")))
+        summary = (
+            f"NBA {_score_text(nba_score)} and ESPN {_score_text(espn_score)} disagreed. The "
+            "automated mismatch alert requires two consecutive comparable polls; an unavailable "
+            "source, unreturned game, or incomplete score breaks that streak. Both values are "
+            "recorded as observations; neither is treated as the correct one."
+        )
+        checks = item.get("comparison_checks") or []
+        latest_check = checks[-1] if checks and isinstance(checks[-1], dict) else {}
+        if latest_check.get("result") == "incomplete":
+            summary += (
+                f" The latest comparison attempt at {latest_check.get('observed_at') or 'an unknown time'} "
+                f"was incomplete ({latest_check.get('reason') or 'reason not recorded'}); no new "
+                "mismatch or agreement is inferred."
+            )
+        elif item.get("status") == "monitoring_for_convergence":
+            summary += " One later comparable poll showed agreement; a second is required to mark the observed window resolved."
         alerts[alert_id] = {
             "id": alert_id,
             "type": "cross_source_score_mismatch",
@@ -141,11 +157,7 @@ def _desired_mismatch_alerts(state: dict[str, Any]) -> dict[str, dict[str, Any]]
                 f"Score feeds disagree: {_team_pair_text(item)} "
                 f"({_score_text(nba_score)} vs {_score_text(espn_score)})"
             ),
-            "summary": (
-                f"NBA {_score_text(nba_score)} and ESPN {_score_text(espn_score)} disagreed for "
-                f"{item.get('consecutive_disagreements', 1)} consecutive polls. Both values are "
-                "recorded as observations; neither is treated as the correct one."
-            ),
+            "summary": summary,
             "game": {
                 "game_key": item.get("game_key"),
                 "game_id": item.get("game_id"),
@@ -407,8 +419,27 @@ def _material_signature(book: dict[str, Any]) -> str:
             "status": alert.get("status"),
             "severity": alert.get("severity"),
             "occurrences_bucket": alert.get("occurrences_bucket"),
-            "dispatch": (alert.get("dispatch") or {}).get("status"),
-            "issue_url": (alert.get("dispatch") or {}).get("issue_url"),
+            "content": {
+                "title": alert.get("title"),
+                "summary": alert.get("summary"),
+                "evidence": alert.get("evidence"),
+                "arithmetic": alert.get("arithmetic"),
+                "status": alert.get("status"),
+                "resolution": alert.get("resolution"),
+            },
+            "dispatch": {
+                key: (alert.get("dispatch") or {}).get(key)
+                for key in (
+                    "status",
+                    "issue_url",
+                    "issue_number",
+                    "last_body_sha256",
+                    "last_status",
+                    "human_closed",
+                    "resolution_comment_pending",
+                    "webhook_status",
+                )
+            },
         }
         for alert in book.get("alerts", [])
     ]
@@ -469,16 +500,21 @@ def update_book(
             lifecycle.append(
                 {"at": observed_at, "event": "reopened", "detail": "the condition was observed again"}
             )
-        dispatch = previous.get("dispatch") or {}
-        if dispatch.get("issue_url"):
-            record["dispatch"] = {
-                "status": dispatch.get("status") or "sent",
-                "reason": dispatch.get("reason"),
-                "issue_url": dispatch.get("issue_url"),
-                "attempts": dispatch.get("attempts") or [],
-                "sent_at": dispatch.get("sent_at"),
-                "close_pending": False,
-            }
+        dispatch = deepcopy(previous.get("dispatch") or {})
+        if dispatch:
+            # Preserve durable delivery metadata (issue number, body hash,
+            # human closure, retry history, and pending non-causal comments).
+            # A comparator outage starts as site-only, then becomes deliverable
+            # after its longer threshold; do not preserve the old not-required
+            # state over that explicit eligibility transition.
+            desired_dispatch = record.get("dispatch") or {}
+            if dispatch.get("status") == "not_required" and desired_dispatch.get("status") == "pending":
+                dispatch["status"] = "pending"
+                dispatch["reason"] = desired_dispatch.get("reason")
+            if previous.get("status") == "resolved" and record["status"] == "open":
+                dispatch["resolution_comment_pending"] = False
+            dispatch.pop("close_pending", None)
+            record["dispatch"] = dispatch
         record["lifecycle"] = lifecycle
         existing[alert_id] = record
 
@@ -496,7 +532,7 @@ def update_book(
         dispatch = alert.get("dispatch") or {}
         if dispatch.get("issue_url"):
             dispatch = dict(dispatch)
-            dispatch["close_pending"] = True
+            dispatch["resolution_comment_pending"] = True
             alert["dispatch"] = dispatch
 
     alerts = sorted(
@@ -625,7 +661,7 @@ def resolve_alert(
         dispatch = alert.get("dispatch") or {}
         if dispatch.get("issue_url"):
             dispatch = dict(dispatch)
-            dispatch["close_pending"] = True
+            dispatch["resolution_comment_pending"] = True
             alert["dispatch"] = dispatch
         break
     updated["counts"] = {

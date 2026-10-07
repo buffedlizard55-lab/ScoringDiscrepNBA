@@ -76,6 +76,11 @@ async function main() {
   assert.match(elements.get("typeBreakdown").innerHTML, /made free throw recorded as miss/);
   assert.equal(elements.get("typeFilter").children.length, 1);
   assert.match(html, /href="docs\/index\.html"/, "root dashboard must link to the preserved historical catalog");
+  assert.match(
+    html,
+    /href="https:\/\/github\.com\/buffedlizard55-lab\/ScoringDiscrepNBA\/issues\?q=is%3Aissue\+in%3Atitle\+score-alert"/,
+    "monitor alert link must match the generated issue title prefix",
+  );
   assert.equal((elements.get("leadList").innerHTML.match(/class="lead-card"/g) || []).length, 2);
   assert.match(elements.get("leadList").innerHTML, /213/);
   assert.match(elements.get("leadList").innerHTML, /214/);
@@ -86,13 +91,20 @@ async function main() {
   // in. The previous hard-coded expectation passed only while no live poll had
   // ever been published, so the first successful scheduled poll silently broke it.
   const expectedPill = feed.status === "healthy"
-    ? /Feeds available|Review candidate/
+    ? /Snapshot: feeds available|Review candidate in snapshot/
     : feed.status === "degraded"
-      ? /Feed degraded/
+      ? /Snapshot: degraded/
       : /Not yet active/;
   assert.match(elements.get("monitorStatus").innerHTML, expectedPill);
   assert.equal(elements.get("investigationsPanel").hidden, true);
+  if (feed.last_updated_at) {
+    assert.match(elements.get("feedTimestamp").textContent, /Last material snapshot change/);
+    assert.match(elements.get("feedTimestamp").textContent, /not a poll heartbeat/);
+  }
   assert.match(elements.get("feedNotice").textContent, /observation|not evidence|stale|snapshot|discrepanc/i);
+  if (feed.status !== "not_started") {
+    assert.match(elements.get("feedNotice").textContent, /does not store a per-poll heartbeat/);
+  }
   assert.match(elements.get("sourceHealth").innerHTML, /NBA primary/, "source health chips must render every configured source");
   assert.match(elements.get("sourceHealth").innerHTML, /ESPN secondary/);
   assert.doesNotMatch(elements.get("caseList").innerHTML, /\[object Object\]/);

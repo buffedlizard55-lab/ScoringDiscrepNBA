@@ -395,21 +395,27 @@
     const potentialDifference = (Array.isArray(feed?.games) && feed.games.some((game) => game.score_mismatch === true))
       || Number(feed?.active_investigation_count || 0) > 0;
     const labels = {
-      healthy: potentialDifference ? ["status-warning", "Review candidate"] : ["status-good", "Feeds available"],
-      degraded: ["status-warning", "Feed degraded"],
+      healthy: potentialDifference
+        ? ["status-warning", "Review candidate in snapshot"]
+        : ["status-good", "Snapshot: feeds available"],
+      degraded: ["status-warning", "Snapshot: degraded"],
       not_started: ["status-neutral", "Not yet active"],
     };
     const [className, label] = labels[status] || labels.not_started;
     pill.className = `status-pill ${className}`;
     pill.innerHTML = `<span class="status-light"></span>${escapeHtml(label)}`;
     $("#feedTimestamp").textContent = feed?.last_updated_at
-      ? `Latest published observation · ${formatTimestamp(feed.last_updated_at)}`
-      : "No successful poll has been published.";
+      ? `Last material snapshot change (UTC) · ${formatTimestamp(feed.last_updated_at)} · not a poll heartbeat`
+      : "No saved material-snapshot timestamp is recorded.";
     const notice = $("#feedNotice");
-    notice.textContent = feed?.note || "No live-feed status is available.";
+    const freshnessNote = status === "not_started"
+      ? null
+      : "This snapshot does not store a per-poll heartbeat, so it may be stale. Check workflow run history for the latest attempt.";
+    notice.textContent = [feed?.note || "No live-feed status is available.", freshnessNote].filter(Boolean).join(" ");
     notice.className = "feed-notice";
-    if (status === "degraded") notice.classList.add("notice-degraded");
-    else if (potentialDifference) notice.classList.add("notice-mismatch");
+    if (status === "degraded") {
+      notice.classList.add("notice-degraded");
+    } else if (potentialDifference) notice.classList.add("notice-mismatch");
 
     const health = feed?.source_health || {};
     const SOURCE_LABELS = { nba: "NBA primary", espn: "ESPN secondary" };
