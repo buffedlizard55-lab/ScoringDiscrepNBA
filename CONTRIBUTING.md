@@ -25,7 +25,7 @@ For a current-case change, edit only the relevant canonical data file after sour
 5. Keep the 213/214 and Kevin Porter Jr. leads unverified until unique games and source histories are established. Do not infer missing game IDs, dates, teams, totals, player values, or causes.
 6. Re-run validation and tests below. Review generated changes and explain coverage, confidence, and limitations in the pull request.
 
-For an automated monitor candidate, follow [`docs/INVESTIGATION_WORKFLOW.md`](docs/INVESTIGATION_WORKFLOW.md) and [`docs/ALERTING.md`](docs/ALERTING.md). GitHub issue notifications are unverified candidates; they must not be promoted to historical cases without independent evidence.
+For an automated monitor candidate, follow [`docs/INVESTIGATION_WORKFLOW.md`](docs/INVESTIGATION_WORKFLOW.md) and [`ALERTING.md`](ALERTING.md). GitHub issue notifications are unverified candidates; they must not be promoted to historical cases without independent evidence.
 
 ## Local checks
 
@@ -37,9 +37,7 @@ python3 scripts/validate.py
 python3 scripts/monitor.py --self-test
 node --check assets/app.js
 node --check docs/app.js
-node --check scripts/github_alerts.js
 node tests/dashboard-smoke.js
-node tests/github-alerts-smoke.js
 ```
 
 If historical case files or generated bundles change, also run:

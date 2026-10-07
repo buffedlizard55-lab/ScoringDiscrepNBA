@@ -1,0 +1,38 @@
+{
+  "alerts": [],
+  "counts": {
+    "open": 0,
+    "open_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "info": 0
+    },
+    "pending_dispatch": 0,
+    "resolved": 0,
+    "total": 0
+  },
+  "coverage_gaps": [],
+  "detector_status": {
+    "cross_source_comparison": {
+      "available": false,
+      "blocked_reason": "no monitor cycle has been recorded with this alert ledger yet",
+      "sources_ok": []
+    },
+    "single_provider_arithmetic_checks": {
+      "by_status": {},
+      "games_checked": 0,
+      "method": "2 * (FGM - 3PM) + 3 * 3PM + FTM from the provider's own box-score components"
+    },
+    "final_score_revision_tracking": {
+      "baselines": 0,
+      "sources_tracked": []
+    },
+    "coverage_gaps_recorded": 0
+  },
+  "dispatch_policy": "Alerts are written to data/alerts.json on every material change. Critical and high-severity alerts are additionally queued for notification as a GitHub issue by 'python3 -m monitor --dispatch-alerts --apply', which the scheduled workflow runs. Medium-severity alerts stay on the site until they escalate. An optional webhook (SCORING_DISCREPANCY_WEBHOOK_URL) can mirror dispatched alerts to Slack, Discord, or a similar endpoint; when it is not configured, notifications are GitHub-issue only and that is recorded, not assumed.",
+  "last_material_signature": null,
+  "note": "This file is the alert ledger for the automated monitor. It advances only when the set of alerts materially changes (new alert, severity change, lifecycle change, dispatch result, or an occurrence milestone), so the scheduled runner does not rewrite it on every poll. Times are monitor poll times in UTC, not provider publication times.",
+  "schema_version": 1,
+  "unverified_reminder": "Automated candidate detection only. This alert records what two published observations showed and when. It does not establish that any NBA record was wrong, which source was correct, or what caused the difference."
+}

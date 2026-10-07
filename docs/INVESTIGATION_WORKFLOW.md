@@ -4,7 +4,7 @@ The current monitor compares the NBA public scoreboard feed with ESPN. A feed di
 
 ## Current data locations
 
-- `data/live-feed.json` — latest published score/health snapshot and poll heartbeat for the dashboard.
+- `data/live-feed.json` — latest saved material score/health snapshot and source diagnostics for the dashboard; it is not rewritten for every unchanged poll.
 - `data/monitor-state.json` — append-only investigation observations, score baselines, and current investigation states.
 - `data/reviewed-cases.json` — two evidence-reviewed root-dashboard examples; separate from the monitor ledger.
 - `data/cases/*.json` and `data/cases.json` — preserved earlier historical collection; see `VERIFICATION.md` for its partial statuses and audit flags.
@@ -26,7 +26,7 @@ A missing score, unparseable feed, source outage, ambiguous game match, or one-p
 
 ## GitHub issue alerts
 
-`.github/workflows/pages-and-monitor.yml` runs the poll on a five-minute GitHub Actions schedule. The notifier in `scripts/github_alerts.js` creates one issue per persistent mismatch or final-feed revision, deduplicates using a stable hash of the investigation ID, refreshes an existing open issue, and comments when feed agreement is later observed. It never closes an issue on its own and respects a human-closed issue. GitHub delivery is subject to watch/notification settings; this is not email, SMS, or guaranteed push delivery. See [`ALERTING.md`](ALERTING.md) for thresholds, freshness semantics, and limitations.
+`.github/workflows/pages-and-monitor.yml` runs the poll and alert ledger on a five-minute GitHub Actions schedule. `monitor/alerts.py` records candidate alerts with stable IDs and review evidence; `monitor/dispatch.py` delivers configured severities as GitHub issues and can optionally send a webhook. Delivery attempts and skips are recorded; unchanged alerts are not repeatedly dispatched. Resolution is non-causal and must not automatically close the linked GitHub issue; a person may close it after review. GitHub delivery is subject to watch/notification settings; it is not guaranteed email, SMS, or push. See [`ALERTING.md`](../ALERTING.md) for thresholds, freshness semantics, and limitations.
 
 ## Evidence-review procedure
 
@@ -40,6 +40,6 @@ A missing score, unparseable feed, source outage, ambiguous game match, or one-p
 
 ## Operational notes
 
-The monitor timestamps are UTC poll/observation times, not provider update times. `last_poll_attempt_at` describes the latest attempt; `last_successful_comparison_at` describes the latest time both feeds parsed; `last_updated_at` is the last material snapshot change. The five-minute schedule can be delayed or skipped. Inspect source-health status, heartbeat, successful-pair time, and the linked Actions run before calling the feed current.
+The monitor's saved timestamps are UTC observation/material-change times, not provider update times. `last_updated_at` marks the last material snapshot change; an unchanged poll does not rewrite it, so it is not a heartbeat. The five-minute schedule can be delayed or skipped. Inspect source-health status, published diagnostics, and the linked Actions run before calling the feed current.
 
 The monitor cannot see arena/TV scorebugs absent from its feeds, detect an error shared by both feeds, recover a discrepancy shorter than its polling interval, or establish the cause of a score change. It does not autonomously convert a candidate into a verified case. See [`ALERTING.md`](ALERTING.md) and [`ROADMAP.md`](../ROADMAP.md).

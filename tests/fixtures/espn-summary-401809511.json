@@ -1,0 +1,31 @@
+{
+  "boxscore": {
+    "teams": [
+      {
+        "team": { "id": "5", "abbreviation": "CLE", "displayName": "Cleveland Cavaliers" },
+        "statistics": [
+          { "name": "fieldGoalsMade-fieldGoalsAttempted", "displayValue": "52-110", "label": "FG" },
+          { "name": "fieldGoalPct", "displayValue": "47", "abbreviation": "FG%", "label": "Field Goal %" },
+          { "name": "threePointFieldGoalsMade-threePointFieldGoalsAttempted", "displayValue": "20-45", "label": "3PT" },
+          { "name": "freeThrowsMade-freeThrowsAttempted", "displayValue": "24-31", "label": "FT" },
+          { "name": "totalRebounds", "displayValue": "57", "label": "Rebounds" }
+        ],
+        "displayOrder": 1,
+        "homeAway": "away"
+      },
+      {
+        "team": { "id": "27", "abbreviation": "WSH", "displayName": "Washington Wizards" },
+        "statistics": [
+          { "name": "fieldGoalsMade-fieldGoalsAttempted", "displayValue": "41-91", "label": "FG" },
+          { "name": "fieldGoalPct", "displayValue": "45", "abbreviation": "FG%", "label": "Field Goal %" },
+          { "name": "threePointFieldGoalsMade-threePointFieldGoalsAttempted", "displayValue": "15-41", "label": "3PT" },
+          { "name": "freeThrowsMade-freeThrowsAttempted", "displayValue": "18-23", "label": "FT" },
+          { "name": "totalRebounds", "displayValue": "44", "label": "Rebounds" }
+        ],
+        "displayOrder": 2,
+        "homeAway": "home"
+      }
+    ],
+    "players": []
+  }
+}

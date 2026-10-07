@@ -3,11 +3,6 @@ name: Publish research site and monitor NBA scores
 on:
   push:
     branches: [main]
-    # Scheduled polls publish the heartbeat/site themselves; avoid a second
-    # Pages deployment when their only commit is monitor-owned JSON state.
-    paths-ignore:
-      - "data/live-feed.json"
-      - "data/monitor-state.json"
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -41,6 +36,11 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Run scheduled source comparison
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: python3 -m monitor --live
@@ -50,58 +50,64 @@ jobs:
           python3 -m compileall -q monitor
           python3 -m monitor --check-data
 
-      - name: Create or refresh persistent-candidate issue alerts
-        id: github_alerts
+      # The scheduled job writes data files back to main with the repository's
+      # GITHUB_TOKEN, and GitHub does not start new workflow runs for those
+      # pushes. The machine-written data therefore has to be verified inside
+      # this same job, before it is committed.
+      - name: Verify the machine-written data and dashboard
+        run: |
+          python3 -m unittest discover -s tests
+          node --check assets/app.js
+          node tests/dashboard-smoke.js
+
+      - name: Dispatch alert notifications
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        continue-on-error: true
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const path = require('node:path');
-            const workspace = process.env.GITHUB_WORKSPACE;
-            const { notifyAlerts } = require(path.join(workspace, 'scripts/github_alerts.js'));
-            await notifyAlerts({
-              github,
-              context,
-              logger: core,
-              statePath: path.join(workspace, 'data/monitor-state.json'),
-            });
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCORING_DISCREPANCY_WEBHOOK_URL: ${{ secrets.SCORING_DISCREPANCY_WEBHOOK_URL }}
+        # Delivery failures are recorded in data/alert-dispatch-log.json and in
+        # data/alerts.json instead of blocking the research site deployment.
+        run: python3 -m monitor --dispatch-alerts --apply || echo "::warning::alert notification delivery reported a failure; see data/alert-dispatch-log.json"
 
-      - name: Report GitHub issue alert transport failure
-        if: steps.github_alerts.outcome == 'failure'
-        run: echo "::warning::Score observations were saved, but GitHub issue notifications failed. See the previous step; the next scheduled run will retry."
-
-      - name: Detect material monitor-ledger updates
+      - name: Detect monitor-ledger updates
         id: changes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          material_changes="$(python3 scripts/monitor_diff.py)"
-          echo "changed=$material_changes" >> "$GITHUB_OUTPUT"
+          if git diff --quiet -- data/live-feed.json data/monitor-state.json data/alerts.json data/alert-dispatch-log.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Persist changed observation and alert state
+      - name: Persist changed observation state
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/live-feed.json data/monitor-state.json
-          git commit -m "chore: update NBA score observations"
+          git add data/live-feed.json data/monitor-state.json data/alerts.json
+          if [ -f data/alert-dispatch-log.json ]; then git add data/alert-dispatch-log.json; fi
+          git commit -m "chore: update NBA score observations and alerts"
           git push origin HEAD:main
 
       - name: Configure GitHub Pages
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/configure-pages@v5
 
       - name: Stage static dashboard files
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         run: |
           mkdir -p _site
-          cp index.html README.md .nojekyll _site/
+          cp index.html README.md ALERTING.md .nojekyll _site/
           cp -R assets data docs _site/
 
       - name: Upload static site
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/deploy-pages@v4

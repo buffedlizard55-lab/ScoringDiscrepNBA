@@ -35,34 +35,103 @@ This log enforces the requested Pass 1 → Pass 2 → Pass 3 sequence. Evidence 
 
 ---
 
-## Current Arena session — notification and freshness hardening (2026-10-07)
+## 2026-10-07 alerting session (feasibility question, implementation, three passes)
+
+Requested scope: review the repository; determine whether an alert detection and
+notification system for scoring discrepancies can be built; state its
+limitations and feasibility; keep the founding brief in the README; publish a
+clean dashboard; open a PR and merge it.
 
 ### Pass 1 — implement and verify
 
-- [x] Read the carried-forward README brief before continuing; preserve Arena's “Maximize P(Win)” and “Own the Outcome” operating values.
-- [x] Add idempotent GitHub issue notifications with durable issue number/body-hash/status metadata; refresh material changes, skip unchanged issues, leave human-closed issues untouched, and keep convergence non-causal/non-auto-closing.
-- [x] Order workflow notification before material-diff detection so notifier metadata is committed with monitor state; keep issue API failures warning-only so feed publication continues.
-- [x] Add poll-attempt and paired-feed timestamps, material-only commit comparison, stale/unknown dashboard freshness messaging, and better HTTP status diagnostics.
-- [x] Preserve investigation originals and add incomplete-comparison markers; outages, missing games, and incomplete scores break the two-comparable-poll alert/convergence streak.
-- [x] Run all active/historical validators, Python/JavaScript syntax checks, monitor self-test, dashboard and alert smoke tests, workflow YAML parsing, deterministic generators, and diff hygiene.
+- [x] Answer feasibility with the repository as evidence: detectors, ledger, dispatch, dashboard
+      panel, and `ALERTING.md` (§1 table: detection yes, confirmation no).
+- [x] Implement the alert ledger (`monitor/alerts.py`: four detector families, severity policy
+      `critical/high/medium/info`, occurrence milestones `1/3/12/48/144/720`, lifecycle
+      `opened → reopened → resolved`, coverage gaps, detector status) and dispatch
+      (`monitor/dispatch.py`: `gh`-CLI GitHub issues, optional Slack/Discord-compatible webhook,
+      append-only `data/alert-dispatch-log.json`, `skipped` recorded rather than assumed).
+- [x] Wire the CLI: `--dispatch-alerts [--apply]`, `--resolve-alert <id> [--note]`; workflow step
+      `Dispatch alert notifications` with `issues: write` and a non-fatal `::warning::` on delivery
+      failure so the site still deploys.
+- [x] Dashboard: `#alerts` section (summary pill, alert cards with evidence/arithmetic/review
+      steps/delivery state, detector status, coverage gaps) plus the corrected feed status pill.
+- [x] Initial implementation checkpoint logged 77 Python tests and dashboard/data checks as green.
+      The final integrated suite now passes 82 tests after merge-integration regression fixes (see
+      the final verification note below).
 
-**Pass 1 results:** 53 Python unit tests passed; both Node smoke tests passed; active data checks passed (2 reviewed cases, 2 explicitly unverified leads); 14 historical case files validated; monitor self-test and compilation passed; updated Pages/CI YAML parsed; stats/site generation made no unexpected changes; material monitor diff returned `false` for the unchanged checked-in snapshot.
+### Pass 2 — adversarial defect / assumption review
 
-### Pass 2 — adversarial defect and gap review
+Found and fixed:
 
-- [x] Verify alert filtering and payload labels do not assign fault or upgrade a source observation into an NBA-record correction.
-- [x] Test deduplication, material score refresh, API-free unchanged runs, persisted notification metadata, closed issues, resolution notices, feed-text HTML/mention escaping, and stale issue references.
-- [x] Find and fix a subtle false-positive path: a failed or missing-game poll had no game-row observation, so two mismatches separated by an unobserved poll could appear adjacent. Persist an `incomplete` comparison marker and reset both streaks; repeated incomplete polls do not create heartbeat-only commits.
-- [x] Check stale/missing/future poll timestamps and distinguish attempt heartbeat from a successful paired-feed comparison in the dashboard.
-- [x] Reorder alerting before material-diff detection and explicitly pass the workspace monitor-state path to the action.
-
-**Pass 2 findings/fixes:** the alert smoke test initially exposed raw-HTML risk in feed-provided play-by-play text; angle brackets are now HTML-encoded. Review also found that a stale saved issue number could otherwise edit an unrelated issue; the notifier now verifies the stable issue marker before mutation and searches/creates safely if the reference is mismatched. Incomplete comparisons now break mismatch and convergence streaks. All findings were regression-tested.
+1. **Primary-feed failure blanked the whole journal** (defect, material): rows were built only
+   from the NBA feed, so an ESPN-only poll published `games: []`, stopped the ESPN final-score
+   baseline, and prevented the single-provider arithmetic check from attaching to any row —
+   in exactly the outage this project is living through. Fixed with the union snapshot builder
+   (`monitor/feeds.py::build_observations_from_sources`), per-row `score_sources`, and a
+   `Not compared` disclosure; the previous test that asserted the empty list was replaced with
+   two tests that pin the corrected behaviour, including the real archived ESPN box score
+   (derived 148 / 115) firing `final_score_internal_inconsistency` while the NBA feed is down.
+2. **Dashboard smoke test asserted the pre-poll world** (`/Not yet active/`) and therefore would
+   have failed on the first real published snapshot; it now derives the expected pill from
+   `data/live-feed.json`, exercises the alert renderer with a labelled synthetic alert, and checks
+   every configured source chip.
+3. **Source health chips were hard-coded** to `nba`/`espn` and printed a raw key for any new
+   source; labels are now mapped and unknown keys degrade to an upper-cased key with the last
+   error in the tooltip.
+4. **Machine-written data was never verified**: pushes made with `GITHUB_TOKEN` do not start a new
+   workflow run, so the first scheduled commit changed the dashboard's data with no check on it.
+   The scheduled job now runs the unit tests + JS syntax + smoke test before committing.
+5. **`duration_ms` and per-poll timestamps** would have rewritten committed files every five
+   minutes; diagnostics are published without durations and the feed/ledger are only rewritten on
+   a material signature or occurrence-milestone change.
+6. **The snapshot's explanation was frozen behind an unchanged game list**: the material
+   signature that decides whether `data/live-feed.json` is rewritten excluded the `note` text,
+   so after this fix a stale explanation ("the last saved snapshot") could have survived even
+   while a reachable source was being published. The note is now part of the signature, with a
+   focused test (`test_note_wording_is_part_of_the_material_signature`).
+7. **Delivery honesty**: unconfigured webhook → logged `skipped` (not silence); missing `gh` →
+   `dispatch.status = "skipped"`; three failed attempts → `failed`; issues always carry the
+   "does not establish that any NBA record was wrong" limitation.
+8. **Comparator outage never became notify-eligible**: `update_book` preserved the first
+   `not_required` state after the comparator's 60-minute dispatch threshold. It now promotes that
+   state to `pending` only when the current policy explicitly makes it eligible; the existing
+   `test_comparator_outage_is_medium_and_not_notified_until_an_hour` caught and locks the fix.
+9. **Issue lifecycle and unsafe-text edge cases**: fixed the generated `gh` stub's line endings and
+   added regressions for material issue refresh, human closure, non-causal resolution comments,
+   Markdown/@mention escaping, and unsafe links. The monitor edits only marker-matching open issues
+   and no longer closes issues automatically.
+10. **Snapshot freshness wording**: removed dashboard references to unsupported per-poll timestamps;
+    the pill describes the saved snapshot, and the page says poll freshness is unknown without an
+    Actions-history check. Corrected verification docs to match the actual workflow artifact rules.
+11. **Alert search link targeted an obsolete marker**: changed the dashboard query to match the
+    `[score-alert]` title prefix generated by `monitor/dispatch.py`; the dashboard smoke test now
+    asserts that wiring.
 
 ### Pass 3 — full-request recheck
 
-- [x] Recheck the founding scope, source-role distinction, no-overwrite/no-hallucination rules, accessible dashboard status, and notification limitations.
-- [x] Keep the originating 213/214 report and 2021 Kevin Porter Jr. lead unverified and excluded from confirmed-case statistics; add no new historical-case claims in this implementation pass.
-- [x] Confirm alert behavior does not prove which feed is right, does not auto-create a verified case, does not auto-close GitHub issues, and does not promise personal email/mobile/closed-tab push.
-- [x] Run the complete test/check matrix recorded above after final changes.
-- [ ] Push the fixed Arena branch, open the requested PR, and merge if GitHub permits; record CI and deployment outcomes below.
-- [ ] Verify a later scheduled feed snapshot only after it occurs. No live poll was run during this review; the checked-in snapshot is the previously observed degraded snapshot, not evidence of current source availability.
+- [x] Founding brief read from `README.md` §0 before work; §0 now carries the entire original
+      prompt verbatim (research spec, core values, site-creation and multi-pass instructions,
+      including the alerting question) and §1 restates the reading rules.
+- [x] Every factual statement added to the README/`ALERTING.md` is either a repository path, a
+      test, or a linked source; the two external probes performed this session
+      (`cdn.nba.com/robots.txt` → S3 `AccessDenied`; scoreboard object → HTTP 500) are quoted as
+      probes, not as league facts. No game-level claim is made about any real correction.
+- [x] Confirm the honest layer distinction: an alert is a candidate, feed convergence is not a
+      correction, and the two confirmed cases remain the only confirmed records.
+- [x] Confirm the "no manual input" requirement: the scheduled workflow polls, validates,
+      dispatches, commits, and deploys unattended; there is no step that requires a human, and no
+      step that silently depends on one.
+- [x] Deliverable status: feasibility answered (§1 table + `ALERTING.md` §3), implementation
+      complete and tested, remaining limitations enumerated (no reachable second source, no
+      corrections feed, best-effort cron, alert not yet delivered in production).
+- [x] Final local verification of the integrated tree: **82 Python tests**. Also passed Python
+      compilation (`monitor`, `scripts`, `src`, `tests`), monitor/data validation, the historical
+      self-test, active/historical JavaScript syntax checks, dashboard smoke test, diff hygiene,
+      and workflow-YAML parsing.
+- [x] Re-scan docs for references to deleted alert scripts and stale timestamp/heartbeat claims;
+      corrected the contributor checklist and verification notes. Dashboard shows `last_updated_at`
+      as a material-change time, not a poll time.
+- [ ] **Unfinished by design:** none of the Pass-3 checks depends on the live NBA feed, but the
+      production notification has still never fired. That gap is stated in README §8 and
+      ROADMAP 5b rather than papered over.

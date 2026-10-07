@@ -20,29 +20,34 @@ Ordered by P(Win): highest-evidence-value first.
    have ever been upheld (NBA.com) — this collection documents 2 (1982-83, 2007-08). The other
    4 (reportedly incl. a 1978 Nets–76ers game plus 1952/1969/1971 games per the PR #2 session's
    leads) are known gaps requiring independent per-case verification.
-5. **Monitor blind spots and current health:** arena scoreboards / TV bugs are invisible to
-   feed comparison; transient live-feed lag is expected noise; ESPN/NBA endpoints can change
-   without notice. The last reviewed scheduled snapshot (`2026-10-07T11:50:09Z`) was degraded:
-   ESPN was `ok`, NBA returned an opaque `HTTPError`, and no games were listed. Do not claim a
-   healthy dual-feed monitor until both source statuses and a recent paired-poll timestamp confirm it.
-6. **Alert delivery is limited.** The first channel is deduplicated GitHub issues for persistent
-   mismatches and final-feed revisions. A workflow warning/retry is best-effort; personal email,
-   SMS, Discord/Slack, and closed-tab browser push are not configured. GitHub notifications depend
-   on watch/subscription settings.
-7. **Workflow cadence is not a real-time guarantee.** GitHub Actions schedules can be delayed or
-   skipped and upstream APIs can fail. The five-minute cadence can miss short-lived differences.
-   Publishing each scheduled snapshot improves freshness but increases Pages deployment/Actions
-   activity; monitor workflow delay and platform limits during a live-game soak test.
-8. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
-   some corrected values, but pre-correction game-night box-score snapshots and exact record-update
+5. **Monitor blind spots (partly mitigated, still real):** arena scoreboards / TV bugs are
+   invisible to feed comparison; transient live-feed lag is expected noise; provider endpoints
+   can change without notice. Since the 2026-10-07 session the monitor no longer blanks out when
+   the primary feed fails: it publishes the games every reachable source reported, marks the row
+   `Not compared`, records the outage as a coverage gap, and runs the single-provider arithmetic
+   check (`2*(FGM-3PM)+3*3PM+FTM` from the provider's own box score). An error propagated
+   identically into both views of one provider is still invisible, and there is still no second
+   reachable comparator while the NBA CDN feed returns HTTP 500 to the runner.
+5b. **Alert delivery is not yet proven in production.** The ledger, lifecycle, dedupe, severity,
+   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (82 tests,
+   stubbed `gh`, local webhook receiver), but no scheduled run has produced an alert that was
+   delivered: the only scheduled poll so far had the NBA feed down and no games. Until
+   `data/alert-dispatch-log.json` contains a `sent` entry with an issue URL, describe the
+   notification system as implemented and verified offline, never as observed working in
+   production.
+5c. **Scheduler cadence is best-effort.** The workflow requests `*/5`, but GitHub documents
+   delays and dropped queue entries under load, and the run history during this review showed far
+   fewer runs than requested. Detection latency cannot be promised below that.
+6. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
+   some corrected values, but pre-correction game-night box-score snapshots and the exact record-update
    times are not preserved for the 2024/2025 examples.
-9. **Duration analysis is day-granularity.** Game→correction/ruling lags are computed where
+7. **Duration analysis is day-granularity.** Game→correction/ruling lags are computed where
    timelines allow (see `resolution_lag_days`); intraday detection→correction timestamps and
    transient display-error durations still need work.
-10. **Schema v1 approximations:** the 1982 rules-misapplication replay is typed
-    `official-scorer-book-error` for lack of a better enum; the 7-day-later 2017 correction
-    reuses `corrected-next-day`. Schema v2 should add `rules-misapplication-replay` and
-    `corrected-later`.
+8. **Schema v1 approximations:** the 1982 rules-misapplication replay is typed
+   `official-scorer-book-error` for lack of a better enum; the 7-day-later 2017 correction
+   reuses `corrected-next-day`. Schema v2 should add `rules-misapplication-replay` and
+   `corrected-later`.
 
 ## 2. Suggested next session (concrete, ordered)
 
@@ -66,11 +71,26 @@ Ordered by P(Win): highest-evidence-value first.
       or independently corroborated evidence identifies the game and the exact change.
 - [ ] **F. Evidence snapshots.** Add `evidence/` with archived pre/post-correction box scores
       for the 2017 + 2024 + 2025 correction cases; link from records.
-- [ ] **G. Monitor hardening.** Run a real-world soak test during a live game window; confirm
-      both feeds respond and the issue-alert permission works; measure false positives and cron-to-
-      Pages delay. Add quarter-line drift detection and a deduplicated/persistent alert for repeated
-      `feed-unavailable` streaks. Consider a Slack/Discord/email channel only after a maintainer
-      configures secrets and an explicit delivery policy; do not enable a noisy default.
+- [x] **G. Monitor hardening — alerting layer.** *(2026-10-07 session)* Alert ledger
+      (`data/alerts.json`), lifecycle with occurrence milestones, severity policy, coverage gaps
+      for outages, GitHub-issue + optional webhook dispatch with an append-only delivery log,
+      dashboard alert panel, and `ALERTING.md` (feasibility + limitations). See
+      `REVIEW_PASSES.md` "2026-10-07 alerting session".
+- [ ] **G2. Reach a second live comparator.** The NBA CDN feed answers the scheduled runner with
+      HTTP errors, so cross-source comparison cannot run. Observed this session: the NBA CDN
+      scoreboard object returned HTTP 500 and `robots.txt` returned an S3 `AccessDenied` document;
+      Yahoo's editorial scoreboard (`https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?leagues=nba&date=YYYY-MM-DD`)
+      answered HTTP 200 with per-game `total_away_points`/`total_home_points`, `status_type`, and
+      `home_team_id`/`away_team_id` (e.g. `nba.t.11`), but its team-id → abbreviation island has
+      **not** been verified yet, so no Yahoo parser was written. Verify that island, add the
+      adapter plus a fixture, then re-check the source-role policy before treating Yahoo as a
+      comparator.
+- [ ] **G3. Corrections watcher.** Watch league statement channels (newsroom RSS / official
+      account) and open an investigation automatically when a correction is published — the
+      missing half of the loop, which is why detection is currently after-the-fact.
+- [ ] **G4. Live-window soak test.** Exercise the alert path during real games; measure how often
+      a first-poll disagreement clears on its own (it should stay unalerted below two consecutive
+      polls) and tune `MAX_SUMMARY_FETCHES`/re-check intervals from observed volume.
 - [ ] **H. Schema v2.** Add `rules-misapplication-replay` type and `corrected-later` outcome;
       migrate the 1982 and 2017 cases; keep validator green.
 
@@ -91,24 +111,25 @@ becoming a record.
 - `validate.py`, `compute_stats.py`, `build_site_data.py`, `monitor.py --self-test` all green.
 - At least 2 open questions closed with primary evidence (or explicitly re-scoped with a dated note).
 - The 213/214 stub either identified or reclassified with a decision log (no silent drift).
-- [x] Previous Pages/monitor implementation was merged and deployed; scheduled workflow runs are
-  now visible in Actions.
-- [ ] After the current alert/freshness review merges, verify a scheduled run publishes both a
-  recent attempt timestamp and a successful paired comparison (`source_health.nba` and `.espn`
-  both `ok`). The last reviewed snapshot was `degraded`; workflow success alone is insufficient.
+- [x] PR #4 merged to `main` after GitHub confirmed success; post-merge validation, verification,
+  and Pages deployment succeeded; public site was fetched and checked.
+- [x] PR #7 merged; the scheduled workflow published its first real snapshot
+  (`data/live-feed.json` = `degraded`, ESPN `ok`, NBA unavailable with an HTTP error, published
+  timestamp `2026-10-07T11:50:09Z`). The `not_started` placeholder is gone; the honest status is
+  now "running, primary feed blocked".
+- [ ] No alert has been delivered by a scheduled run yet (see limitation 5b).
 
 ## 5. Current architecture and retained earlier layers
 
-The root dashboard and `monitor/` package are the active interface and live monitor. The older
-historical catalog and `scripts/monitor.py` backfill monitor remain available for their distinct
-purposes; do not conflate their data, state, schedules, or verification statuses.
+The root dashboard/monitor (PR #5/#6) is the active published interface. The older historical
+catalog and monitor remain available for their distinct purposes; they must not be conflated.
 
 | Concern | Active root dashboard / monitor | Historical or retained layer |
 |---|---|---|
 | Root case sample | `data/reviewed-cases.json` (2 evidence-reviewed cases) | `data/cases/*.json` → `data/cases.json` and the linked `docs/` catalog (12 partial cases + 2 unverified stubs) |
 | Open leads | `data/leads.json` (213/214 and KPJ; excluded from counts) | `data/discrepancies.json` — legacy leads, audit-flagged |
-| Current monitor | `monitor/` package; `data/live-feed.json` + `data/monitor-state.json`; GitHub issue alerts for persistent mismatch/final-feed revision | `scripts/monitor.py` and `data/monitor/current.json` for manual/backfill; current snapshot is `not-run` |
-| Site | Root `index.html` + `assets/`; every scheduled poll stages a fresh Pages artifact | `docs/` historical catalog and monitor/alert runbooks, included in Pages artifact |
+| Current monitor | `monitor/` package; `data/live-feed.json` + `data/monitor-state.json` | `scripts/monitor.py` and `data/monitor/current.json` for manual/backfill; current snapshot is `not-run` |
+| Site | Root `index.html` + `assets/`; `.github/workflows/pages-and-monitor.yml` | `docs/` historical catalog, included in Pages artifact |
 | Validation | `python3 -m monitor --check-data`; `.github/workflows/ci.yml` | `scripts/validate.py`, `compute_stats.py`, `build_site_data.py`; manual `monitor.yml` |
 | Statistics | Root seed counts are descriptive only; no NBA-wide rates | `data/stats.json` is collection-only; `data/statistics.json` is a superseded/audit-flagged manifest; old numeric archive remains historical |
 | Legacy tooling | — | `src/` may require API keys; do not treat as the scheduled monitor |

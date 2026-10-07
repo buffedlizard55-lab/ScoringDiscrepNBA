@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
@@ -18,6 +19,33 @@ from urllib.request import Request, urlopen
 NBA_SCOREBOARD_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
 NBA_PLAY_BY_PLAY_URL = "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{game_id}.json"
 ESPN_SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+ESPN_SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event={game_id}"
+
+# Request header profiles. The default profile identifies the project honestly.
+# The browser profile exists only because some provider CDNs are known to reject
+# non-browser user agents; every attempt is recorded in data/live-feed.json
+# (source_diagnostics) so a blocked or degraded source is visible rather than
+# silently assumed healthy.
+HEADER_PROFILES: dict[str, dict[str, str]] = {
+    "monitor": {
+        "Accept": "application/json",
+        "Cache-Control": "no-cache",
+        "User-Agent": "ScoringDiscrepNBA-monitor/0.1 (+https://github.com/buffedlizard55-lab/ScoringDiscrepNBA)",
+    },
+    "browser": {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Cache-Control": "no-cache",
+        "Origin": "https://www.nba.com",
+        "Referer": "https://www.nba.com/",
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+        ),
+    },
+}
+
+DEFAULT_PROFILE_ORDER = ("monitor", "browser")
 
 # ESPN and NBA use a few different display abbreviations. Canonical codes are
 # NBA codes. Unknown abbreviations are retained (and can still be compared if
@@ -47,16 +75,19 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def fetch_json(url: str, timeout: int = 15) -> tuple[dict[str, Any], dict[str, str | None]]:
-    """Fetch JSON with a clear user-agent and retain a response hash for provenance."""
-    request = Request(
-        url,
-        headers={
-            "Accept": "application/json",
-            "Cache-Control": "no-cache",
-            "User-Agent": "ScoringDiscrepNBA-monitor/0.1 (+https://github.com/buffedlizard55-lab/ScoringDiscrepNBA)",
-        },
-    )
+def _error_detail(exc: Exception) -> str:
+    """Include the HTTP status code so a blocked source is diagnosable."""
+    if isinstance(exc, HTTPError):
+        reason = getattr(exc, "reason", None)
+        return f"HTTP {exc.code}" + (f" {reason}" if reason else "")
+    return type(exc).__name__
+
+
+def fetch_json(
+    url: str, timeout: int = 15, profile: str = "monitor"
+) -> tuple[dict[str, Any], dict[str, str | None]]:
+    """Fetch JSON with a named header profile and retain a response hash for provenance."""
+    request = Request(url, headers=dict(HEADER_PROFILES.get(profile, HEADER_PROFILES["monitor"])))
     try:
         with urlopen(request, timeout=timeout) as response:
             body = response.read()
@@ -70,14 +101,54 @@ def fetch_json(url: str, timeout: int = 15) -> tuple[dict[str, Any], dict[str, s
                 "sha256": hashlib.sha256(body).hexdigest(),
                 "etag": response.headers.get("ETag"),
                 "last_modified": response.headers.get("Last-Modified"),
+                "profile": profile,
             }
             return payload, metadata
-    except HTTPError as exc:
-        # Preserve the useful status code so an operator can distinguish a
-        # denied/retired endpoint from a transient network or parse failure.
-        raise FeedError(f"Upstream returned HTTP {exc.code}") from exc
-    except (URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise FeedError(f"Could not fetch or decode upstream JSON: {type(exc).__name__}") from exc
+    except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise FeedError(
+            f"Could not fetch or decode upstream JSON: {type(exc).__name__} ({_error_detail(exc)})"
+        ) from exc
+
+
+def fetch_with_fallbacks(
+    url: str,
+    timeout: int = 15,
+    profiles: tuple[str, ...] = DEFAULT_PROFILE_ORDER,
+) -> tuple[dict[str, Any] | None, dict[str, str | None], list[dict[str, Any]]]:
+    """Try each header profile in order, recording one diagnostic row per attempt.
+
+    Returns ``(payload, metadata, attempts)``. ``payload`` is ``None`` only when
+    every attempt failed, and ``attempts`` is always populated so the reason is
+    reviewable from the published snapshot.
+    """
+    attempts: list[dict[str, Any]] = []
+    for profile in profiles:
+        started = time.monotonic()
+        try:
+            payload, metadata = fetch_json(url, timeout=timeout, profile=profile)
+        except FeedError as exc:
+            attempts.append(
+                {
+                    "profile": profile,
+                    "outcome": "failed",
+                    "error": str(exc),
+                    "duration_ms": int((time.monotonic() - started) * 1000),
+                }
+            )
+            continue
+        attempts.append(
+            {
+                "profile": profile,
+                "outcome": "ok",
+                "http_status": 200,
+                "sha256": metadata.get("sha256"),
+                "etag": metadata.get("etag"),
+                "last_modified": metadata.get("last_modified"),
+                "duration_ms": int((time.monotonic() - started) * 1000),
+            }
+        )
+        return payload, metadata, attempts
+    return None, {}, attempts
 
 
 def _canonical_code(value: Any) -> str | None:
@@ -333,50 +404,104 @@ def extract_latest_scoring_play(payload: dict[str, Any]) -> dict[str, Any] | Non
     return None
 
 
+SOURCE_LABELS = {"nba": "NBA", "espn": "ESPN", "yahoo": "Yahoo"}
+
+
+def source_label(source_key: str) -> str:
+    """Human-readable label for a configured source key."""
+    return SOURCE_LABELS.get(source_key, source_key.upper())
+
+
+def build_observations_from_sources(
+    source_games: dict[str, list[dict[str, Any]]],
+    observed_at: str,
+    source_hashes: dict[str, str | None] | None = None,
+) -> list[dict[str, Any]]:
+    """Union every source's games into one row per game, retaining missing values.
+
+    The first source that lists a game supplies the row identity, so a joined
+    game keeps the primary feed's game id exactly as before. Each source's score
+    is stored side by side under ``scores`` and ``score_mismatch`` stays ``None``
+    until two sources publish both sides of the same game: a comparison that
+    could not run is not agreement.
+
+    Building the union (instead of driving everything from the primary feed)
+    matters because the primary NBA CDN feed has been unavailable to the
+    scheduled runner: without this, a reachable secondary source published
+    nothing at all and its single-provider arithmetic checks never ran.
+    """
+    hashes = source_hashes or {}
+    source_hash_view = {key: hashes.get(key) for key in source_games}
+    observations: list[dict[str, Any]] = []
+    for source_key, games in source_games.items():
+        for game in games or []:
+            pair = _team_pair(game)
+            if pair is None:
+                continue
+            row = next(
+                (
+                    candidate
+                    for candidate in observations
+                    if candidate["_team_pair"] == pair and source_key not in candidate["scores"]
+                ),
+                None,
+            )
+            if row is None:
+                row = {
+                    "_team_pair": pair,
+                    "observed_at": observed_at,
+                    "game_id": game.get("game_id"),
+                    "game_date": game.get("game_date"),
+                    "status": game.get("status", "unknown"),
+                    "status_text": game.get("status_text"),
+                    "period": game.get("period"),
+                    "clock": game.get("clock"),
+                    "away_team": game.get("away_team"),
+                    "home_team": game.get("home_team"),
+                    "scores": {},
+                    "score_sources": [],
+                    "score_mismatch": None,
+                    "source_hashes": deepcopy_source_hashes(source_hash_view),
+                    "latest_official_scoring_play": None,
+                    "play_by_play_source_url": None,
+                }
+                observations.append(row)
+            row["scores"][source_key] = {
+                "away": (game.get("away_team") or {}).get("score"),
+                "home": (game.get("home_team") or {}).get("score"),
+                "source_url": game.get("source_url"),
+            }
+    for row in observations:
+        published = {
+            key: value
+            for key, value in row["scores"].items()
+            if value.get("away") is not None and value.get("home") is not None
+        }
+        row["score_sources"] = sorted(published)
+        if len(published) < 2:
+            row["score_mismatch"] = None
+        else:
+            reference = next(iter(published.values()))
+            row["score_mismatch"] = any(
+                (value["away"], value["home"]) != (reference["away"], reference["home"])
+                for value in published.values()
+            )
+        row.pop("_team_pair", None)
+    return observations
+
+
+def deepcopy_source_hashes(source_hash_view: dict[str, Any]) -> dict[str, Any]:
+    """Copy a per-source hash mapping without importing deepcopy for one use."""
+    return {key: value for key, value in source_hash_view.items()}
+
+
 def build_observations(
     nba_games: list[dict[str, Any]],
     espn_games: list[dict[str, Any]],
     observed_at: str,
     source_hashes: dict[str, str | None] | None = None,
 ) -> list[dict[str, Any]]:
-    """Create comparable snapshots, retaining missing values instead of guessing."""
-    hashes = source_hashes or {}
-    observations: list[dict[str, Any]] = []
-    for nba_game, espn_game in match_scoreboards(nba_games, espn_games):
-        nba_home = (nba_game.get("home_team") or {}).get("score")
-        nba_away = (nba_game.get("away_team") or {}).get("score")
-        espn_home = (espn_game.get("home_team") or {}).get("score") if espn_game else None
-        espn_away = (espn_game.get("away_team") or {}).get("score") if espn_game else None
-        both_sources_have_scores = all(value is not None for value in (nba_home, nba_away, espn_home, espn_away))
-        mismatch = None if not both_sources_have_scores else (nba_home != espn_home or nba_away != espn_away)
-        period = nba_game.get("period")
-        clock = nba_game.get("clock")
-        observations.append(
-            {
-                "observed_at": observed_at,
-                "game_id": nba_game.get("game_id"),
-                "game_date": nba_game.get("game_date"),
-                "status": nba_game.get("status", "unknown"),
-                "status_text": nba_game.get("status_text"),
-                "period": period,
-                "clock": clock,
-                "away_team": nba_game.get("away_team"),
-                "home_team": nba_game.get("home_team"),
-                "scores": {
-                    "nba": {"away": nba_away, "home": nba_home, "source_url": nba_game.get("source_url")},
-                    "espn": {
-                        "away": espn_away,
-                        "home": espn_home,
-                        "source_url": espn_game.get("source_url") if espn_game else None,
-                    },
-                },
-                "score_mismatch": mismatch,
-                "source_hashes": {
-                    "nba": hashes.get("nba"),
-                    "espn": hashes.get("espn"),
-                },
-                "latest_official_scoring_play": None,
-                "play_by_play_source_url": None,
-            }
-        )
-    return observations
+    """Backwards-compatible two-source wrapper around the union builder."""
+    return build_observations_from_sources(
+        {"nba": nba_games, "espn": espn_games}, observed_at, source_hashes
+    )
