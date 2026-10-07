@@ -83,24 +83,33 @@ class InvestigationLifecycleTests(unittest.TestCase):
         first = observation("2026-10-07T04:00:00Z", 100, 99, 100, 99, status="final")
         state = update_state(empty_state(), [first], first["observed_at"], HEALTHY)
         self.assertEqual(state["investigations"], [])
-        self.assertIn("0022600001", state["final_score_baselines"])
+        self.assertIn("nba:0022600001", state["final_score_baselines"])
+        self.assertIn("espn:0022600001", state["final_score_baselines"])
 
         revised = observation("2026-10-07T04:05:00Z", 101, 99, 101, 99, status="final")
         state = update_state(state, [revised], revised["observed_at"], HEALTHY)
-        self.assertEqual(len(state["investigations"]), 1)
-        event = state["investigations"][0]
-        self.assertEqual(event["detection_type"], "nba_final_feed_revision")
+        # Each compared source keeps its own baseline, so a revision on both
+        # feeds produces one record per source instead of conflating them.
+        self.assertEqual(len(state["investigations"]), 2)
+        self.assertEqual(
+            sorted(item["source_key"] for item in state["investigations"]), ["espn", "nba"]
+        )
+        event = next(item for item in state["investigations"] if item["source_key"] == "nba")
+        self.assertEqual(event["detection_type"], "final_score_feed_revision")
+        self.assertEqual(event["source_key"], "nba")
         self.assertEqual(event["status"], "change_observed_unverified")
         self.assertIn("not by itself proof", event["first_details"]["warning"])
         self.assertEqual(event["verification_status"], "unverified")
-        self.assertEqual(event["previous_nba_feed_score"], {"away": 100, "home": 99})
-        self.assertEqual(event["current_nba_feed_score"], {"away": 101, "home": 99})
+        self.assertEqual(event["previous_final_score"], {"away": 100, "home": 99})
+        self.assertEqual(event["current_final_score"], {"away": 101, "home": 99})
         self.assertEqual(event["change_interval"]["detected_at"], "2026-10-07T04:05:00Z")
 
         same = observation("2026-10-07T04:10:00Z", 101, 99, 101, 99, status="final")
         state = update_state(state, [same], same["observed_at"], HEALTHY)
-        self.assertEqual(len(state["investigations"]), 1)
-        self.assertEqual(state["investigations"][0]["status"], "change_observed_unverified")
+        self.assertEqual(len(state["investigations"]), 2)
+        self.assertEqual(
+            {item["status"] for item in state["investigations"]}, {"change_observed_unverified"}
+        )
 
     def test_no_games_or_unavailable_source_does_not_claim_success_or_resolution(self) -> None:
         state = update_state(

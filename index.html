@@ -19,6 +19,7 @@
       </a>
       <nav class="primary-nav" aria-label="Main navigation">
         <a href="#monitor">Live monitor</a>
+        <a href="#alerts">Alerts</a>
         <a href="#cases">Research ledger</a>
         <a href="docs/index.html">Historical catalog</a>
         <a href="#method">Method &amp; limits</a>
@@ -109,12 +110,39 @@
           <h3>Best effort, not real-time</h3>
           <p>Scheduled checks depend on GitHub Actions and upstream data feeds. The site reports the latest <em>published observation</em>, not a guaranteed live connection.</p>
           <a class="text-link" href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions" target="_blank" rel="noopener noreferrer">Review workflow runs <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="ALERTING.md">Alerting scope, limits, and how to enable channels <span aria-hidden="true">↗</span></a>
           <div class="source-health" id="sourceHealth" aria-label="Source health"></div>
         </aside>
       </div>
       <div id="investigationsPanel" class="investigations-panel" hidden>
         <div class="investigations-header"><span class="investigation-indicator"></span><strong id="investigationsTitle">Investigation ledger</strong><span class="muted-text">Automated records · closure does not confirm the cause</span></div>
         <div id="investigationsList"></div>
+      </div>
+    </section>
+
+    <section class="section alerts-section" id="alerts" aria-labelledby="alerts-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow eyebrow-amber">ALERT LEDGER</p>
+          <h2 id="alerts-title">Automated detections, kept until a human reviews them</h2>
+          <p class="section-deck">Every alert is a candidate, not a verdict. Each one names the sources that disagreed, the exact values, the time this project observed them, and the steps to check it by hand.</p>
+        </div>
+        <span id="alertSummary" class="status-pill status-neutral"><span class="status-light"></span> Loading alerts…</span>
+      </div>
+      <div id="alertsList" class="alerts-list" aria-live="polite">
+        <div class="empty-state"><span class="empty-state-mark" aria-hidden="true">◷</span><p>Loading the alert ledger…</p></div>
+      </div>
+      <div class="detector-grid">
+        <div class="detector-card">
+          <h3>What the monitor checks</h3>
+          <div id="detectorStatus" class="detector-status"><p class="muted-text">Loading detector status…</p></div>
+        </div>
+        <div class="detector-card">
+          <h3>Blind windows (coverage gaps)</h3>
+          <p class="muted-text">When a source is unreachable, no comparison against it can run. Those windows are listed instead of being counted as “no discrepancy found”.</p>
+          <div id="coverageGaps" class="coverage-gaps"><p class="muted-text">No coverage gaps recorded yet.</p></div>
+          <a class="text-link" href="ALERTING.md">How detection works and what it cannot do <span aria-hidden="true">↗</span></a>
+        </div>
       </div>
     </section>
 
@@ -183,6 +211,9 @@
         <article class="method-step">
           <span class="step-index">04</span><div><h3>Earn the statistics</h3><p>Rates and typical durations require full coverage and reliable timestamps. Until then, the dashboard shows sample counts and says what cannot be measured.</p></div>
         </article>
+        <article class="method-step">
+          <span class="step-index">05</span><div><h3>Say when the monitor was blind</h3><p>A source outage means no comparison could run. Those windows are published as coverage gaps so silence is never presented as a clean result.</p></div>
+        </article>
       </div>
       <div class="rule-reference">
         <span class="rule-icon" aria-hidden="true">§</span>
@@ -206,6 +237,6 @@
     </div>
   </footer>
 
-  <noscript><div class="noscript-notice">JavaScript is needed to load the linked research records and current monitor snapshot. The saved files remain available in the repository’s <a href="data/reviewed-cases.json">reviewed case dataset</a>, <a href="data/leads.json">unverified leads</a>, and <a href="data/live-feed.json">feed snapshot</a>.</div></noscript>
+  <noscript><div class="noscript-notice">JavaScript is needed to load the linked research records and current monitor snapshot. The saved files remain available in the repository’s <a href="data/reviewed-cases.json">reviewed case dataset</a>, <a href="data/leads.json">unverified leads</a>, <a href="data/live-feed.json">feed snapshot</a>, and <a href="data/alerts.json">alert ledger</a>.</div></noscript>
 </body>
 </html>

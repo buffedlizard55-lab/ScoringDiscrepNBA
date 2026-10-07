@@ -9,25 +9,53 @@ from typing import Any
 STATE_SCHEMA_VERSION = 1
 RESOLVED_STATUSES = {"resolved"}
 
+# Retention: the first observations of an event and the most recent ones are
+# kept, so a long-running mismatch window cannot grow the committed state file
+# without bound while the original observation is preserved.
+OBSERVATION_RETENTION_FIRST = 3
+OBSERVATION_RETENTION_RECENT = 20
+
+# Volatile bookkeeping fields: they change on every healthy poll, so they must
+# not by themselves mark the state as materially changed (otherwise the
+# scheduled runner would commit on every single poll).
+_VOLATILE_STATE_FIELDS = {
+    "source_health_state": ("last_ok_at",),
+    "final_game_checks": ("checked_at",),
+}
+
+# Outage bookkeeping uses wall-clock duration rather than a poll counter,
+# because the scheduled runner is queued and delayed by GitHub Actions: a poll
+# count would understate how long a source was actually unavailable. Only the
+# first failure time is stored, so a long outage does not rewrite the committed
+# state file on every poll.
+
 
 def empty_state() -> dict[str, Any]:
     return {
         "schema_version": STATE_SCHEMA_VERSION,
         "last_state_change_at": None,
         "source_health": {},
+        "source_health_state": {},
+        "coverage_gaps": [],
         "final_score_baselines": {},
+        "final_game_checks": {},
         "investigations": [],
         "note": "Automated detections are unverified leads, not confirmed NBA scoring errors.",
     }
 
 
-def _game_identity(observation: dict[str, Any]) -> str:
+def game_identity(observation: dict[str, Any]) -> str:
+    """Stable per-game key used by investigations and alert records."""
     game_id = observation.get("game_id")
     if game_id:
         return str(game_id)
     away = (observation.get("away_team") or {}).get("abbreviation") or "away"
     home = (observation.get("home_team") or {}).get("abbreviation") or "home"
     return f"{observation.get('game_date') or 'undated'}-{away}-{home}"
+
+
+def _game_identity(observation: dict[str, Any]) -> str:
+    return game_identity(observation)
 
 
 def _compact_observation(observation: dict[str, Any]) -> dict[str, Any]:
@@ -53,12 +81,16 @@ def _compact_observation(observation: dict[str, Any]) -> dict[str, Any]:
 
 
 def _open_investigation(
-    investigations: list[dict[str, Any]], game_id: str, detection_type: str
+    investigations: list[dict[str, Any]],
+    game_id: str,
+    detection_type: str,
+    source_key: str | None = None,
 ) -> dict[str, Any] | None:
     for item in reversed(investigations):
         if (
             item.get("game_key") == game_id
             and item.get("detection_type") == detection_type
+            and (source_key is None or item.get("source_key") == source_key)
             and item.get("status") not in RESOLVED_STATUSES
         ):
             return item
@@ -71,13 +103,16 @@ def _create_investigation(
     detection_type: str,
     status: str,
     first_details: dict[str, Any],
+    source_key: str | None = None,
 ) -> dict[str, Any]:
     game_key = _game_identity(observation)
     detected_at = observation.get("observed_at")
     index = 1 + sum(
         1
         for item in investigations
-        if item.get("game_key") == game_key and item.get("detection_type") == detection_type
+        if item.get("game_key") == game_key
+        and item.get("detection_type") == detection_type
+        and (source_key is None or item.get("source_key") == source_key)
     )
     event_id = f"{game_key}:{detection_type}:{index}"
     compact = _compact_observation(observation)
@@ -89,6 +124,7 @@ def _create_investigation(
         "away_team": deepcopy(observation.get("away_team")),
         "home_team": deepcopy(observation.get("home_team")),
         "detection_type": detection_type,
+        "source_key": source_key,
         "status": status,
         "verification_status": "unverified",
         "detected_at": detected_at,
@@ -113,7 +149,20 @@ def _append_observation(item: dict[str, Any], observation: dict[str, Any]) -> No
     item["latest_observation"] = compact
     item["last_seen_at"] = observation.get("observed_at")
     item["observation_count"] = int(item.get("observation_count", 0)) + 1
-    item.setdefault("observations", []).append(compact)
+    stored = item.setdefault("observations", [])
+    stored.append(compact)
+    limit = OBSERVATION_RETENTION_FIRST + OBSERVATION_RETENTION_RECENT
+    if len(stored) > limit:
+        dropped = len(stored) - limit
+        kept_first = stored[:OBSERVATION_RETENTION_FIRST]
+        kept_recent = stored[-OBSERVATION_RETENTION_RECENT:]
+        item["observations"] = kept_first + kept_recent
+        item["observations_truncated_count"] = int(item.get("observations_truncated_count", 0)) + dropped
+        item["observations_retention_note"] = (
+            f"Only the first {OBSERVATION_RETENTION_FIRST} and most recent "
+            f"{OBSERVATION_RETENTION_RECENT} saved observations are retained in this ledger; "
+            "the full count is preserved in observation_count and the first snapshot in first_observation."
+        )
 
 
 def _process_feed_mismatches(
@@ -180,71 +229,262 @@ def _process_feed_mismatches(
 def _process_final_score_revisions(
     state: dict[str, Any], observations: list[dict[str, Any]]
 ) -> None:
+    """Track post-final score changes on every compared source, keyed per source.
+
+    A source's final score changing after it was first served as final is the
+    closest automatic signal to a scoring correction, and it is exactly the
+    class of event the project exists to explain. It is still only an
+    observation: the record may have been corrected, or the provider may have
+    been wrong and then fixed its own feed.
+    """
     for observation in observations:
         if observation.get("status") != "final":
             continue
-        nba_score = (observation.get("scores") or {}).get("nba") or {}
-        if nba_score.get("away") is None or nba_score.get("home") is None:
-            continue
         game_key = _game_identity(observation)
         baselines = state.setdefault("final_score_baselines", {})
-        current = {"away": nba_score["away"], "home": nba_score["home"]}
-        baseline = baselines.get(game_key)
-        if baseline is None:
-            baselines[game_key] = {
-                "game_id": observation.get("game_id"),
-                "game_date": observation.get("game_date"),
-                "first_final_seen_at": observation.get("observed_at"),
-                "current_score": current,
-                "team_codes": {
-                    "away": (observation.get("away_team") or {}).get("abbreviation"),
-                    "home": (observation.get("home_team") or {}).get("abbreviation"),
-                },
-                "source_url": nba_score.get("source_url"),
-            }
-            continue
-        previous = baseline.get("current_score") or {}
-        if previous == current:
-            continue
+        for source_key, source_score in sorted((observation.get("scores") or {}).items()):
+            if not isinstance(source_score, dict):
+                continue
+            if source_score.get("away") is None or source_score.get("home") is None:
+                continue
+            baseline_key = f"{source_key}:{game_key}"
+            current = {"away": source_score["away"], "home": source_score["home"]}
+            baseline = baselines.get(baseline_key)
+            if baseline is None:
+                baselines[baseline_key] = {
+                    "source_key": source_key,
+                    "game_id": observation.get("game_id"),
+                    "game_date": observation.get("game_date"),
+                    "first_final_seen_at": observation.get("observed_at"),
+                    "current_score": current,
+                    "team_codes": {
+                        "away": (observation.get("away_team") or {}).get("abbreviation"),
+                        "home": (observation.get("home_team") or {}).get("abbreviation"),
+                    },
+                    "source_url": source_score.get("source_url"),
+                }
+                continue
+            previous = baseline.get("current_score") or {}
+            if previous == current:
+                continue
 
-        revision = _open_investigation(
-            state["investigations"], game_key, "nba_final_feed_revision"
-        )
-        details = {
-            "previous_nba_feed_score": deepcopy(previous),
-            "new_nba_feed_score": current,
-            "previous_value_first_seen_at": baseline.get("first_final_seen_at"),
-            "change_detected_at": observation.get("observed_at"),
-            "change_time_precision": "bounded between saved observations; exact internal record-change time unknown",
-            "nba_scoreboard_source_url": nba_score.get("source_url"),
-            "warning": "A change in the NBA scoreboard feed is not by itself proof that the underlying official record was corrected.",
-        }
-        if revision is None:
-            _create_investigation(
-                state["investigations"],
-                observation,
-                "nba_final_feed_revision",
-                "change_observed_unverified",
-                details,
+            revision = _open_investigation(
+                state["investigations"], game_key, "final_score_feed_revision", source_key
             )
-            revision = state["investigations"][-1]
-            revision["previous_nba_feed_score"] = deepcopy(previous)
-            revision["current_nba_feed_score"] = current
-            revision["change_interval"] = {
-                "not_before": baseline.get("first_final_seen_at"),
-                "detected_at": observation.get("observed_at"),
-                "precision": "between saved polls; not an exact NBA record-change timestamp",
+            details = {
+                "source_key": source_key,
+                "previous_final_score": deepcopy(previous),
+                "new_final_score": current,
+                "previous_value_first_seen_at": baseline.get("first_final_seen_at"),
+                "change_detected_at": observation.get("observed_at"),
+                "change_time_precision": "bounded between saved observations; exact internal record-change time unknown",
+                "source_url": source_score.get("source_url"),
+                "warning": (
+                    "A change in a published feed is not by itself proof that the underlying official "
+                    "record was corrected. Feed-side fixes by the provider are a competing explanation."
+                ),
             }
-        else:
-            _append_observation(revision, observation)
-            revision["current_nba_feed_score"] = current
-            revision["current_details"] = details
-        # Preserve the old feed value on the investigation before advancing
-        # the baseline. A later revision starts a new investigation only
-        # after this one is explicitly resolved by independent evidence, not
-        # by polling.
-        baseline["current_score"] = current
-        baseline["first_final_seen_at"] = observation.get("observed_at")
+            if revision is None:
+                _create_investigation(
+                    state["investigations"],
+                    observation,
+                    "final_score_feed_revision",
+                    "change_observed_unverified",
+                    details,
+                    source_key=source_key,
+                )
+                revision = state["investigations"][-1]
+                revision["previous_final_score"] = deepcopy(previous)
+                revision["current_final_score"] = current
+                revision["change_interval"] = {
+                    "not_before": baseline.get("first_final_seen_at"),
+                    "detected_at": observation.get("observed_at"),
+                    "precision": "between saved polls; not an exact record-change timestamp",
+                }
+            else:
+                _append_observation(revision, observation)
+                revision["current_final_score"] = current
+                revision["current_details"] = details
+            # Preserve the old feed value on the investigation before advancing
+            # the baseline. A later revision starts a new investigation only
+            # after this one is explicitly resolved by independent evidence.
+            baseline["current_score"] = current
+            baseline["first_final_seen_at"] = observation.get("observed_at")
+
+
+def _source_role(source_key: str) -> str:
+    return "authoritative" if source_key == "nba" else "comparator"
+
+
+def _elapsed_minutes(start: Any, end: Any) -> float | None:
+    from datetime import datetime
+
+    if not isinstance(start, str) or not isinstance(end, str):
+        return None
+    try:
+        start_dt = datetime.fromisoformat(start.replace("Z", "+00:00"))
+        end_dt = datetime.fromisoformat(end.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return round((end_dt - start_dt).total_seconds() / 60, 1)
+
+
+def _process_source_health(
+    state: dict[str, Any], source_health: dict[str, Any], observed_at: str | None
+) -> None:
+    """Record source availability and the blind windows it creates.
+
+    Automated comparison cannot report a discrepancy while a source is down, so
+    an outage window is recorded explicitly as a coverage gap rather than being
+    silently averaged into "no discrepancies found".
+    """
+    health_state = state.setdefault("source_health_state", {})
+    for source_key, health in sorted(source_health.items()):
+        if not isinstance(health, dict):
+            continue
+        previous = health_state.get(source_key) or {}
+        healthy = health.get("status") == "ok"
+        if healthy:
+            if previous.get("first_failure_at"):
+                state.setdefault("coverage_gaps", []).append(
+                    {
+                        "source_key": source_key,
+                        "role": _source_role(source_key),
+                        "from": previous.get("first_failure_at"),
+                        "to": observed_at,
+                        "unavailable_minutes": _elapsed_minutes(
+                            previous.get("first_failure_at"), observed_at
+                        ),
+                        "impact": (
+                            "No successful poll of this source during this window. Automated comparison "
+                            "against it could not run, so absence of detections here is not evidence of "
+                            "absence of discrepancies."
+                        ),
+                        "last_error": previous.get("last_error"),
+                    }
+                )
+            health_state[source_key] = {
+                "role": _source_role(source_key),
+                "status": "ok",
+                "first_failure_at": None,
+                "last_error": None,
+                "last_ok_at": observed_at,
+            }
+            continue
+        health_state[source_key] = {
+            "role": _source_role(source_key),
+            "status": health.get("status"),
+            "first_failure_at": previous.get("first_failure_at") or observed_at,
+            "last_error": health.get("error"),
+            "last_ok_at": previous.get("last_ok_at"),
+            "unavailable_minutes": _elapsed_minutes(
+                previous.get("first_failure_at") or observed_at, observed_at
+            ),
+        }
+
+
+def _process_final_game_consistency(
+    state: dict[str, Any],
+    checks: list[dict[str, Any]] | None,
+    observations: list[dict[str, Any]],
+    observed_at: str | None,
+) -> None:
+    """Record single-provider arithmetic checks for finals and flag mismatches.
+
+    ``checks`` are produced by ``monitor.consistency`` and must already carry
+    ``source_key`` and ``game_key``. A passing check is stored (so the coverage
+    of the check itself is auditable) and resolves any earlier mismatch record
+    for the same source/game only when the arithmetic is consistent.
+    """
+    if not checks:
+        return
+    observation_by_game = {_game_identity(item): item for item in observations}
+    store = state.setdefault("final_game_checks", {})
+    for check in checks:
+        source_key = check.get("source_key")
+        game_key = check.get("game_key")
+        if not source_key or not game_key:
+            continue
+        store_key = f"{source_key}:{game_key}"
+        record = {
+            "source_key": source_key,
+            "game_key": game_key,
+            "game_id": check.get("game_id"),
+            "checked_at": observed_at,
+            "status": check.get("status"),
+            "provider_reported": deepcopy(check.get("provider_reported")),
+            "derived": [
+                {
+                    "side": item.get("side"),
+                    "derived_points": item.get("derived_points"),
+                    "provider_reported_final": item.get("provider_reported_final"),
+                }
+                for item in check.get("checks", [])
+            ],
+            "source_url": check.get("source_url"),
+            "method": check.get("method"),
+            "note": check.get("note"),
+        }
+        store[store_key] = record
+        observation = observation_by_game.get(game_key)
+        if check.get("status") == "inconsistent":
+            if observation is None or observation.get("status") != "final":
+                continue
+            existing = _open_investigation(
+                state["investigations"], game_key, "final_score_internal_inconsistency", source_key
+            )
+            if existing is None:
+                _create_investigation(
+                    state["investigations"],
+                    observation,
+                    "final_score_internal_inconsistency",
+                    "detected",
+                    deepcopy(check),
+                    source_key=source_key,
+                )
+                item = state["investigations"][-1]
+                item["arithmetic_check"] = deepcopy(check)
+            else:
+                _append_observation(existing, observation)
+                existing["current_details"] = deepcopy(check)
+                existing["arithmetic_check"] = deepcopy(check)
+        elif check.get("status") == "consistent":
+            existing = _open_investigation(
+                state["investigations"], game_key, "final_score_internal_inconsistency", source_key
+            )
+            if existing is not None:
+                _append_observation(existing, observation or {})
+                existing["status"] = "resolved"
+                existing["resolved_at"] = observed_at
+                existing["resolution"] = {
+                    "type": "arithmetic_now_consistent",
+                    "at": observed_at,
+                    "note": (
+                        "A later check of the same provider data found the published final consistent "
+                        "with its own box-score components. This records that the earlier mismatch no "
+                        "longer reproduces; it does not explain the earlier values or establish who "
+                        "changed what."
+                    ),
+                }
+
+
+def material_state_view(state: dict[str, Any]) -> dict[str, Any]:
+    """Return the state without per-poll bookkeeping timestamps.
+
+    Used to decide whether a poll materially changed anything, so the scheduled
+    runner does not commit a new revision every five minutes while nothing
+    reviewable changed.
+    """
+    view = deepcopy(state)
+    view.pop("last_state_change_at", None)
+    for section, fields in _VOLATILE_STATE_FIELDS.items():
+        entries = view.get(section)
+        if isinstance(entries, dict):
+            for entry in entries.values():
+                if isinstance(entry, dict):
+                    for field in fields:
+                        entry.pop(field, None)
+    return view
 
 
 def update_state(
@@ -252,6 +492,7 @@ def update_state(
     observations: list[dict[str, Any]],
     observed_at: str,
     source_health: dict[str, Any],
+    consistency_checks: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Apply one poll without converting feed differences into verified cases.
 
@@ -262,19 +503,24 @@ def update_state(
     state = deepcopy(previous_state) if previous_state else empty_state()
     state.setdefault("schema_version", STATE_SCHEMA_VERSION)
     state.setdefault("final_score_baselines", {})
+    state.setdefault("final_game_checks", {})
+    state.setdefault("source_health_state", {})
+    state.setdefault("coverage_gaps", [])
     state.setdefault("investigations", [])
     before = deepcopy(state)
     state["source_health"] = deepcopy(source_health)
 
     _process_feed_mismatches(state, observations)
     _process_final_score_revisions(state, observations)
+    _process_final_game_consistency(state, consistency_checks, observations, observed_at)
+    _process_source_health(state, source_health, observed_at)
     state["note"] = (
         "Automated detections are unverified leads, not confirmed NBA scoring errors. "
-        "Feed convergence closes only an observed mismatch window; it does not establish cause."
+        "Feed convergence closes only an observed mismatch window; it does not establish cause. "
+        "Source outages are recorded as coverage gaps because no comparison can run while a "
+        "source is unavailable."
     )
-    state.pop("last_state_change_at", None)
-    before.pop("last_state_change_at", None)
-    if state != before:
+    if material_state_view(state) != material_state_view(before):
         state["last_state_change_at"] = observed_at
     else:
         state["last_state_change_at"] = (previous_state or {}).get("last_state_change_at")

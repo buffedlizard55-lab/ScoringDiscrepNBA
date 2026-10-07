@@ -108,6 +108,20 @@ cause beyond what sources state.
   Updated `compute_stats.py`, `ROADMAP.md`, site copy, and the 1982 case's USA Today note.
 - Ran the cross-session audit (§6). No legacy facts imported without fresh verification.
 
+### Pass 2026-10-07-C (alerting feasibility + implementation; reviewer: agent session)
+
+No new game-level facts were admitted in this pass, so there is nothing to add to the case
+tables above. What was verified instead:
+
+| Claim made by this session | Evidence used | Status |
+|---|---|---|
+| NBA Rule 5 §I(8): "If there is a discrepancy in the score and it cannot be resolved, the running score shall be official." | `https://official.nba.com/rule-no-5-scoring-and-timing/` fetched during the pass | Confirmed verbatim (already in the README, now re-checked) |
+| The NBA CDN scoreboard object is unreachable from the scheduled runner | Actions run 37616762038 + commit `99cae832` saved `nba: unavailable` while ESPN was `ok` | Confirmed from published artifacts |
+| `cdn.nba.com/robots.txt` answers with an S3 `AccessDenied` document and the scoreboard object with HTTP 500 to an independent fetch | Direct probes during this pass | Confirmed as probes of this tooling only; **not** a statement about league policy |
+| Yahoo's editorial scoreboard answers for a given NBA date and exposes per-game totals/status/team ids | `https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?leagues=nba&date=2026-10-07` fetched (HTTP 200; games `nba.g.2026100711`, `nba.g.2026100729`, …) | Partially confirmed: the team-id → abbreviation mapping island was **not** read, so no Yahoo adapter exists and no Yahoo value is cited anywhere in this repository |
+| ESPN's box-score components for CLE@WAS (2025-11-07) reproduce the corrected 148-115 arithmetic | Archived fixture `tests/fixtures/espn-summary-401809511.json` used by the arithmetic tests | Confirmed (fixture is the archived provider payload) |
+| Alert detection/notification is implementable and what it cannot do | 76 offline tests + `ALERTING.md` §3 | Confirmed to the extent stated; production delivery explicitly listed as unproven |
+
 ## 5. Re-verification checklist (run before any release/PR)
 
 - [x] `python3 scripts/validate.py` passes

@@ -20,8 +20,24 @@ Ordered by P(Win): highest-evidence-value first.
    have ever been upheld (NBA.com) — this collection documents 2 (1982-83, 2007-08). The other
    4 (reportedly incl. a 1978 Nets–76ers game plus 1952/1969/1971 games per the PR #2 session's
    leads) are known gaps requiring independent per-case verification.
-5. **Monitor blind spots:** arena scoreboards / TV bugs are invisible to feed comparison;
-   transient live-feed lag is expected noise; ESPN/NBA endpoints can change without notice.
+5. **Monitor blind spots (partly mitigated, still real):** arena scoreboards / TV bugs are
+   invisible to feed comparison; transient live-feed lag is expected noise; provider endpoints
+   can change without notice. Since the 2026-10-07 session the monitor no longer blanks out when
+   the primary feed fails: it publishes the games every reachable source reported, marks the row
+   `Not compared`, records the outage as a coverage gap, and runs the single-provider arithmetic
+   check (`2*(FGM-3PM)+3*3PM+FTM` from the provider's own box score). An error propagated
+   identically into both views of one provider is still invisible, and there is still no second
+   reachable comparator while the NBA CDN feed returns HTTP 500 to the runner.
+5b. **Alert delivery is not yet proven in production.** The ledger, lifecycle, dedupe, severity,
+   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (76 tests,
+   stubbed `gh`, local webhook receiver), but no scheduled run has produced an alert that was
+   delivered: the only scheduled poll so far had the NBA feed down and no games. Until
+   `data/alert-dispatch-log.json` contains a `sent` entry with an issue URL, describe the
+   notification system as implemented and verified offline, never as observed working in
+   production.
+5c. **Scheduler cadence is best-effort.** The workflow requests `*/5`, but GitHub documents
+   delays and dropped queue entries under load, and the run history during this review showed far
+   fewer runs than requested. Detection latency cannot be promised below that.
 6. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
    some corrected values, but pre-correction game-night box-score snapshots and the exact record-update
    times are not preserved for the 2024/2025 examples.
@@ -55,9 +71,26 @@ Ordered by P(Win): highest-evidence-value first.
       or independently corroborated evidence identifies the game and the exact change.
 - [ ] **F. Evidence snapshots.** Add `evidence/` with archived pre/post-correction box scores
       for the 2017 + 2024 + 2025 correction cases; link from records.
-- [ ] **G. Monitor hardening.** Real-world soak test during a live game window; tune
-      live-vs-final handling; add quarter-line drift detection; alert on
-      `feed-unavailable` streaks. Decide whether to adopt PR #2's auto-issue idea (spam-safe?).
+- [x] **G. Monitor hardening — alerting layer.** *(2026-10-07 session)* Alert ledger
+      (`data/alerts.json`), lifecycle with occurrence milestones, severity policy, coverage gaps
+      for outages, GitHub-issue + optional webhook dispatch with an append-only delivery log,
+      dashboard alert panel, and `ALERTING.md` (feasibility + limitations). See
+      `REVIEW_PASSES.md` "2026-10-07 alerting session".
+- [ ] **G2. Reach a second live comparator.** The NBA CDN feed answers the scheduled runner with
+      HTTP errors, so cross-source comparison cannot run. Observed this session: the NBA CDN
+      scoreboard object returned HTTP 500 and `robots.txt` returned an S3 `AccessDenied` document;
+      Yahoo's editorial scoreboard (`https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?leagues=nba&date=YYYY-MM-DD`)
+      answered HTTP 200 with per-game `total_away_points`/`total_home_points`, `status_type`, and
+      `home_team_id`/`away_team_id` (e.g. `nba.t.11`), but its team-id → abbreviation island has
+      **not** been verified yet, so no Yahoo parser was written. Verify that island, add the
+      adapter plus a fixture, then re-check the source-role policy before treating Yahoo as a
+      comparator.
+- [ ] **G3. Corrections watcher.** Watch league statement channels (newsroom RSS / official
+      account) and open an investigation automatically when a correction is published — the
+      missing half of the loop, which is why detection is currently after-the-fact.
+- [ ] **G4. Live-window soak test.** Exercise the alert path during real games; measure how often
+      a first-poll disagreement clears on its own (it should stay unalerted below two consecutive
+      polls) and tune `MAX_SUMMARY_FETCHES`/re-check intervals from observed volume.
 - [ ] **H. Schema v2.** Add `rules-misapplication-replay` type and `corrected-later` outcome;
       migrate the 1982 and 2017 cases; keep validator green.
 
@@ -79,8 +112,12 @@ becoming a record.
 - At least 2 open questions closed with primary evidence (or explicitly re-scoped with a dated note).
 - The 213/214 stub either identified or reclassified with a decision log (no silent drift).
 - [x] PR #4 merged to `main` after GitHub confirmed success; post-merge validation, verification,
-  and Pages deployment succeeded; public site was fetched and checked. The live feed status remains
-  honestly `not_started` until a scheduled NBA/ESPN poll succeeds and publishes a timestamp.
+  and Pages deployment succeeded; public site was fetched and checked.
+- [x] PR #7 merged; the scheduled workflow published its first real snapshot
+  (`data/live-feed.json` = `degraded`, ESPN `ok`, NBA unavailable with an HTTP error, published
+  timestamp `2026-10-07T11:50:09Z`). The `not_started` placeholder is gone; the honest status is
+  now "running, primary feed blocked".
+- [ ] No alert has been delivered by a scheduled run yet (see limitation 5b).
 
 ## 5. Current architecture and retained earlier layers
 
