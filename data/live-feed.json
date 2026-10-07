@@ -1,13 +1,21 @@
 {
-  "schema_version": 1,
-  "status": "not_started",
-  "source_health": {
-    "nba": { "status": "not_checked", "source": "NBA live scoreboard" },
-    "espn": { "status": "not_checked", "source": "ESPN public scoreboard (secondary)" }
-  },
-  "games": [],
   "active_investigation_count": 0,
-  "last_state_change_at": null,
-  "last_updated_at": null,
-  "note": "No successful monitor poll has been published from this repository yet. An empty game list is not evidence that there are no live games or discrepancies."
+  "games": [],
+  "last_material_signature": "{\"games\":[],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-07T11:50:09Z\",\"status\":\"degraded\"}",
+  "last_state_change_at": "2026-10-07T11:50:09Z",
+  "last_updated_at": "2026-10-07T11:50:09Z",
+  "note": "NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. The current NBA poll failed; any displayed games are the last saved snapshot and may be stale. An empty list in this state is not evidence of no games or no discrepancies.",
+  "schema_version": 1,
+  "source_health": {
+    "espn": {
+      "status": "ok",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+    },
+    "nba": {
+      "error": "Could not fetch or decode upstream JSON: HTTPError",
+      "status": "unavailable",
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+    }
+  },
+  "status": "degraded"
 }

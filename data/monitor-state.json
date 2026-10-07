@@ -1,8 +1,18 @@
 {
-  "schema_version": 1,
-  "last_state_change_at": null,
-  "source_health": {},
   "final_score_baselines": {},
   "investigations": [],
-  "note": "Seed state only; no successful live monitor run has been observed."
+  "last_state_change_at": "2026-10-07T11:50:09Z",
+  "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause.",
+  "schema_version": 1,
+  "source_health": {
+    "espn": {
+      "status": "ok",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+    },
+    "nba": {
+      "error": "Could not fetch or decode upstream JSON: HTTPError",
+      "status": "unavailable",
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+    }
+  }
 }
