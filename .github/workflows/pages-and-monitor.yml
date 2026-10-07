@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pages: write
   id-token: write
 
@@ -35,6 +36,11 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Run scheduled source comparison
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: python3 -m monitor --live
@@ -44,12 +50,31 @@ jobs:
           python3 -m compileall -q monitor
           python3 -m monitor --check-data
 
+      # The scheduled job writes data files back to main with the repository's
+      # GITHUB_TOKEN, and GitHub does not start new workflow runs for those
+      # pushes. The machine-written data therefore has to be verified inside
+      # this same job, before it is committed.
+      - name: Verify the machine-written data and dashboard
+        run: |
+          python3 -m unittest discover -s tests
+          node --check assets/app.js
+          node tests/dashboard-smoke.js
+
+      - name: Dispatch alert notifications
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCORING_DISCREPANCY_WEBHOOK_URL: ${{ secrets.SCORING_DISCREPANCY_WEBHOOK_URL }}
+        # Delivery failures are recorded in data/alert-dispatch-log.json and in
+        # data/alerts.json instead of blocking the research site deployment.
+        run: python3 -m monitor --dispatch-alerts --apply || echo "::warning::alert notification delivery reported a failure; see data/alert-dispatch-log.json"
+
       - name: Detect monitor-ledger updates
         id: changes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          if git diff --quiet -- data/live-feed.json data/monitor-state.json; then
+          if git diff --quiet -- data/live-feed.json data/monitor-state.json data/alerts.json data/alert-dispatch-log.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -60,8 +85,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/live-feed.json data/monitor-state.json
-          git commit -m "chore: update NBA score observations"
+          git add data/live-feed.json data/monitor-state.json data/alerts.json
+          if [ -f data/alert-dispatch-log.json ]; then git add data/alert-dispatch-log.json; fi
+          git commit -m "chore: update NBA score observations and alerts"
           git push origin HEAD:main
 
       - name: Configure GitHub Pages
@@ -72,7 +98,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         run: |
           mkdir -p _site
-          cp index.html README.md .nojekyll _site/
+          cp index.html README.md ALERTING.md .nojekyll _site/
           cp -R assets data docs _site/
 
       - name: Upload static site

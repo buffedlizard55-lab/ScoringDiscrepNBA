@@ -6,6 +6,7 @@
     leads: "data/leads.json",
     feed: "data/live-feed.json",
     state: "data/monitor-state.json",
+    alerts: "data/alerts.json",
   };
 
   const $ = (selector) => document.querySelector(selector);
@@ -291,9 +292,9 @@
     const games = Array.isArray(feed.games) ? feed.games : [];
     if (games.length === 0) {
       const message = feed.status === "healthy"
-        ? "Both feeds returned successfully, but no games were included in the saved snapshot. That does not establish that no scoring discrepancy exists outside those responses."
+        ? "Every configured source returned successfully, but no games were included in the saved snapshot. That does not establish that no scoring discrepancy exists outside those responses."
         : feed.status === "degraded"
-          ? "A source is unavailable. No current game list can be verified from this snapshot; this is not a clean bill of health."
+          ? "A source is unavailable and no game rows could be built from the source(s) that answered. This snapshot cannot be read as a clean bill of health."
           : "Waiting for the first published source snapshot. The absence of a feed is not evidence of no discrepancies.";
       container.innerHTML = `<div class="empty-state"><span class="empty-state-mark" aria-hidden="true">◷</span><p>${escapeHtml(message)}</p></div>`;
       return;
@@ -306,14 +307,21 @@
         const espn = scores.espn || {};
         const isMismatch = game.score_mismatch === true;
         const noComparison = game.score_mismatch == null;
+        const publishedBy = Array.isArray(game.score_sources) && game.score_sources.length
+          ? game.score_sources
+          : Object.keys(scores).filter((key) => scores[key] && scores[key].away != null && scores[key].home != null);
+        const sideScore = (score) => (score.away == null || score.home == null ? `<span class="muted-text">Not published</span>` : `${escapeHtml(score.away)}–${escapeHtml(score.home)}`);
+        const publishedNote = publishedBy.length === 1
+          ? `Only ${escapeHtml(publishedBy[0].toUpperCase())} published this game in the saved snapshot; nothing could be compared.`
+          : "";
         const pbpUrl = safeExternalUrl(game.play_by_play_source_url);
         const scoringPlay = game.latest_official_scoring_play;
         const statusText = game.status_text || game.status || "Status not supplied";
         return `<tr>
           <td><div class="game-matchup">${teamLine(game.away_team)}${teamLine(game.home_team)}<span class="game-clock">${escapeHtml(statusText)}${game.period ? ` · Q${escapeHtml(game.period)}` : ""}${game.clock ? ` · ${escapeHtml(game.clock)}` : ""}</span></div></td>
-          <td>${escapeHtml(nba.away ?? "—")}–${escapeHtml(nba.home ?? "—")}</td>
-          <td>${espn.away == null || espn.home == null ? "Unavailable" : `${escapeHtml(espn.away)}–${escapeHtml(espn.home)}`}</td>
-          <td>${isMismatch ? `<span class="diff-chip">Potential difference</span>` : noComparison ? `<span class="muted-text">Not compared</span>` : `<span class="match-chip">Feeds agree</span>`}</td>
+          <td>${sideScore(nba)}</td>
+          <td>${sideScore(espn)}</td>
+          <td>${isMismatch ? `<span class="diff-chip">Potential difference</span>` : noComparison ? `<span class="muted-text">Not compared</span>` : `<span class="match-chip">Feeds agree</span>`}${publishedNote ? `<span class="pbp-context">${publishedNote}</span>` : ""}</td>
           <td><span class="game-clock">${escapeHtml(formatTimestamp(game.observed_at))}${game.stale ? " · stale" : ""}</span></td>
           <td class="source-url-cell">${pbpUrl ? `<a href="${escapeHtml(pbpUrl)}" target="_blank" rel="noopener noreferrer">Open PBP ↗</a>` : "—"}${scoringPlay?.description ? `<span class="pbp-context">Context only · ${scoringPlay.period ? `Q${escapeHtml(scoringPlay.period)} ` : ""}${escapeHtml(scoringPlay.clock || "")} · ${escapeHtml(scoringPlay.description)}</span>` : ""}</td>
         </tr>`;
@@ -404,12 +412,16 @@
     else if (potentialDifference) notice.classList.add("notice-mismatch");
 
     const health = feed?.source_health || {};
-    $("#sourceHealth").innerHTML = ["nba", "espn"].map((key) => {
+    const SOURCE_LABELS = { nba: "NBA primary", espn: "ESPN secondary" };
+    const healthKeys = Object.keys(health);
+    const sourceKeys = healthKeys.length ? healthKeys : ["nba", "espn"];
+    $("#sourceHealth").innerHTML = sourceKeys.map((key) => {
       const source = health[key] || {};
       const sourceStatus = source.status || "not_checked";
       const good = sourceStatus === "ok";
-      const labelText = key === "nba" ? "NBA primary" : "ESPN secondary";
-      return `<span class="health-chip ${good ? "ok" : sourceStatus === "not_checked" ? "" : "down"}" title="${escapeHtml(sourceStatus)}">${escapeHtml(labelText)} · ${escapeHtml(sourceStatus.replaceAll("_", " "))}</span>`;
+      const labelText = SOURCE_LABELS[key] || key.toUpperCase();
+      const title = `${sourceStatus}${source.error ? ` · ${source.error}` : ""}`;
+      return `<span class="health-chip ${good ? "ok" : sourceStatus === "not_checked" ? "" : "down"}" title="${escapeHtml(title)}">${escapeHtml(labelText)} · ${escapeHtml(sourceStatus.replaceAll("_", " "))}</span>`;
     }).join("");
     renderCurrentGames(feed || { status: "not_started", games: [] });
 
@@ -444,6 +456,156 @@
       panel.hidden = true;
       $("#investigationsList").innerHTML = "";
     }
+  };
+
+
+  const SEVERITY_LABEL = { critical: "Critical", high: "High", medium: "Medium", info: "Info" };
+
+  const renderAlertEvidence = (alert) => {
+    const entries = Array.isArray(alert.evidence) ? alert.evidence : [];
+    if (entries.length === 0) return `<p class="muted-text">No evidence link was attached to this alert. Treat it as incomplete.</p>`;
+    return `<ul class="alert-evidence">${entries.map((entry) => {
+      const url = safeExternalUrl(entry.url);
+      const label = escapeHtml(entry.label || "Source");
+      const value = entry.value ? ` — ${escapeHtml(entry.value)}` : "";
+      return `<li>${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${label} ↗</a>` : label}${value}</li>`;
+    }).join("")}</ul>`;
+  };
+
+  const renderAlertArithmetic = (alert) => {
+    const checks = Array.isArray(alert.arithmetic) ? alert.arithmetic : [];
+    if (!checks.length) return "";
+    return `<details class="alert-arithmetic"><summary>The arithmetic behind this alert</summary>
+      <div class="game-table-wrap"><table class="game-table">
+        <thead><tr><th scope="col">Side</th><th scope="col">Team</th><th scope="col">Provider final</th><th scope="col">Derived points</th><th scope="col">Difference</th><th scope="col">FG</th><th scope="col">3PT</th><th scope="col">FT</th></tr></thead>
+        <tbody>${checks.map((check) => {
+          const components = check.components || {};
+          const cell = (key) => Array.isArray(components[key]) ? components[key].join("-") : "—";
+          return `<tr><td>${escapeHtml(check.side || "—")}</td><td>${escapeHtml(check.team || "—")}</td><td>${escapeHtml(check.provider_reported_final ?? "—")}</td><td>${escapeHtml(check.derived_points ?? "—")}</td><td>${escapeHtml(check.difference ?? "—")}</td><td>${escapeHtml(cell("fieldGoalsMade-attempted"))}</td><td>${escapeHtml(cell("threePointersMade-attempted"))}</td><td>${escapeHtml(cell("freeThrowsMade-attempted"))}</td></tr>`;
+        }).join("")}</tbody></table></div>
+      <p class="evidence-caption">${escapeHtml(alert.method || "Derived from the provider's own published components.")}</p></details>`;
+  };
+
+  const renderAlertDispatch = (alert) => {
+    const dispatch = alert.dispatch || {};
+    const issueUrl = safeExternalUrl(dispatch.issue_url);
+    const stateLabels = {
+      pending: "Queued for notification",
+      sent: "Notification delivered",
+      failed: "Notification failed",
+      skipped: "Notification skipped",
+      not_required: "Site-only (no notification)",
+    };
+    const parts = [stateLabels[dispatch.status] || "Notification state unknown"];
+    if (dispatch.reason) parts.push(dispatch.reason);
+    if (issueUrl) parts.push(`<a href="${escapeHtml(issueUrl)}" target="_blank" rel="noopener noreferrer">Open the delivered alert ↗</a>`);
+    if (Array.isArray(dispatch.attempts) && dispatch.attempts.length) parts.push(`${dispatch.attempts.length} delivery attempt(s) recorded`);
+    if (dispatch.webhook_status) parts.push(`webhook: ${escapeHtml(dispatch.webhook_status)}`);
+    return `<p class="alert-dispatch">${parts.join(" · ")}</p>`;
+  };
+
+  const renderAlertCard = (alert) => {
+    const severity = String(alert.severity || "info");
+    const resolved = alert.status === "resolved";
+    const steps = Array.isArray(alert.review_steps) ? alert.review_steps : [];
+    const game = alert.game || {};
+    return `<article class="alert-card alert-${escapeHtml(severity)}${resolved ? " alert-resolved" : ""}">
+      <div class="alert-card-head">
+        <span class="alert-severity">${escapeHtml(SEVERITY_LABEL[severity] || severity)}</span>
+        <span class="alert-state">${escapeHtml(resolved ? "Resolved" : "Open")}</span>
+        <span class="alert-type">${escapeHtml(String(alert.type || "alert").replaceAll("_", " "))}</span>
+        ${game.matchup ? `<span class="alert-matchup">${escapeHtml(game.matchup)}${game.game_date ? ` · ${escapeHtml(formatDate(game.game_date))}` : ""}</span>` : ""}
+      </div>
+      <h3>${escapeHtml(alert.title || "Untitled alert")}</h3>
+      <p>${escapeHtml(alert.summary || "No summary supplied.")}</p>
+      <p class="alert-times">Observed by this project: first ${escapeHtml(formatTimestamp(alert.first_seen_at))} · latest ${escapeHtml(formatTimestamp(alert.last_seen_at))} · ${escapeHtml(alert.occurrences ?? "?")} saved observation(s). Poll times are when this project looked, not when any provider changed a value.</p>
+      ${renderAlertEvidence(alert)}
+      ${renderAlertArithmetic(alert)}
+      ${steps.length ? `<details class="alert-steps"><summary>How to check this by hand</summary><ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol></details>` : ""}
+      ${resolved && alert.resolution?.note ? `<p class="alert-resolution"><strong>Closure:</strong> ${escapeHtml(alert.resolution.note)}</p>` : ""}
+      ${renderAlertDispatch(alert)}
+      <p class="alert-disclaimer">${escapeHtml(alert.disclaimer || "Automated candidate detection only; this is not a statement about the NBA's official record.")}</p>
+      <p class="alert-id">Alert id ${escapeHtml(alert.id || "unknown")} · ${escapeHtml(alert.verification_status || "unverified")}</p>
+    </article>`;
+  };
+
+  const renderDetectorStatus = (alertsDoc, feed) => {
+    const container = $("#detectorStatus");
+    if (!container) return;
+    const status = alertsDoc?.detector_status || {};
+    const comparison = status.cross_source_comparison || {};
+    const arithmetic = status.single_provider_arithmetic_checks || {};
+    const revisions = status.final_score_revision_tracking || {};
+    const rows = [
+      {
+        label: "Cross-source score comparison",
+        value: comparison.available
+          ? `Running against ${(comparison.sources_ok || []).join(", ") || "the reachable sources"}`
+          : `Not running — ${comparison.blocked_reason || "fewer than two reachable sources"}`,
+        ok: Boolean(comparison.available),
+      },
+      {
+        label: "Post-final score change tracking",
+        value: (revisions.sources_tracked || []).length
+          ? `Tracking ${revisions.sources_tracked.join(", ")} (${revisions.baselines || 0} baselines)`
+          : "No final scores recorded yet",
+        ok: (revisions.baselines || 0) > 0,
+      },
+      {
+        label: "Single-provider arithmetic check",
+        value: `${arithmetic.games_checked || 0} finished game(s) checked · ${escapeHtml(arithmetic.method || "")}`,
+        ok: (arithmetic.games_checked || 0) > 0,
+      },
+    ];
+    container.innerHTML = rows.map((row) => `<div class="detector-row"><span class="detector-light ${row.ok ? "ok" : "off"}"></span><div><strong>${escapeHtml(row.label)}</strong><span>${row.value}</span></div></div>`).join("");
+  };
+
+  const renderCoverageGaps = (alertsDoc) => {
+    const container = $("#coverageGaps");
+    if (!container) return;
+    const gaps = Array.isArray(alertsDoc?.coverage_gaps) ? alertsDoc.coverage_gaps : [];
+    if (!gaps.length) {
+      container.innerHTML = `<p class="muted-text">No coverage gaps recorded yet.</p>`;
+      return;
+    }
+    container.innerHTML = gaps.slice().reverse().map((gap) => `<div class="coverage-gap">
+      <strong>${escapeHtml(String(gap.source_key || "source").toUpperCase())} · ${escapeHtml(gap.role || "source")} unavailable</strong>
+      <span>${escapeHtml(formatTimestamp(gap.from))} → ${escapeHtml(formatTimestamp(gap.to))}${gap.unavailable_minutes != null ? ` · about ${escapeHtml(gap.unavailable_minutes)} minutes` : ""}</span>
+      <span>${escapeHtml(gap.impact || "")}</span>
+    </div>`).join("");
+  };
+
+  const renderAlerts = (alertsDoc) => {
+    const list = $("#alertsList");
+    const summary = $("#alertSummary");
+    if (!list || !summary) return;
+    if (!alertsDoc) {
+      summary.className = "status-pill status-warning";
+      summary.innerHTML = `<span class="status-light"></span>Alert ledger unavailable`;
+      list.innerHTML = `<div class="empty-state"><span class="empty-state-mark" aria-hidden="true">!</span><p>The alert ledger could not be loaded. An unreadable ledger is not evidence that nothing was detected.</p></div>`;
+      return;
+    }
+    const alerts = Array.isArray(alertsDoc.alerts) ? alertsDoc.alerts : [];
+    const counts = alertsDoc.counts || {};
+    const open = counts.open || 0;
+    const bySeverity = counts.open_by_severity || {};
+    const pending = counts.pending_dispatch || 0;
+    summary.className = `status-pill ${open === 0 ? "status-good" : "status-warning"}`;
+    summary.innerHTML = `<span class="status-light"></span>${open === 0 ? "No open alerts" : `${open} open alert${open === 1 ? "" : "s"}`} · ${pending} queued for notification`;
+    if (alerts.length === 0) {
+      list.innerHTML = `<div class="empty-state"><span class="empty-state-mark" aria-hidden="true">✓</span><p>No alerts have been recorded yet.${alertsDoc.detector_status?.cross_source_comparison?.available ? "" : " Cross-source comparison is not currently able to run, so this is not a clean bill of health."}</p></div>`;
+    } else {
+      list.innerHTML = alerts.map(renderAlertCard).join("");
+    }
+    const severityNote = bySeverity.critical || bySeverity.high
+      ? ` Open severities: ${["critical", "high", "medium", "info"].filter((key) => bySeverity[key]).map((key) => `${bySeverity[key]} ${key}`).join(", ")}.`
+      : "";
+    const note = document.createElement("p");
+    note.className = "alerts-footnote";
+    note.textContent = `${alertsDoc.note || ""}${severityNote}`;
+    list.append(note);
+    renderDetectorStatus(alertsDoc);
+    renderCoverageGaps(alertsDoc);
   };
 
   const renderLeads = (leads) => {
@@ -510,6 +672,7 @@
     renderStatistics(cases, leads, docs.cases?.coverage_note);
     renderCases(cases);
     renderLeads(leads);
+    renderAlerts(docs.alerts || null);
     renderMonitor(docs.feed || { status: "not_started", games: [], source_health: {} }, docs.state || { investigations: [] });
 
     if (!docs.cases) {

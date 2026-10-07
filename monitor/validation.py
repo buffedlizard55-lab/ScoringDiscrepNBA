@@ -54,6 +54,8 @@ def validate_repository_data(root: str | Path = ".") -> list[str]:
     leads_doc = _read_json(root_path / "data" / "leads.json")
     feed = _read_json(root_path / "data" / "live-feed.json")
     state = _read_json(root_path / "data" / "monitor-state.json")
+    alerts_path = root_path / "data" / "alerts.json"
+    alerts = _read_json(alerts_path) if alerts_path.exists() else None
     errors: list[str] = []
 
     if not isinstance(cases_doc, dict) or not isinstance(cases_doc.get("cases"), list):
@@ -64,6 +66,59 @@ def validate_repository_data(root: str | Path = ".") -> list[str]:
         errors.append("data/live-feed.json must contain a games array")
     if not isinstance(state, dict) or not isinstance(state.get("investigations"), list):
         errors.append("data/monitor-state.json must contain an investigations array")
+    if isinstance(feed, dict) and not isinstance(feed.get("source_diagnostics", {}), dict):
+        errors.append("data/live-feed.json source_diagnostics must be an object when present")
+    if isinstance(feed, dict):
+        for source_key, attempts in (feed.get("source_diagnostics") or {}).items():
+            if not isinstance(attempts, list):
+                errors.append(f"live-feed source_diagnostics.{source_key} must be a list")
+
+    # Alert ledger: every alert must be reviewable (evidence, severity, an
+    # explicit unverified marker, and a disclaimer) and no delivery may be
+    # claimed without a link to the delivered notification.
+    if alerts is not None:
+        if not isinstance(alerts, dict) or not isinstance(alerts.get("alerts"), list):
+            errors.append("data/alerts.json must contain an alerts array")
+        else:
+            alert_ids: set[str] = set()
+            for alert_index, alert in enumerate(alerts.get("alerts", [])):
+                where = f"alerts[{alert_index}]"
+                if not isinstance(alert, dict):
+                    errors.append(f"{where} must be an object")
+                    continue
+                alert_id = alert.get("id")
+                if not isinstance(alert_id, str) or not alert_id:
+                    errors.append(f"{where}.id must be a non-empty string")
+                elif alert_id in alert_ids:
+                    errors.append(f"Duplicate alert id: {alert_id}")
+                else:
+                    alert_ids.add(alert_id)
+                for field in ("type", "severity", "status", "title", "summary", "first_seen_at"):
+                    if not alert.get(field):
+                        errors.append(f"{where}.{field} is required")
+                if alert.get("verification_status") != "unverified":
+                    errors.append(f"{where} must stay explicitly marked unverified")
+                if not alert.get("disclaimer"):
+                    errors.append(f"{where}.disclaimer is required for automated alerts")
+                if not isinstance(alert.get("review_steps"), list) or not alert.get("review_steps"):
+                    errors.append(f"{where}.review_steps must list how to check the alert by hand")
+                if alert.get("status") == "open":
+                    evidence = alert.get("evidence") or []
+                    if not any(_is_https_url(entry.get("url")) for entry in evidence if isinstance(entry, dict)):
+                        errors.append(f"{where} is open but has no https evidence link")
+                dispatch = alert.get("dispatch") or {}
+                if dispatch.get("status") == "sent" and not _is_https_url(dispatch.get("issue_url")):
+                    errors.append(f"{where} claims delivery without an issue URL")
+                if dispatch.get("issue_url") and not _is_https_url(dispatch.get("issue_url")):
+                    errors.append(f"{where}.dispatch.issue_url must be an HTTPS link")
+            for gap_index, gap in enumerate(alerts.get("coverage_gaps") or []):
+                where = f"coverage_gaps[{gap_index}]"
+                if not isinstance(gap, dict):
+                    errors.append(f"{where} must be an object")
+                    continue
+                for field in ("source_key", "from", "to", "impact"):
+                    if not gap.get(field):
+                        errors.append(f"{where}.{field} is required")
 
     cases = cases_doc.get("cases", [])
     case_ids: set[str] = set()

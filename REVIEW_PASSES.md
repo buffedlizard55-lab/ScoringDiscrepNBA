@@ -32,3 +32,79 @@ This log enforces the requested Pass 1 → Pass 2 → Pass 3 sequence. Evidence 
 - [ ] Verify the first successful scheduled NBA/ESPN poll and published timestamp. Manual `workflow_dispatch` from this session was denied by GitHub with HTTP 403 (`Resource not accessible by integration`); no live poll is claimed.
 
 **Pass 3 implementation/review is complete.** Production deployment is confirmed, but live monitoring is **not yet proven operational** until the scheduled poll publishes a successful snapshot. Keep that distinction explicit in future updates.
+
+---
+
+## 2026-10-07 alerting session (feasibility question, implementation, three passes)
+
+Requested scope: review the repository; determine whether an alert detection and
+notification system for scoring discrepancies can be built; state its
+limitations and feasibility; keep the founding brief in the README; publish a
+clean dashboard; open a PR and merge it.
+
+### Pass 1 — implement and verify
+
+- [x] Answer feasibility with the repository as evidence: detectors, ledger, dispatch, dashboard
+      panel, and `ALERTING.md` (§1 table: detection yes, confirmation no).
+- [x] Implement the alert ledger (`monitor/alerts.py`: four detector families, severity policy
+      `critical/high/medium/info`, occurrence milestones `1/3/12/48/144/720`, lifecycle
+      `opened → reopened → resolved`, coverage gaps, detector status) and dispatch
+      (`monitor/dispatch.py`: `gh`-CLI GitHub issues, optional Slack/Discord-compatible webhook,
+      append-only `data/alert-dispatch-log.json`, `skipped` recorded rather than assumed).
+- [x] Wire the CLI: `--dispatch-alerts [--apply]`, `--resolve-alert <id> [--note]`; workflow step
+      `Dispatch alert notifications` with `issues: write` and a non-fatal `::warning::` on delivery
+      failure so the site still deploys.
+- [x] Dashboard: `#alerts` section (summary pill, alert cards with evidence/arithmetic/review
+      steps/delivery state, detector status, coverage gaps) plus the corrected feed status pill.
+- [x] Verify: 76 Python tests, `node --check assets/app.js`, `node tests/dashboard-smoke.js`,
+      `python3 -m monitor --check-data`, `python3 scripts/validate.py` — all green.
+
+### Pass 2 — adversarial defect / assumption review
+
+Found and fixed:
+
+1. **Primary-feed failure blanked the whole journal** (defect, material): rows were built only
+   from the NBA feed, so an ESPN-only poll published `games: []`, stopped the ESPN final-score
+   baseline, and prevented the single-provider arithmetic check from attaching to any row —
+   in exactly the outage this project is living through. Fixed with the union snapshot builder
+   (`monitor/feeds.py::build_observations_from_sources`), per-row `score_sources`, and a
+   `Not compared` disclosure; the previous test that asserted the empty list was replaced with
+   two tests that pin the corrected behaviour, including the real archived ESPN box score
+   (derived 148 / 115) firing `final_score_internal_inconsistency` while the NBA feed is down.
+2. **Dashboard smoke test asserted the pre-poll world** (`/Not yet active/`) and therefore would
+   have failed on the first real published snapshot; it now derives the expected pill from
+   `data/live-feed.json`, exercises the alert renderer with a labelled synthetic alert, and checks
+   every configured source chip.
+3. **Source health chips were hard-coded** to `nba`/`espn` and printed a raw key for any new
+   source; labels are now mapped and unknown keys degrade to an upper-cased key with the last
+   error in the tooltip.
+4. **Machine-written data was never verified**: pushes made with `GITHUB_TOKEN` do not start a new
+   workflow run, so the first scheduled commit changed the dashboard's data with no check on it.
+   The scheduled job now runs the unit tests + JS syntax + smoke test before committing.
+5. **`duration_ms` and per-poll timestamps** would have rewritten committed files every five
+   minutes; diagnostics are published without durations and the feed/ledger are only rewritten on
+   a material signature or occurrence-milestone change.
+6. **Delivery honesty**: unconfigured webhook → logged `skipped` (not silence); missing `gh` →
+   `dispatch.status = "skipped"`; three failed attempts → `failed`; issues always carry the
+   "does not establish that any NBA record was wrong" limitation.
+
+### Pass 3 — full-request recheck
+
+- [x] Founding brief read from `README.md` §0 before work; §0 now carries the entire original
+      prompt verbatim (research spec, core values, site-creation and multi-pass instructions,
+      including the alerting question) and §1 restates the reading rules.
+- [x] Every factual statement added to the README/`ALERTING.md` is either a repository path, a
+      test, or a linked source; the two external probes performed this session
+      (`cdn.nba.com/robots.txt` → S3 `AccessDenied`; scoreboard object → HTTP 500) are quoted as
+      probes, not as league facts. No game-level claim is made about any real correction.
+- [x] Confirm the honest layer distinction: an alert is a candidate, feed convergence is not a
+      correction, and the two confirmed cases remain the only confirmed records.
+- [x] Confirm the "no manual input" requirement: the scheduled workflow polls, validates,
+      dispatches, commits, and deploys unattended; there is no step that requires a human, and no
+      step that silently depends on one.
+- [x] Deliverable status: feasibility answered (§1 table + `ALERTING.md` §3), implementation
+      complete and tested, remaining limitations enumerated (no reachable second source, no
+      corrections feed, best-effort cron, alert not yet delivered in production).
+- [ ] **Unfinished by design:** none of the Pass-3 checks depends on the live NBA feed, but the
+      production notification has still never fired. That gap is stated in README §8 and
+      ROADMAP 5b rather than papered over.
