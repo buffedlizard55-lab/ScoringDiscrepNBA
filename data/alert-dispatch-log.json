@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "action": "create_issue",
+      "alert_id": "ALR-source_unavailable-nba",
+      "at": "2026-10-07T23:02:13Z",
+      "channel": "github_issue",
+      "detail": "https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/issues/13",
+      "result": "sent"
+    },
+    {
+      "action": "webhook",
+      "alert_ids": [
+        "ALR-source_unavailable-nba"
+      ],
+      "at": "2026-10-07T23:02:13Z",
+      "channel": "webhook",
+      "detail": "SCORING_DISCREPANCY_WEBHOOK_URL is not configured; GitHub issues remain the only delivery channel",
+      "result": "skipped"
+    }
+  ],
+  "note": "Append-only delivery log. A failed or skipped entry means the alert was not delivered through that channel; it does not mean the alert did not happen.",
+  "schema_version": 1,
+  "updated_at": "2026-10-07T23:02:13Z"
+}

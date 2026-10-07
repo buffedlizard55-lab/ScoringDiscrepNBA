@@ -21,17 +21,14 @@
     "espn": {
       "first_failure_at": null,
       "last_error": null,
-      "last_ok_at": "2026-10-07T18:04:06Z",
       "role": "comparator",
       "status": "ok"
     },
     "nba": {
       "first_failure_at": "2026-10-07T18:04:06Z",
       "last_error": "Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)",
-      "last_ok_at": null,
       "role": "authoritative",
-      "status": "unavailable",
-      "unavailable_minutes": 0.0
+      "status": "unavailable"
     }
   }
 }
