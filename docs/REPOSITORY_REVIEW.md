@@ -159,6 +159,6 @@ remain subject to the dedicated network-capable, claim-by-claim re-verification
 backlog above. Current limitations remain: historical snapshots are incomplete,
 post-final monitoring is not durable after games leave the scoreboard, the
 observed Actions cadence is sparse, and no real notification receipt has been
-observed. The current hardening change is proposed in [PR #12](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/12);
-consult its GitHub checks for integration status rather than treating local
-tests as proof of deployment or delivery.
+observed. The current hardening change is tracked in [PR #12](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/12);
+use its GitHub checks and merge record to verify integration rather than
+treating local tests as proof of deployment or delivery.

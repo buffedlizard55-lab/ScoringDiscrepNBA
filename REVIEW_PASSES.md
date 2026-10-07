@@ -236,4 +236,4 @@ Found and fixed:
 - [x] After integrating PR #11, rerun **100 Python tests**, current and historical
       validation, monitor self-test, JavaScript syntax and dashboard smoke tests, Python
       compilation, deterministic stats/site-data generation with no drift, and `git diff --check`.
-- [ ] PR #12 checks/merge status: update after the requested integration completes.
+- PR #12 check and merge state: see [the GitHub PR](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/12); local verification above does not imply deployment or notification delivery.
