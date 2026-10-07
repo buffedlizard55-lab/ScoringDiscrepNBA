@@ -96,6 +96,37 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("nba", feed["note"])
             self.assertIn("arithmetic", feed["note"])
 
+    def test_repeated_source_outage_poll_does_not_persist_a_heartbeat_only_change(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            espn = read_fixture("espn-scoreboard.json")
+            first_state, _ = run_with_payloads(
+                None,
+                espn,
+                root=root,
+                observed_at="2026-10-07T04:00:00Z",
+                source_errors={"nba": "network unavailable"},
+            )
+            state_path = Path(directory) / "data/monitor-state.json"
+            first_persisted = state_path.read_bytes()
+            saved_state = json.loads(first_persisted)
+            self.assertNotIn(
+                "unavailable_minutes", saved_state["source_health_state"]["nba"]
+            )
+            self.assertNotIn("last_ok_at", saved_state["source_health_state"]["espn"])
+
+            second_state, _ = run_with_payloads(
+                None,
+                espn,
+                root=root,
+                observed_at="2026-10-07T04:05:00Z",
+                source_errors={"nba": "network unavailable"},
+            )
+
+            self.assertEqual(second_state["source_health_state"]["nba"]["unavailable_minutes"], 5.0)
+            self.assertEqual(state_path.read_bytes(), first_persisted)
+            self.assertEqual(first_state["last_state_change_at"], second_state["last_state_change_at"])
+
     def test_single_provider_arithmetic_check_runs_while_nba_feed_is_down(self) -> None:
         """The one-provider detector is the reason this project is not blind today.
 
@@ -253,6 +284,32 @@ class FinalGameConsistencyTests(unittest.TestCase):
             record = state["final_game_checks"]["espn:0022500029"]
             self.assertEqual(record["status"], "consistent")
             self.assertEqual({entry["derived_points"] for entry in record["derived"]}, {148, 115})
+
+    def test_impossible_components_create_an_alert_in_the_full_poll(self) -> None:
+        summary = read_fixture("espn-summary-401809511.json")
+        away_stats = {
+            entry["name"]: entry
+            for entry in summary["boxscore"]["teams"][0]["statistics"]
+        }
+        away_stats["fieldGoalsMade-fieldGoalsAttempted"]["displayValue"] = "10-50"
+        away_stats["threePointFieldGoalsMade-threePointFieldGoalsAttempted"]["displayValue"] = "12-45"
+        with tempfile.TemporaryDirectory() as directory:
+            state, _ = run_with_payloads(
+                self.final_nba_scoreboard(),
+                self.final_espn_scoreboard(),
+                root=directory,
+                observed_at="2026-10-07T04:00:00Z",
+                summary_payloads={"espn:401809511": summary},
+            )
+            record = next(iter(state["final_game_checks"].values()))
+            self.assertEqual(record["status"], "inconsistent")
+            alert_book = json.loads((Path(directory) / "data/alerts.json").read_text())
+            alert = next(
+                item for item in alert_book["alerts"]
+                if item["type"] == "final_score_internal_inconsistency"
+            )
+            self.assertIn("three-point makes exceed total field-goal makes", alert["summary"])
+            self.assertEqual(alert["verification_status"], "unverified")
 
     def test_one_point_box_score_conflict_creates_a_critical_alert_record(self) -> None:
         summary = read_fixture("espn-summary-401809511.json")

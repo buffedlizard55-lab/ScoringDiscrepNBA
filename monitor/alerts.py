@@ -151,6 +151,7 @@ def _desired_mismatch_alerts(state: dict[str, Any]) -> dict[str, dict[str, Any]]
             summary += " One later comparable poll showed agreement; a second is required to mark the observed window resolved."
         alerts[alert_id] = {
             "id": alert_id,
+            "condition_id": item.get("id"),
             "type": "cross_source_score_mismatch",
             "severity": "high",
             "title": (
@@ -198,6 +199,7 @@ def _desired_revision_alerts(state: dict[str, Any]) -> dict[str, dict[str, Any]]
         alert_id = _alert_id("final_score_feed_revision", f"{source_key}-{item.get('game_key')}")
         alerts[alert_id] = {
             "id": alert_id,
+            "condition_id": item.get("id"),
             "type": "final_score_feed_revision",
             "severity": "critical",
             "title": (
@@ -253,14 +255,26 @@ def _desired_inconsistency_alerts(state: dict[str, Any]) -> dict[str, dict[str, 
         source_key = item.get("source_key") or "unknown"
         alert_id = _alert_id("final_score_internal_inconsistency", f"{source_key}-{item.get('game_key')}")
         checks = check.get("checks") or []
-        mismatched = [entry for entry in checks if entry.get("difference") not in (0, None)]
-        summary_parts = [
-            f"{entry.get('side', '?')} derived {entry.get('derived_points')} vs published final "
-            f"{entry.get('provider_reported_final')} (difference {entry.get('difference')})"
-            for entry in mismatched
+        mismatched = [
+            entry
+            for entry in checks
+            if entry.get("component_error") or entry.get("difference") not in (0, None)
         ]
+        summary_parts = []
+        for entry in mismatched:
+            if entry.get("component_error"):
+                summary_parts.append(
+                    f"{entry.get('side', '?')} box-score components are internally impossible: "
+                    f"{entry['component_error']}"
+                )
+            else:
+                summary_parts.append(
+                    f"{entry.get('side', '?')} derived {entry.get('derived_points')} vs published final "
+                    f"{entry.get('provider_reported_final')} (difference {entry.get('difference')})"
+                )
         alerts[alert_id] = {
             "id": alert_id,
+            "condition_id": item.get("id"),
             "type": "final_score_internal_inconsistency",
             "severity": "critical",
             "title": (
@@ -290,8 +304,8 @@ def _desired_inconsistency_alerts(state: dict[str, Any]) -> dict[str, dict[str, 
             "arithmetic": checks,
             "method": check.get("method"),
             "review_steps": REVIEW_STEPS_COMMON + [
-                "Recompute the derived points by hand from the provider's published field-goal, "
-                "three-point, and free-throw cells.",
+                "Check that three-point makes/attempts do not exceed total field-goal makes/attempts; "
+                "when the components are valid, recompute points by hand from those cells.",
             ],
             "dispatch": {"status": "pending", "reason": "critical severity", "issue_url": None, "attempts": []},
         }
@@ -323,12 +337,15 @@ def _desired_source_alerts(state: dict[str, Any], feed: dict[str, Any]) -> dict[
         url = (health.get(source_key) or {}).get("url")
         alerts[alert_id] = {
             "id": alert_id,
+            "condition_id": f"{source_key}:{entry.get('first_failure_at')}",
             "type": "source_unavailable",
             "severity": "high" if role == "authoritative" else "medium",
-            "title": f"{source_key.upper()} source unavailable for {minutes:g} minutes ({role})",
+            "title": f"{source_key.upper()} source unavailable ({role})",
             "summary": (
-                f"The {source_key.upper()} feed has not answered since {entry.get('first_failure_at')} "
-                f"({minutes:g} minutes as of the latest poll). While it is unavailable, no comparison "
+                f"The {source_key.upper()} feed's first consecutive failure was recorded at "
+                f"{entry.get('first_failure_at')}. The configured {threshold}-minute alert threshold "
+                "has been reached according to monitor poll times; the exact provider recovery time "
+                "is unknown until a later successful poll. While it is unavailable, no comparison "
                 "against it can run, so an absence of detections is not evidence that no discrepancy "
                 "exists."
             ),
@@ -412,10 +429,32 @@ def detector_status(state: dict[str, Any], feed: dict[str, Any]) -> dict[str, An
     }
 
 
+def _review_signature(alert: dict[str, Any]) -> str:
+    """Fingerprint the detection evidence a reviewer explicitly closed."""
+    fields = (
+        "condition_id",
+        "type",
+        "severity",
+        "title",
+        "summary",
+        "game",
+        "evidence",
+        "arithmetic",
+        "method",
+        "review_steps",
+    )
+    return json.dumps(
+        {key: alert.get(key) for key in fields},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 def _material_signature(book: dict[str, Any]) -> str:
     rows = [
         {
             "id": alert.get("id"),
+            "condition_id": alert.get("condition_id"),
             "status": alert.get("status"),
             "severity": alert.get("severity"),
             "occurrences_bucket": alert.get("occurrences_bucket"),
@@ -484,19 +523,32 @@ def update_book(
     for alert_id, wanted in desired.items():
         previous = existing.get(alert_id) or {}
         record = wanted
+        reviewed_resolution = (previous.get("resolution") or {}).get("type") == "closed_by_review"
+        previous_review_signature = previous.get("reviewed_signature") or _review_signature(previous)
+        review_still_applies = (
+            previous.get("status") == "resolved"
+            and reviewed_resolution
+            and previous_review_signature == _review_signature(record)
+        )
         record["verification_status"] = "unverified"
         record["disclaimer"] = DISCLAIMER
         record["first_seen_at"] = previous.get("first_seen_at") or observed_at
         record["last_seen_at"] = observed_at
         record["occurrences"] = int(previous.get("occurrences") or 0) + 1
         record["occurrences_bucket"] = _occurrence_bucket(record["occurrences"])
-        record["status"] = "open"
-        record["resolved_at"] = None
-        record["resolution"] = None
+        if review_still_applies:
+            record["status"] = "resolved"
+            record["resolved_at"] = previous.get("resolved_at")
+            record["resolution"] = deepcopy(previous.get("resolution"))
+            record["reviewed_signature"] = previous_review_signature
+        else:
+            record["status"] = "open"
+            record["resolved_at"] = None
+            record["resolution"] = None
         lifecycle = list(previous.get("lifecycle") or [])
         if not previous:
             lifecycle.append({"at": observed_at, "event": "opened", "detail": "first detection"})
-        elif previous.get("status") == "resolved":
+        elif previous.get("status") == "resolved" and not review_still_applies:
             lifecycle.append(
                 {"at": observed_at, "event": "reopened", "detail": "the condition was observed again"}
             )
@@ -648,6 +700,7 @@ def resolve_alert(
     for alert in updated.get("alerts", []):
         if alert.get("id") != alert_id:
             continue
+        alert["reviewed_signature"] = _review_signature(alert)
         alert["status"] = "resolved"
         alert["resolved_at"] = resolved_at
         alert["resolution"] = {

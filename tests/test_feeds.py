@@ -9,6 +9,7 @@ from urllib.error import HTTPError
 from monitor.feeds import (
     FeedError,
     build_observations,
+    build_observations_from_sources,
     extract_latest_scoring_play,
     fetch_json,
     match_scoreboards,
@@ -127,6 +128,23 @@ class FeedParsingTests(unittest.TestCase):
         duplicate["game_id"] = "another-event"
         matches = match_scoreboards(nba, espn + [duplicate])
         self.assertIsNone(matches[0][1])
+
+    def test_union_builder_keeps_duplicate_matchups_unmatched(self) -> None:
+        nba = parse_nba_scoreboard(fixture("nba-scoreboard.json"))
+        espn = parse_espn_scoreboard(fixture("espn-scoreboard.json"))
+        for duplicate_source in ("nba", "espn"):
+            with self.subTest(duplicate_source=duplicate_source):
+                source_games = {"nba": list(nba), "espn": list(espn)}
+                game = source_games[duplicate_source][0]
+                duplicate = dict(game)
+                duplicate["game_id"] = f"{game['game_id']}-duplicate"
+                source_games[duplicate_source].append(duplicate)
+
+                rows = build_observations_from_sources(source_games, "2026-10-07T04:00:00Z")
+
+                self.assertEqual(len(rows), 3)
+                self.assertTrue(all(row["score_mismatch"] is None for row in rows))
+                self.assertTrue(all(len(row["score_sources"]) == 1 for row in rows))
 
     def test_reversed_home_away_roles_are_not_joined_as_a_score_difference(self) -> None:
         nba = parse_nba_scoreboard(fixture("nba-scoreboard.json"))

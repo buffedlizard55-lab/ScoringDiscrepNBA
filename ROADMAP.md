@@ -26,18 +26,22 @@ Ordered by P(Win): highest-evidence-value first.
    the primary feed fails: it publishes the games every reachable source reported, marks the row
    `Not compared`, records the outage as a coverage gap, and runs the single-provider arithmetic
    check (`2*(FGM-3PM)+3*3PM+FTM` from the provider's own box score). An error propagated
-   identically into both views of one provider is still invisible, and there is still no second
-   reachable comparator while the NBA CDN feed returns HTTP 500 to the runner.
+   identically into both views of one provider is still invisible. The newest committed snapshot
+   records the NBA endpoint as HTTP 403 under both request profiles, while ESPN is reachable; there
+   was no second live comparator as of that observation. This does not establish current endpoint
+   health after the snapshot.
 5b. **Alert delivery is not yet proven in production.** The ledger, lifecycle, dedupe, severity,
-   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (82 tests,
-   stubbed `gh`, local webhook receiver), but no scheduled run has produced an alert that was
-   delivered: the only scheduled poll so far had the NBA feed down and no games. Until
-   `data/alert-dispatch-log.json` contains a `sent` entry with an issue URL, describe the
-   notification system as implemented and verified offline, never as observed working in
-   production.
-5c. **Scheduler cadence is best-effort.** The workflow requests `*/5`, but GitHub documents
-   delays and dropped queue entries under load, and the run history during this review showed far
-   fewer runs than requested. Detection latency cannot be promised below that.
+   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (100 tests,
+   stubbed `gh`, local webhook receiver), but no scheduled run has produced a delivered alert. The
+   latest scheduled snapshot contains only ESPN-reported scheduled games and has no open alerts to
+   deliver; no `data/alert-dispatch-log.json` sent entry exists. Until a live alert produces a
+   recorded issue URL, describe notifications as implemented and verified offline, never as
+   observed working in production.
+5c. **Scheduler cadence is best-effort and currently far sparser than requested.** The workflow
+   requests `*/5`; in the 10 workflow runs returned during review, only two were scheduled
+   (`2026-10-07T11:49:59Z` and `2026-10-07T18:03:53Z`, about 6 hours 14 minutes apart). GitHub
+   documents delays and dropped queue entries under load, and this observed gap means detection
+   latency cannot be promised below the actual workflow cadence.
 6. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
    some corrected values, but pre-correction game-night box-score snapshots and the exact record-update
    times are not preserved for the 2024/2025 examples.

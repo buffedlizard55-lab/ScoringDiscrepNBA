@@ -162,7 +162,35 @@ class AlertRuleTests(unittest.TestCase):
         self.assertIn("114", alert["summary"])
         self.assertEqual(alert["arithmetic"][0]["derived_points"], 114)
         self.assertEqual(alert["arithmetic"][0]["provider_reported_final"], 115)
-        self.assertIn("Recompute", " ".join(alert["review_steps"]))
+        self.assertIn("recompute", " ".join(alert["review_steps"]).lower())
+
+    def test_impossible_components_are_explained_in_the_alert_summary(self) -> None:
+        game = observation("2026-10-07T04:00:00Z", (148, 115), (148, 115), status="final")
+        check = consistency_check("inconsistent")
+        check["note"] = "The provider's box-score components are internally inconsistent."
+        check["checks"] = [
+            {
+                "side": "home",
+                "team": "WSH",
+                "provider_reported_final": 115,
+                "derived_points": None,
+                "difference": None,
+                "component_error": "three-point makes exceed total field-goal makes",
+                "components": {
+                    "fieldGoalsMade-attempted": (10, 50),
+                    "threePointersMade-attempted": (12, 45),
+                    "freeThrowsMade-attempted": (5, 6),
+                },
+            }
+        ]
+        state = update_state(empty_state(), [game], game["observed_at"], HEALTHY, [check])
+        book, _ = update_book(empty_book(), state, feed_health(HEALTHY), game["observed_at"])
+        alert = next(
+            item for item in book["alerts"]
+            if item["type"] == "final_score_internal_inconsistency"
+        )
+        self.assertIn("three-point makes exceed total field-goal makes", alert["summary"])
+        self.assertIn("internally impossible", alert["summary"])
 
     def test_source_outage_alert_fires_after_the_configured_window(self) -> None:
         state = empty_state()
@@ -186,7 +214,9 @@ class AlertRuleTests(unittest.TestCase):
         alert = outage[0]
         self.assertEqual(alert["severity"], "high")
         self.assertEqual(alert["dispatch"]["status"], "pending")
-        self.assertIn("16 minutes", alert["title"])
+        self.assertIn("NBA source unavailable (authoritative)", alert["title"])
+        self.assertIn("15-minute alert threshold", alert["summary"])
+        self.assertIn("16 minutes", alert["dispatch"]["reason"])
         self.assertIn("not evidence that no discrepancy exists", alert["summary"])
         self.assertIn("HTTP 403", str(alert["evidence"]))
 
@@ -201,6 +231,64 @@ class AlertRuleTests(unittest.TestCase):
         self.assertEqual(alert["resolution"]["type"], "source_recovered")
         self.assertEqual(book["coverage_gaps"][0]["source_key"], "nba")
         self.assertIn("could not run", book["coverage_gaps"][0]["impact"])
+
+    def test_human_resolution_survives_same_condition_and_reopens_for_a_new_outage(self) -> None:
+        state = empty_state()
+        book = empty_book()
+        for at in ("2026-10-07T04:00:00Z", "2026-10-07T04:16:00Z"):
+            state = update_state(state, [], at, NBA_DOWN)
+            book, _ = update_book(book, state, feed_health(NBA_DOWN), at)
+        alert = next(item for item in book["alerts"] if item["type"] == "source_unavailable")
+        alert_id = alert["id"]
+        book = resolve_alert(
+            book,
+            alert_id,
+            "Reviewed as a runner-only access limitation; keep monitoring.",
+            "2026-10-07T04:17:00Z",
+            reviewer="test",
+        )
+
+        state = update_state(state, [], "2026-10-07T04:21:00Z", NBA_DOWN)
+        book, _ = update_book(book, state, feed_health(NBA_DOWN), "2026-10-07T04:21:00Z")
+        still_closed = next(item for item in book["alerts"] if item["id"] == alert_id)
+        self.assertEqual(still_closed["status"], "resolved")
+        self.assertEqual(still_closed["resolution"]["note"], "Reviewed as a runner-only access limitation; keep monitoring.")
+
+        state = update_state(state, [], "2026-10-07T04:22:00Z", HEALTHY)
+        book, _ = update_book(book, state, feed_health(HEALTHY), "2026-10-07T04:22:00Z")
+        state = update_state(state, [], "2026-10-07T05:00:00Z", NBA_DOWN)
+        book, _ = update_book(book, state, feed_health(NBA_DOWN), "2026-10-07T05:00:00Z")
+        state = update_state(state, [], "2026-10-07T05:16:00Z", NBA_DOWN)
+        book, _ = update_book(book, state, feed_health(NBA_DOWN), "2026-10-07T05:16:00Z")
+        reopened = next(item for item in book["alerts"] if item["id"] == alert_id)
+        self.assertEqual(reopened["status"], "open")
+        self.assertEqual(reopened["lifecycle"][-1]["event"], "reopened")
+
+    def test_source_outage_alert_does_not_change_text_on_every_poll(self) -> None:
+        state = empty_state()
+        book = empty_book()
+        first_alert_summary = None
+        for index, at in enumerate(
+            (
+                "2026-10-07T04:00:00Z",
+                "2026-10-07T04:16:00Z",
+                "2026-10-07T04:21:00Z",
+                "2026-10-07T04:26:00Z",
+            )
+        ):
+            state = update_state(state, [], at, NBA_DOWN)
+            book, changed = update_book(book, state, feed_health(NBA_DOWN), at)
+            outage = [alert for alert in book["alerts"] if alert["type"] == "source_unavailable"]
+            if index == 0:
+                self.assertEqual(outage, [])
+            else:
+                self.assertEqual(len(outage), 1)
+                if first_alert_summary is None:
+                    first_alert_summary = outage[0]["summary"]
+                else:
+                    self.assertEqual(outage[0]["summary"], first_alert_summary)
+            if at == "2026-10-07T04:26:00Z":
+                self.assertFalse(changed, "an unchanged outage poll should not rewrite the alert ledger")
 
     def test_comparator_outage_is_medium_and_not_notified_until_an_hour(self) -> None:
         espn_down = {

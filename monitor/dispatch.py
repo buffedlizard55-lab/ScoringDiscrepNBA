@@ -386,19 +386,20 @@ def dispatch_pending(
             for label in issue["labels"] if labels_ready else []:
                 args.extend(["--label", label])
             ok, detail = _run_gh(resolved_gh, args, body=issue["body"])
+            issue_url = _safe_issue_url(detail) if ok else None
             attempt = {
                 "at": timestamp,
                 "channel": "github_issue",
-                "result": "sent" if ok else "failed",
+                "result": "sent" if issue_url else "failed",
                 "detail": detail,
             }
             attempts.append(attempt)
-            if ok and _safe_issue_url(detail):
-                issue_number = _issue_number(detail)
+            if issue_url:
+                issue_number = _issue_number(issue_url)
                 dispatch.update(
                     {
                         "status": "sent",
-                        "issue_url": detail,
+                        "issue_url": issue_url,
                         "issue_number": issue_number,
                         "sent_at": timestamp,
                         "reason": None,
@@ -410,16 +411,31 @@ def dispatch_pending(
                         "reference_mismatch": False,
                     }
                 )
-                alert["issue_url"] = detail
+                alert["issue_url"] = issue_url
             elif ok:
-                dispatch.update({"status": "sent", "reason": "gh reported success without a valid issue URL", "sent_at": timestamp})
+                # A successful CLI exit without a parseable issue URL leaves
+                # delivery ambiguous: the remote issue might have been created.
+                # Do not claim success or retry blindly, which could create a
+                # duplicate issue; require a person to inspect GitHub first.
+                attempt["detail"] = "gh exited successfully but returned no valid HTTPS issue URL; delivery outcome is unknown"
+                dispatch.update(
+                    {
+                        "status": "failed",
+                        "reason": attempt["detail"],
+                    }
+                )
             else:
                 dispatch.update({"status": "pending" if len(attempts) < MAX_ATTEMPTS else "failed", "reason": detail})
             dispatch["attempts"] = attempts
             alert["dispatch"] = dispatch
             log_entries.append({"alert_id": alert.get("id"), "action": "create_issue", **attempt})
             results.append(
-                {"alert_id": alert.get("id"), "action": "create_issue", "result": attempt["result"], "detail": detail}
+                {
+                    "alert_id": alert.get("id"),
+                    "action": "create_issue",
+                    "result": attempt["result"],
+                    "detail": attempt["detail"],
+                }
             )
             continue
 

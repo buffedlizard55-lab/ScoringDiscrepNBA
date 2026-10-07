@@ -141,3 +141,24 @@ The request for zero manual checking is achievable for routine collection,
 comparison, triage and notification, but automatic factual confirmation is not
 established. Ambiguous evidence must remain unresolved rather than forcing a
 conclusion just to close a workflow.
+
+## Follow-up hardening and integration — 2026-10-07
+
+The first review above was a checkpoint: its 90-test count describes that
+session, not the current integrated branch. Main subsequently incorporated
+PR #11's date-aware Eastern-calendar matching, provider-local identifiers and
+clocks, safer summary fallback, and per-provider final-status logic. The
+follow-up review then hardened arithmetic validation for impossible shooting
+cells, stable human alert closure, ambiguous issue-create outcomes, and
+heartbeat-only state churn. The integrated suite now has 100 passing tests.
+
+No historical NBA facts were added or promoted. The 213/214 and Kevin Porter
+Jr. entries remain unverified. No NBA/news pages were freshly re-fetched under
+the session's network allowlist; source citations and historical case claims
+remain subject to the dedicated network-capable, claim-by-claim re-verification
+backlog above. Current limitations remain: historical snapshots are incomplete,
+post-final monitoring is not durable after games leave the scoreboard, the
+observed Actions cadence is sparse, and no real notification receipt has been
+observed. The current hardening change is tracked in [PR #12](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/12);
+use its GitHub checks and merge record to verify integration rather than
+treating local tests as proof of deployment or delivery.

@@ -430,78 +430,81 @@ def build_observations_from_sources(
     observed_at: str,
     source_hashes: dict[str, str | None] | None = None,
 ) -> list[dict[str, Any]]:
-    """Union every source's games into one row per game, retaining missing values.
+    """Union feeds only when the ordered matchup and Eastern game date agree.
 
-    The first source that lists a game supplies the row identity, so a joined
-    game keeps the primary feed's game id exactly as before. Each source's score
-    is stored side by side under ``scores`` and ``score_mismatch`` stays ``None``
-    until two sources publish both sides of the same game: a comparison that
-    could not run is not agreement.
+    The feeds have no shared event identifier. A unique ordered home/away pair
+    on the same known game date is therefore only a best-effort join. Unknown
+    dates and duplicate same-day matchups remain separate observations: joining
+    by response order could manufacture a false comparison. Provider-specific
+    event IDs, dates, status, period, and clock are retained under each score so
+    an investigator can assess latency and identity uncertainty.
 
-    Building the union (instead of driving everything from the primary feed)
-    matters because the primary NBA CDN feed has been unavailable to the
-    scheduled runner: without this, a reachable secondary source published
-    nothing at all and its single-provider arithmetic checks never ran.
+    Rows are the union of every source that answered, so a reachable secondary
+    feed remains visible during a primary-feed outage. A missing or ambiguous
+    comparison is never reported as agreement.
     """
     hashes = source_hashes or {}
     source_hash_view = {key: hashes.get(key) for key in source_games}
-    observations: list[dict[str, Any]] = []
-    # A date and unique ordered team pair per source are required. Never guess
-    # which duplicate row represents a game or compare different game dates.
-    counts = {}
-    for source, games in source_games.items():
-        for game in games or []:
-            key = (source, _team_pair(game), game.get("game_date"))
-            counts[key] = counts.get(key, 0) + 1
+    grouped: dict[
+        tuple[tuple[str, str], str | None], dict[str, list[dict[str, Any]]]
+    ] = {}
     for source_key, games in source_games.items():
         for game in games or []:
             pair = _team_pair(game)
             if pair is None:
                 continue
             date = game.get("game_date")
-            unique = bool(date) and counts[(source_key, pair, date)] == 1
-            row = next(
-                (
-                    candidate
-                    for candidate in observations
-                    if unique and candidate["_joinable"]
-                    and candidate["_team_pair"] == pair
-                    and candidate["game_date"] == date
-                    and source_key not in candidate["scores"]
-                ),
-                None,
-            )
-            if row is None:
-                row = {
-                    "_team_pair": pair,
-                    "_joinable": unique,
-                    "observed_at": observed_at,
-                    "game_id": game.get("game_id"),
-                    "game_date": game.get("game_date"),
-                    "status": game.get("status", "unknown"),
-                    "status_text": game.get("status_text"),
-                    "period": game.get("period"),
-                    "clock": game.get("clock"),
-                    "away_team": game.get("away_team"),
-                    "home_team": game.get("home_team"),
-                    "scores": {},
-                    "score_sources": [],
-                    "score_mismatch": None,
-                    "source_hashes": deepcopy_source_hashes(source_hash_view),
-                    "latest_official_scoring_play": None,
-                    "play_by_play_source_url": None,
-                }
-                observations.append(row)
-            row["scores"][source_key] = {
-                "away": (game.get("away_team") or {}).get("score"),
-                "home": (game.get("home_team") or {}).get("score"),
-                "source_url": game.get("source_url"),
-                "game_id": game.get("game_id"),
-                "game_date": date,
-                "status": game.get("status"),
-                "period": game.get("period"),
-                "clock": game.get("clock"),
-            }
+            grouped.setdefault((pair, date), {}).setdefault(source_key, []).append(game)
+
+    def new_row(game: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "observed_at": observed_at,
+            "game_id": game.get("game_id"),
+            "game_date": game.get("game_date"),
+            "status": game.get("status", "unknown"),
+            "status_text": game.get("status_text"),
+            "period": game.get("period"),
+            "clock": game.get("clock"),
+            "away_team": game.get("away_team"),
+            "home_team": game.get("home_team"),
+            "scores": {},
+            "score_sources": [],
+            "score_mismatch": None,
+            "source_hashes": deepcopy_source_hashes(source_hash_view),
+            "latest_official_scoring_play": None,
+            "play_by_play_source_url": None,
+        }
+
+    def add_score(row: dict[str, Any], source_key: str, game: dict[str, Any]) -> None:
+        row["scores"][source_key] = {
+            "away": (game.get("away_team") or {}).get("score"),
+            "home": (game.get("home_team") or {}).get("score"),
+            "source_url": game.get("source_url"),
+            "game_id": game.get("game_id"),
+            "game_date": game.get("game_date"),
+            "status": game.get("status"),
+            "period": game.get("period"),
+            "clock": game.get("clock"),
+        }
+
+    observations: list[dict[str, Any]] = []
+    for (pair, date), by_source in grouped.items():
+        ambiguous = not date or any(len(games) > 1 for games in by_source.values())
+        if ambiguous:
+            # Preserve all rows but never infer a cross-source match.
+            for source_key, games in by_source.items():
+                for game in games:
+                    row = new_row(game)
+                    add_score(row, source_key, game)
+                    observations.append(row)
+            continue
+
+        game_rows = [(source_key, games[0]) for source_key, games in by_source.items()]
+        row = new_row(game_rows[0][1])
+        for source_key, game in game_rows:
+            add_score(row, source_key, game)
+        observations.append(row)
+
     for row in observations:
         published = {
             key: value
@@ -517,10 +520,7 @@ def build_observations_from_sources(
                 (value["away"], value["home"]) != (reference["away"], reference["home"])
                 for value in published.values()
             )
-        row.pop("_team_pair", None)
-        row.pop("_joinable", None)
     return observations
-
 
 def deepcopy_source_hashes(source_hash_view: dict[str, Any]) -> dict[str, Any]:
     """Copy a per-source hash mapping without importing deepcopy for one use."""

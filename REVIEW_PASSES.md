@@ -119,9 +119,12 @@ Found and fixed:
       probes, not as league facts. No game-level claim is made about any real correction.
 - [x] Confirm the honest layer distinction: an alert is a candidate, feed convergence is not a
       correction, and the two confirmed cases remain the only confirmed records.
-- [x] Confirm the "no manual input" requirement: the scheduled workflow polls, validates,
-      dispatches, commits, and deploys unattended; there is no step that requires a human, and no
-      step that silently depends on one.
+- [x] Verify unattended collection mechanics: the scheduled workflow polls, validates,
+      dispatches, commits, and deploys without a person entering each score or operating each run.
+- [ ] Fully human-free case confirmation/resolution: **not achieved and not claimed**. Determining
+      whether the NBA's official record was wrong, identifying cause, and promoting research records
+      still require independent evidence review; an automated feed mismatch cannot establish those
+      facts. This is an intentional safety boundary, documented in `ALERTING.md` §1/§3.
 - [x] Deliverable status: feasibility answered (§1 table + `ALERTING.md` §3), implementation
       complete and tested, remaining limitations enumerated (no reachable second source, no
       corrections feed, best-effort cron, alert not yet delivered in production).
@@ -135,6 +138,8 @@ Found and fixed:
 - [ ] **Unfinished by design:** none of the Pass-3 checks depends on the live NBA feed, but the
       production notification has still never fired. That gap is stated in README §8 and
       ROADMAP 5b rather than papered over.
+
+---
 
 ## 2026-10-07 — session 09ce52af: reliability and feasibility audit
 
@@ -167,13 +172,68 @@ orderings. Validated NBA calendar date slices rather than accepting malformed
 strings. Re-read the changes against the brief; marked incomplete research and
 operational requirements explicitly instead of asserting completion.
 
-Final local gates: **90 unit tests passed**, active data validator passed,
-14 historical records validated, historical monitor self-test passed, both JS
-syntax checks passed, dashboard DOM smoke test passed, Python compilation
-passed, regenerated historical data had no drift, `git diff --check` passed.
-No new historical cases or factual promotions. No NBA/news content could be
-re-fetched under the session network policy. No browser screenshot audit or
-real notification receipt was obtained. See `docs/REPOSITORY_REVIEW.md` for
-verified scope, direct evidence links, unresolved irregularities and prioritized
-acceptance criteria. The complete product brief remains an ongoing target, not
-a claim that all requirements are satisfied by this change.
+Final local gates at that checkpoint: **90 unit tests passed**, active data
+validator passed, 14 historical records validated, historical monitor self-test
+passed, both JS syntax checks passed, dashboard DOM smoke test passed, Python
+compilation passed, regenerated historical data had no drift, and
+`git diff --check` passed. No new historical cases or factual promotions. No
+NBA/news content could be re-fetched under that session's network policy. No
+browser screenshot audit or real notification receipt was obtained. See
+`docs/REPOSITORY_REVIEW.md` for scope, direct evidence links, unresolved
+irregularities and prioritized acceptance criteria. The complete product brief
+remains an ongoing target, not a claim that all requirements are satisfied.
+
+---
+
+## 2026-10-07 repository review and alerting hardening (three passes)
+
+Scope: review the repository against the founding brief, assess alert feasibility
+and current production state, fix code defects found, and distinguish unattended
+collection from human confirmation. No new NBA incident facts were added or
+promoted in this review.
+
+### Pass 1 — inventory and baseline verification
+
+- [x] Read `README.md` first and confirm §0 preserves the founding brief; inspect the
+      dashboard, monitor, workflow, dispatch, data and tests.
+- [x] Check GitHub state: the saved feed snapshot at `2026-10-07T18:04:06Z` has
+      ESPN only, NBA HTTP 403 under both request profiles, five ESPN-only rows and no
+      open alerts. This is a historical observation, not current health.
+- [x] Verify the queried workflow history: 10 runs returned, only two scheduled,
+      about 6 hours 14 minutes apart despite the requested five-minute cadence.
+- [x] Run baseline tests and validators; 82 pre-existing tests passed before changes.
+
+### Pass 2 — adversarial review and fixes
+
+Found and fixed:
+
+1. **Impossible shooting components could be missed or mislabeled “consistent.”**
+   Numeric but impossible cells are retained and produce an unverified candidate for
+   makes exceeding attempts, negative values, 3PT makes exceeding total FG makes, or
+   3PT attempts exceeding total FGA.
+2. **Ambiguous or cross-date rows could be compared by response order.** The integrated
+   builder now requires a known matching Eastern game date and unique ordered matchup;
+   ambiguous and unknown-date rows remain separate observations.
+3. **An issue-create success without a valid HTTPS URL could falsely say `sent`.** The
+   dispatcher records an unknown/failed outcome and avoids blind retry.
+4. **Polling heartbeat fields caused avoidable Git churn.** Per-poll elapsed fields are
+   stripped from persisted state and source-outage alert text is stable between material
+   milestones; runtime durations still drive thresholds.
+5. **“No manual input” was too broad.** Collection, detection, dispatch and publishing
+   are unattended; attribution and promotion still require independent evidence review.
+6. **A reviewed alert could reopen on an identical poll.** Manual closure now fingerprints
+   evidence and condition generation; unchanged observations preserve the closure, while
+   materially changed evidence or a new generation can reopen it.
+
+### Pass 3 — full-request recheck and integration verification
+
+- [x] Recheck the requested boundaries: no new game facts; the 213/214 and Kevin Porter
+      Jr. records remain unverified; collection statistics remain small-sample only.
+- [x] Verify that Pages, feed health, scheduler cadence, and production dispatch claims
+      are presented as observed facts/limitations, not guarantees.
+- [x] Pre-integration checkpoint: 92 tests and repository gates passed before the
+      upstream PR #11 changes were incorporated.
+- [x] After integrating PR #11, rerun **100 Python tests**, current and historical
+      validation, monitor self-test, JavaScript syntax and dashboard smoke tests, Python
+      compilation, deterministic stats/site-data generation with no drift, and `git diff --check`.
+- PR #12 check and merge state: see [the GitHub PR](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/12); local verification above does not imply deployment or notification delivery.

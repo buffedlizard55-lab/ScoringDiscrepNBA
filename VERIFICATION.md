@@ -365,3 +365,30 @@ This pass reviewed monitor freshness, notification behavior, workflow permission
 The active implementation records source health, publishable HTTP-attempt diagnostics, investigation history, and deduplicated GitHub issue alerts, but the saved `last_updated_at` is only the last material snapshot change—not a poll heartbeat. The scheduled workflow does not publish a fresh Pages artifact for an unchanged poll; use the Actions run history to check whether a poll ran. Alert contents remain explicitly unverified. Offline tests exercise mismatch persistence, no-fault wording, issue deduplication, material issue refresh, respect for human closure, non-causal resolution comments, and material snapshot timestamp stability. See `ALERTING.md`, `docs/INVESTIGATION_WORKFLOW.md`, and `monitor/STATE.md` for behavior and limitations.
 
 **Still unverified:** no conclusion is made here about whether the NBA feed is healthy after the recorded poll, whether the NBA official record was wrong, whether any public issue notification reached a particular person, or whether the schedule will meet a real-time service guarantee. Confirm the next live poll and issue API permissions in GitHub Actions after deployment.
+
+## 9. Repository review and alerting hardening — 2026-10-07 UTC
+
+No NBA incident facts were added, promoted, or externally re-researched in this pass. The checks below concern implementation behavior and the already-published repository artifacts only.
+
+- The GitHub Pages API returned `status: built` for
+  `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`. The latest scheduled run in the
+  queried workflow history was [37663924132](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37663924132),
+  which completed successfully. The committed feed artifact records a poll timestamp of
+  `2026-10-07T18:04:06Z`, ESPN `ok`, NBA HTTP 403 under both configured request profiles, five
+  ESPN-only rows, and no open alerts. That is a record of that poll, not current endpoint health.
+- The `gh run list --limit 50` query for the publishing workflow returned 10 runs, of which only
+  two were scheduled (`11:49:59Z` and `18:03:53Z` on 2026-10-07). The five-minute cron is therefore
+  not demonstrated to provide five-minute operational monitoring.
+- Code-review fixes: impossible shooting-cell values and 3PT/FG relationships are no longer
+  classified as arithmetic agreement; duplicate same-team-pair rows are not paired by response
+  order; an issue-creation process without a valid HTTPS URL is not recorded as delivered; volatile
+  outage fields/text no longer force heartbeat-only writes; reviewed closures persist across
+  identical polls and reopen for changed evidence or a new condition generation.
+- Verification: 100 Python tests passed after integrating PR #11's date-aware feed matching;
+  `python3 -m monitor --check-data`, `python3 scripts/validate.py`,
+  `python3 scripts/monitor.py --self-test`, JavaScript syntax and dashboard smoke tests, Python
+  compilation, deterministic historical data generation/drift check, and `git diff --check` passed.
+  (If a later CI run differs, its result supersedes this local check.)
+- Production delivery remains unproven: the current committed alert ledger is empty and no
+  `data/alert-dispatch-log.json` sent entry exists. No external notification was observed in this
+  review. An automated candidate still requires evidence review before confirmation.

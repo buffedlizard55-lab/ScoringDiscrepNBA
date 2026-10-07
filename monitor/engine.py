@@ -19,15 +19,18 @@ OBSERVATION_RETENTION_RECENT = 20
 # not by themselves mark the state as materially changed (otherwise the
 # scheduled runner would commit on every single poll).
 _VOLATILE_STATE_FIELDS = {
-    "source_health_state": ("last_ok_at",),
+    # These are recalculated on each run for threshold evaluation and must not
+    # make an otherwise unchanged committed state look new.
+    "source_health_state": ("last_ok_at", "unavailable_minutes"),
     "final_game_checks": ("checked_at",),
 }
 
-# Outage bookkeeping uses wall-clock duration rather than a poll counter,
+# Outage thresholds use wall-clock duration rather than a poll counter,
 # because the scheduled runner is queued and delayed by GitHub Actions: a poll
-# count would understate how long a source was actually unavailable. Only the
-# first failure time is stored, so a long outage does not rewrite the committed
-# state file on every poll.
+# count would understate how long a source was actually unavailable. Runtime
+# duration is recalculated for the alert policy but stripped from the persisted
+# state; the ledger keeps the first failure time and error, avoiding heartbeat-
+# only commits during a long outage.
 
 
 def empty_state() -> dict[str, Any]:
@@ -468,7 +471,6 @@ def _process_source_health(
                 "status": "ok",
                 "first_failure_at": None,
                 "last_error": None,
-                "last_ok_at": observed_at,
             }
             continue
         health_state[source_key] = {
@@ -476,7 +478,6 @@ def _process_source_health(
             "status": health.get("status"),
             "first_failure_at": previous.get("first_failure_at") or observed_at,
             "last_error": health.get("error"),
-            "last_ok_at": previous.get("last_ok_at"),
             "unavailable_minutes": _elapsed_minutes(
                 previous.get("first_failure_at") or observed_at, observed_at
             ),
