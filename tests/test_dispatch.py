@@ -182,6 +182,28 @@ class DispatchTests(unittest.TestCase):
             again = dispatch_pending(root=root, apply=True, gh_path=str(gh), env={})
             self.assertEqual(again["results"], [])
 
+    def test_success_without_issue_url_is_not_claimed_or_retried_blindly(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            revision_book(root)
+            gh = write_stub_gh(root, url="not-a-url")
+
+            result = dispatch_pending(root=root, apply=True, gh_path=str(gh), env={})
+
+            self.assertTrue(result["results"])
+            self.assertTrue(all(entry["result"] == "failed" for entry in result["results"]))
+            book = json.loads((root / "data" / "alerts.json").read_text())
+            for alert in book["alerts"]:
+                dispatch = alert["dispatch"]
+                self.assertEqual(dispatch["status"], "failed")
+                self.assertIsNone(dispatch.get("issue_url"))
+                self.assertIn("outcome is unknown", dispatch["reason"])
+            log = json.loads((root / "data" / "alert-dispatch-log.json").read_text())
+            self.assertTrue(all(entry["result"] == "failed" for entry in log["entries"]))
+
+            retry = dispatch_pending(root=root, apply=True, gh_path=str(gh), env={})
+            self.assertEqual(retry["results"], [], "an uncertain create must not be retried blindly")
+
     def test_failed_delivery_is_recorded_and_retried_then_abandoned(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

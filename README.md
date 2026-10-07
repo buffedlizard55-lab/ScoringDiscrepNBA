@@ -76,9 +76,9 @@
 | Piece | Location | Status |
 |---|---|---|
 | Founding brief + operating rules | this README §0/§1 | Verbatim brief retained; read at the start of every session |
-| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (82 tests); **first live dispatch has not been observed yet** — see §8 |
+| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (92 tests); **first live dispatch has not been observed yet** — see §8 |
 | Alerting feasibility, limitations, verification | `ALERTING.md` | New in this session; every claim links to a source or a repository file |
-| Current live comparison monitor (NBA liveData vs ESPN + PBP context + final-game box-score arithmetic) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; the NBA CDN feed is currently **unreachable from the runner**, so the published rows come from ESPN alone and only the single-provider checks fire today (§8) |
+| Current live comparison monitor (NBA liveData vs ESPN + PBP context + final-game box-score arithmetic) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; the latest saved poll has ESPN only and records NBA HTTP 403 from both request profiles, so cross-source comparison did not run; snapshot freshness and sparse scheduling are limitations (§8) |
 | Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; Melton's exact corrected player total remains disputed (11 vs 12) |
 | Unresolved research leads (213/214 and 2021 Kevin Porter Jr.) | `data/leads.json` | Explicitly unverified; excluded from all confirmed counts and statistics |
 | Earlier historical collection (12 verified-partial records + 2 unverified stubs) | `data/cases/*.json` → `data/cases.json`; published at `docs/` | Preserved with source and open-question caveats; collection statistics are 12 of 14, never league-wide rates |
@@ -195,28 +195,41 @@ checked — retrieves the ESPN summary box score to recompute
 observation time is the monitor poll time; it is not a provider publication
 time.
 
-**Observed blocker (not an assumption).** `cdn.nba.com` is currently
-unreachable from the scheduled runner: run
-[37616762038](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37616762038)
-saved `nba: unavailable (HTTPError)` while ESPN was `ok`
-([commit `99cae832`](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/commit/99cae8322239b52486fe26777fa70f33565f3959)).
-Independent probes during this review returned an S3 `AccessDenied` document at
-`https://cdn.nba.com/robots.txt` and HTTP 500 for the scoreboard object. The
-monitor now retries with a browser-like header profile and publishes each
-attempt under `source_diagnostics`, so the next run records the exact status
-code. Until the primary feed answers, cross-source comparison cannot run and the
-dashboard says so instead of implying a clean result.
+**Last recorded source state (not a claim about current endpoint health).**
+The newest scheduled run in the reviewed Actions history is
+[37663924132](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37663924132)
+(started `2026-10-07T18:03:53Z`). The committed
+[`data/live-feed.json`](data/live-feed.json) snapshot records `last_updated_at` as
+`2026-10-07T18:04:06Z`: ESPN returned successfully; the NBA feed returned HTTP
+403 under both the `monitor` and `browser` header profiles; five ESPN-only game
+rows were published with comparison marked unavailable. This is evidence about
+that poll only, not what either endpoint is serving now. An earlier poll,
+[37616762038](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37616762038),
+also recorded the NBA source unavailable. Separate probes documented in
+[`ALERTING.md`](ALERTING.md) returned an S3 `AccessDenied` document for
+`cdn.nba.com/robots.txt` and HTTP 500 for the scoreboard object; they do not
+establish why access differs by client or run. The monitor publishes each
+request profile's result in `source_diagnostics` so a failed comparison is
+visible rather than presented as a clean result.
 
 **Alerts.** Detections become alert records with severity, lifecycle, evidence
-links, review steps, and delivery state; critical/high alerts are delivered as
-GitHub issues by `python3 -m monitor --dispatch-alerts --apply`, and an optional
-webhook (`SCORING_DISCREPANCY_WEBHOOK_URL`) can mirror them. Offline evidence:
-82 unit tests (rules, lifecycle, dedupe, arithmetic, delivery with a stubbed
-`gh`, issue refresh/closure/resolution behavior, unsafe-text escaping, webhook
-receipt, and coverage gaps) plus a deterministic end-to-end fixture run that
+links, review steps, and delivery state; critical/high alerts are configured
+for GitHub issue delivery by `python3 -m monitor --dispatch-alerts --apply`, and
+an optional webhook (`SCORING_DISCREPANCY_WEBHOOK_URL`) can mirror them. Offline
+evidence: 92 unit tests (rules, lifecycle, dedupe, arithmetic, ambiguous-match
+handling, delivery with a stubbed `gh`, issue refresh/closure/resolution behavior,
+unsafe-text escaping, webhook receipt, and coverage gaps) plus a deterministic
+end-to-end fixture run that
 opens a critical alert and plans its notification while the primary feed is down. **The first live dispatch has not been observed yet**; do not
 describe notifications as proven until `data/alert-dispatch-log.json` contains a
 `sent` entry and `data/alerts.json` shows a delivered `issue_url`.
+
+**Automation boundary.** Scheduled collection, detection, investigation-ledger
+updates, alert dispatch, and Pages publishing are unattended. A literal
+zero-human research/adjudication system is not achieved: there is no verified
+machine-readable NBA correction stream, so a person must review evidence before
+calling a case an official-record error, assigning a cause, or promoting it to a
+confirmed research record. Alerts remain candidates, not conclusions.
 
 **Single-source operation (fixed this session).** The published game list used
 to be built entirely from the primary NBA feed, so that feed failing produced
@@ -231,11 +244,12 @@ and `::test_single_provider_arithmetic_check_runs_while_nba_feed_is_down`.
 **Scheduler reality.** The workflow requests `*/5 * * * *`, but GitHub documents
 that scheduled runs can be delayed and that queued jobs may be dropped under
 load ([docs](https://docs.github.com/actions/using-workflows/events-that-trigger-workflows)).
-During this review the run history showed a single scheduled run in roughly ten
-hours. Treat the cadence as best-effort, not real-time. The scheduled job also
-now re-runs the unit tests, the JavaScript syntax check, and the dashboard smoke
-test after the poll and before committing, because data written with the
-repository's `GITHUB_TOKEN` does not start a new workflow run of its own.
+The workflow history returned by `gh run list --workflow 'Publish research site and monitor NBA scores' --limit 50` contained 10 runs, only two of which were scheduled: `2026-10-07T11:49:59Z` and `2026-10-07T18:03:53Z` (about 6 hours 14 minutes apart), despite the requested five-minute cadence. Treat the
+schedule as best-effort, not real-time; this observed gap is a material
+operational blocker for short-lived discrepancies. The scheduled job also
+re-runs the unit tests, the JavaScript syntax check, and the dashboard smoke test
+after the poll and before committing, because data written with the repository's
+`GITHUB_TOKEN` does not start a new workflow run of its own.
 
 **Integrity fix from this session.** GitHub does not start new workflow runs for
 pushes made with the repository's `GITHUB_TOKEN`

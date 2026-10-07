@@ -417,60 +417,76 @@ def build_observations_from_sources(
     observed_at: str,
     source_hashes: dict[str, str | None] | None = None,
 ) -> list[dict[str, Any]]:
-    """Union every source's games into one row per game, retaining missing values.
+    """Union every source's games, retaining missing values and refusing ambiguous joins.
 
-    The first source that lists a game supplies the row identity, so a joined
-    game keeps the primary feed's game id exactly as before. Each source's score
-    is stored side by side under ``scores`` and ``score_mismatch`` stays ``None``
-    until two sources publish both sides of the same game: a comparison that
-    could not run is not agreement.
+    The feeds do not expose a shared game identifier, so ordered home/away team
+    codes are the join key. A pair is joined only when every source in the
+    current response reports at most one game for that pair. If a source returns
+    duplicate pair rows, the rows remain separate and ``score_mismatch`` stays
+    ``None``: choosing a match by list order could create a false alert.
 
-    Building the union (instead of driving everything from the primary feed)
-    matters because the primary NBA CDN feed has been unavailable to the
-    scheduled runner: without this, a reachable secondary source published
-    nothing at all and its single-provider arithmetic checks never ran.
+    The first source that lists an unambiguous game supplies the row identity,
+    so the NBA game id is retained when present. Each source's score is stored
+    side by side under ``scores``; a missing or ambiguous comparison is not
+    agreement. Building a union instead of driving everything from the primary
+    feed also lets reachable secondary sources publish rows during primary-feed
+    outages, preserving single-provider arithmetic checks.
     """
     hashes = source_hashes or {}
     source_hash_view = {key: hashes.get(key) for key in source_games}
-    observations: list[dict[str, Any]] = []
+    grouped: dict[tuple[str, str], dict[str, list[dict[str, Any]]]] = {}
     for source_key, games in source_games.items():
         for game in games or []:
             pair = _team_pair(game)
             if pair is None:
                 continue
-            row = next(
-                (
-                    candidate
-                    for candidate in observations
-                    if candidate["_team_pair"] == pair and source_key not in candidate["scores"]
-                ),
-                None,
-            )
-            if row is None:
-                row = {
-                    "_team_pair": pair,
-                    "observed_at": observed_at,
-                    "game_id": game.get("game_id"),
-                    "game_date": game.get("game_date"),
-                    "status": game.get("status", "unknown"),
-                    "status_text": game.get("status_text"),
-                    "period": game.get("period"),
-                    "clock": game.get("clock"),
-                    "away_team": game.get("away_team"),
-                    "home_team": game.get("home_team"),
-                    "scores": {},
-                    "score_sources": [],
-                    "score_mismatch": None,
-                    "source_hashes": deepcopy_source_hashes(source_hash_view),
-                    "latest_official_scoring_play": None,
-                    "play_by_play_source_url": None,
-                }
-                observations.append(row)
-            row["scores"][source_key] = {
-                "away": (game.get("away_team") or {}).get("score"),
-                "home": (game.get("home_team") or {}).get("score"),
-                "source_url": game.get("source_url"),
-            }
+            grouped.setdefault(pair, {}).setdefault(source_key, []).append(game)
+
+    def new_row(game: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "observed_at": observed_at,
+            "game_id": game.get("game_id"),
+            "game_date": game.get("game_date"),
+            "status": game.get("status", "unknown"),
+            "status_text": game.get("status_text"),
+            "period": game.get("period"),
+            "clock": game.get("clock"),
+            "away_team": game.get("away_team"),
+            "home_team": game.get("home_team"),
+            "scores": {},
+            "score_sources": [],
+            "score_mismatch": None,
+            "source_hashes": deepcopy_source_hashes(source_hash_view),
+            "latest_official_scoring_play": None,
+            "play_by_play_source_url": None,
+        }
+
+    def add_score(row: dict[str, Any], source_key: str, game: dict[str, Any]) -> None:
+        row["scores"][source_key] = {
+            "away": (game.get("away_team") or {}).get("score"),
+            "home": (game.get("home_team") or {}).get("score"),
+            "source_url": game.get("source_url"),
+        }
+
+    observations: list[dict[str, Any]] = []
+    for by_source in grouped.values():
+        ambiguous = any(len(games) > 1 for games in by_source.values())
+        if ambiguous:
+            # Keep every provider's duplicate events as standalone observations.
+            # This preserves evidence without inventing a cross-source mapping.
+            for source_key, games in by_source.items():
+                for game in games:
+                    row = new_row(game)
+                    add_score(row, source_key, game)
+                    observations.append(row)
+            continue
+
+        game_rows = [(source_key, games[0]) for source_key, games in by_source.items()]
+        row = new_row(game_rows[0][1])
+        for source_key, game in game_rows:
+            add_score(row, source_key, game)
+        observations.append(row)
+
     for row in observations:
         published = {
             key: value
@@ -486,7 +502,6 @@ def build_observations_from_sources(
                 (value["away"], value["home"]) != (reference["away"], reference["home"])
                 for value in published.values()
             )
-        row.pop("_team_pair", None)
     return observations
 
 

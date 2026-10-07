@@ -29,6 +29,7 @@ shape verified against a live response (2026-10-07, CLE@WSH 2025-11-07 game
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 CONSISTENCY_SCHEMA_VERSION = 1
@@ -40,21 +41,17 @@ NOT_CHECKABLE_NOTE = (
 
 
 def _parse_made_attempted(value: Any) -> tuple[int, int] | None:
-    """Parse a provider stat cell such as ``"52-110"`` into (made, attempted)."""
+    """Parse a provider stat cell such as ``"52-110"`` into (made, attempted).
+
+    Keep numeric but impossible values for the consistency checker to flag;
+    treating them as missing would turn corrupt data into a silent blind spot.
+    """
     if not isinstance(value, str):
         return None
-    text = value.strip()
-    if "-" not in text:
+    match = re.fullmatch(r"\s*(-?\d+)\s*-\s*(-?\d+)\s*", value)
+    if not match:
         return None
-    made_text, _, attempted_text = text.partition("-")
-    try:
-        made = int(made_text.strip())
-        attempted = int(attempted_text.strip())
-    except ValueError:
-        return None
-    if made < 0 or attempted < 0 or made > attempted:
-        return None
-    return made, attempted
+    return int(match.group(1)), int(match.group(2))
 
 
 def _statistics_by_name(statistics: Any) -> dict[str, str]:
@@ -71,17 +68,45 @@ def _statistics_by_name(statistics: Any) -> dict[str, str]:
     return lookup
 
 
+def _component_error(components: dict[str, tuple[int, int] | None]) -> str | None:
+    """Return a reason when shooting cells are impossible or contradict each other."""
+    labels = {
+        "fieldGoals": "field-goal",
+        "threePointers": "three-point",
+        "freeThrows": "free-throw",
+    }
+    for key, label in labels.items():
+        pair = components.get(key)
+        if pair is None:
+            continue
+        made, attempted = pair
+        if made < 0 or attempted < 0:
+            return f"{label} makes or attempts are negative"
+        if made > attempted:
+            return f"{label} makes exceed attempts"
+
+    field_goals = components.get("fieldGoals")
+    three_pointers = components.get("threePointers")
+    if field_goals is None or three_pointers is None:
+        return None
+    if three_pointers[0] > field_goals[0]:
+        return "three-point makes exceed total field-goal makes"
+    if three_pointers[1] > field_goals[1]:
+        return "three-point attempts exceed total field-goal attempts"
+    return None
+
+
 def derive_points_from_components(components: dict[str, tuple[int, int]]) -> int | None:
-    """Return 2*(FGM-3PM) + 3*3PM + FTM, or None when a component is unknown."""
+    """Return 2*(FGM-3PM) + 3*3PM + FTM, or None for unknown/impossible inputs."""
     required = ("fieldGoals", "threePointers", "freeThrows")
     if any(key not in components for key in required):
         return None
     field_goals = components["fieldGoals"]
     three_pointers = components["threePointers"]
     free_throws = components["freeThrows"]
-    two_pointers_made = field_goals[0] - three_pointers[0]
-    if two_pointers_made < 0:
+    if _component_error(components) is not None:
         return None
+    two_pointers_made = field_goals[0] - three_pointers[0]
     return 2 * two_pointers_made + 3 * three_pointers[0] + free_throws[0]
 
 
@@ -167,6 +192,7 @@ def espn_consistency_checks(
             result["reason"] = f"the {side} box score did not include parseable FGM/3PM/FTM cells"
             result["checks"] = checks
             return result
+        component_error = _component_error(derivable)
         derived = derive_points_from_components(derivable)
         reported = provider_scores.get(side)
         checks.append(
@@ -176,22 +202,32 @@ def espn_consistency_checks(
                 "provider_reported_final": reported,
                 "derived_points": derived,
                 "difference": None if derived is None or reported is None else derived - reported,
+                "component_error": component_error,
                 "components": {
                     "fieldGoalsMade-attempted": derivable["fieldGoals"],
                     "threePointersMade-attempted": derivable["threePointers"],
                     "freeThrowsMade-attempted": derivable["freeThrows"],
                 },
-                "twoPointersMade": derivable["fieldGoals"][0] - derivable["threePointers"][0],
+                "twoPointersMade": (
+                    derivable["fieldGoals"][0] - derivable["threePointers"][0]
+                    if component_error is None
+                    else None
+                ),
             }
         )
 
-    mismatches = [check for check in checks if check["difference"] not in (0, None)]
+    mismatches = [
+        check
+        for check in checks
+        if check.get("component_error") or check["difference"] not in (0, None)
+    ]
     result["checks"] = checks
     if mismatches:
         result["status"] = "inconsistent"
         result["note"] = (
-            "The provider's reported final does not follow from the box-score components it "
-            "publishes for the same game. This is a candidate discrepancy for review; it does "
+            "The provider's final and/or box-score components are internally inconsistent. "
+            "Where components are valid, the reported final is compared with the arithmetic "
+            "derived from those components. This is a candidate discrepancy for review; it does "
             "not establish which value the NBA's official record holds."
         )
         result["differences"] = [
@@ -200,6 +236,7 @@ def espn_consistency_checks(
                 "derived_points": check["derived_points"],
                 "provider_reported_final": check["provider_reported_final"],
                 "difference": check["difference"],
+                **({"component_error": check["component_error"]} if check.get("component_error") else {}),
             }
             for check in mismatches
         ]

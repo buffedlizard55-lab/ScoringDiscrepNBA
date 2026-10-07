@@ -48,9 +48,23 @@ class ArithmeticTests(unittest.TestCase):
         )
 
     def test_impossible_components_are_not_derived(self) -> None:
+        baseline = {"fieldGoals": (10, 50), "threePointers": (5, 20), "freeThrows": (5, 6)}
+        impossible = [
+            {**baseline, "fieldGoals": (51, 50)},
+            {**baseline, "threePointers": (21, 20)},
+            {**baseline, "freeThrows": (7, 6)},
+            {**baseline, "fieldGoals": (10, 50), "threePointers": (12, 45)},
+            {**baseline, "fieldGoals": (10, 50), "threePointers": (5, 51)},
+            {**baseline, "freeThrows": (-1, 6)},
+        ]
+        for components in impossible:
+            with self.subTest(components=components):
+                self.assertIsNone(derive_points_from_components(components))
+
+    def test_three_point_attempts_cannot_exceed_field_goal_attempts(self) -> None:
         self.assertIsNone(
             derive_points_from_components(
-                {"fieldGoals": (10, 50), "threePointers": (12, 45), "freeThrows": (5, 6)}
+                {"fieldGoals": (10, 50), "threePointers": (5, 51), "freeThrows": (5, 6)}
             )
         )
 
@@ -74,6 +88,56 @@ class EspnSummaryTests(unittest.TestCase):
         self.assertEqual(check["checks"][0]["derived_points"], 148)
         self.assertEqual(check["checks"][1]["derived_points"], 115)
         self.assertIn("cannot detect an error the provider propagated consistently", check["note"])
+
+    def test_impossible_component_relationship_is_flagged_not_called_consistent(self) -> None:
+        payload = fixture()
+        away_stats = {
+            entry["name"]: entry
+            for entry in payload["boxscore"]["teams"][0]["statistics"]
+        }
+        away_stats["fieldGoalsMade-fieldGoalsAttempted"]["displayValue"] = "10-50"
+        away_stats["threePointFieldGoalsMade-threePointFieldGoalsAttempted"]["displayValue"] = "12-45"
+
+        check = espn_consistency_checks(
+            payload,
+            {"away": 100, "home": 100},
+            source_url="https://example.invalid/summary",
+            game_id="401809511",
+        )
+
+        self.assertEqual(check["status"], "inconsistent")
+        self.assertEqual(
+            check["checks"][0]["component_error"],
+            "three-point makes exceed total field-goal makes",
+        )
+        self.assertIsNone(check["checks"][0]["derived_points"])
+        self.assertIn("internally inconsistent", check["note"])
+
+    def test_impossible_made_attempted_cells_are_reported_as_inconsistent(self) -> None:
+        variants = (
+            ("32-31", "free-throw makes exceed attempts"),
+            ("-1-31", "free-throw makes or attempts are negative"),
+            ("24--1", "free-throw makes or attempts are negative"),
+        )
+        for display_value, expected_error in variants:
+            with self.subTest(display_value=display_value):
+                payload = fixture()
+                free_throw_stats = {
+                    entry["name"]: entry
+                    for entry in payload["boxscore"]["teams"][0]["statistics"]
+                }
+                free_throw_stats["freeThrowsMade-freeThrowsAttempted"]["displayValue"] = display_value
+
+                check = espn_consistency_checks(
+                    payload,
+                    {"away": 148, "home": 115},
+                    source_url="https://example.invalid/summary",
+                    game_id="401809511",
+                )
+
+                self.assertEqual(check["status"], "inconsistent")
+                self.assertEqual(check["checks"][0]["component_error"], expected_error)
+                self.assertIsNone(check["checks"][0]["derived_points"])
 
     def test_scoreboard_that_disagrees_with_its_own_box_score_is_flagged(self) -> None:
         payload = fixture()

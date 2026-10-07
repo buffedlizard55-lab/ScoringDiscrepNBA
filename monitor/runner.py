@@ -57,6 +57,22 @@ def _read_optional_json(path: Path, default: Any) -> Any:
     return value
 
 
+def _persisted_monitor_state(state: dict[str, Any]) -> dict[str, Any]:
+    """Strip per-poll timestamps/durations before writing the durable ledger.
+
+    The live state retains outage duration so alert thresholds can be evaluated,
+    but serializing it would change the repository file on every five-minute
+    poll even when no investigation or coverage fact changed.
+    """
+    persisted = deepcopy(state)
+    health_state = persisted.get("source_health_state") or {}
+    for entry in health_state.values():
+        if isinstance(entry, dict):
+            entry.pop("last_ok_at", None)
+            entry.pop("unavailable_minutes", None)
+    return persisted
+
+
 def _source_status(url: str, status: str, **extra: Any) -> dict[str, Any]:
     result = {"status": status, "url": url}
     result.update(extra)
@@ -439,7 +455,7 @@ def run_with_payloads(
         ],
         source_diagnostics=source_diagnostics or {},
     )
-    write_json(state_path, state)
+    write_json(state_path, _persisted_monitor_state(state))
     write_json(feed_path, feed)
 
     # Alert ledger. It is only rewritten when the alert set materially changes
