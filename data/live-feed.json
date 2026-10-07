@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "status": "not_started",
+  "source_health": {
+    "nba": { "status": "not_checked", "source": "NBA live scoreboard" },
+    "espn": { "status": "not_checked", "source": "ESPN public scoreboard (secondary)" }
+  },
+  "games": [],
+  "active_investigation_count": 0,
+  "last_state_change_at": null,
+  "last_updated_at": null,
+  "note": "No successful monitor poll has been published from this repository yet. An empty game list is not evidence that there are no live games or discrepancies."
+}

@@ -4,8 +4,8 @@
 > It holds the founding brief, the operating values, and the no-hallucination policy.
 > Build, research, suggest, and implement against it. Own the outcome end to end.
 
-**Live site (GitHub Pages):** `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`
-*(enable Pages: repo Settings → Pages → Source “GitHub Actions”, then the `Deploy site` workflow publishes `docs/`)*
+**Expected GitHub Pages URL:** `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/` (not claimed live until a successful deployment is observed).
+The current root dashboard is published by `pages-and-monitor.yml`; the earlier historical catalog remains available under `docs/` and is copied into the same Pages artifact.
 
 ---
 
@@ -71,20 +71,21 @@ date current feed.
 
 | Piece | Location | Status |
 |---|---|---|
-| Canonical case database (12 verified-partial + 1 unverified stub) | `data/cases/*.json` → `data/cases.json` | ✅ Live |
-| Canonical record schema + validation | `data/cases-schema.json`, `scripts/validate.py` | ✅ Live |
-| Collection statistics (regenerated, caveated) | `data/stats.json` via `scripts/compute_stats.py` | ✅ Live |
-| Source reliability tiers | `data/sources.json` | ✅ Live |
-| Continuous monitor (ESPN vs NBA liveData + PBP) | `scripts/monitor.py`, `monitor/STATE.md` | ✅ Live (runs in CI; self-test passes offline) |
-| Investigation log / live feed | `data/investigations.json` | ✅ Live (empty = no open detections) |
-| Public website (search, filter, compare, verify) | `docs/` → GitHub Pages | ✅ Live |
-| CI: validate on push/PR | `.github/workflows/validate.yml` | ✅ Live |
-| CI: scheduled monitoring | `.github/workflows/monitor.yml` | ✅ Live (active after merge to `main`) |
-| CI: Pages deploy | `.github/workflows/pages.yml` | ✅ Live (needs Pages → GitHub Actions enabled once) |
-| Verification log + methods | `VERIFICATION.md` | ✅ Live |
-| Limitations + roadmap | `ROADMAP.md` | ✅ Live |
-| Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | ⚠️ Preserved, audit-flagged (see §7) |
-| Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | 📦 Archived, standalone |
+| Earlier historical collection (12 partial case records + 1 unverified stub) | `data/cases/*.json` → `data/cases.json`; also `docs/` | Preserved; not re-audited in this pass |
+| Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; intentionally a small sample |
+| Current unresolved 213/214 lead | `data/leads.json` | Unidentified; excluded from confirmed-case counts |
+| Earlier case schema, validation, and collection statistics | `data/cases-schema.json`, `scripts/validate.py`, `data/stats.json` | Retained with source caveats |
+| Earlier historical monitor (ESPN vs NBA liveData, PBP, quarter totals) | `scripts/monitor.py`, `monitor/STATE.md` | Retained for manual/backfill use; its old schedule is disabled |
+| Current live comparison monitor (NBA scoreboard vs ESPN + PBP context) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; no successful live run observed yet |
+| Current root dashboard (search, filter, source comparison) | `index.html`, `assets/` | Built locally; Pages deployment not yet verified |
+| Historical catalog / previous dashboard | `docs/` | Preserved and linked from the root dashboard |
+| New CI for the current monitor/dashboard | `.github/workflows/ci.yml` | 22 offline tests plus data and JavaScript checks |
+| Current Pages publishing and five-minute monitor workflow | `.github/workflows/pages-and-monitor.yml` | Configured; requires successful run and Pages permissions |
+| Earlier data validation and manual monitor workflows | `.github/workflows/validate.yml`, `.github/workflows/monitor.yml` | Retained; see runbook and limitations below |
+| Verification log + methods | `VERIFICATION.md` | Retained; includes the earlier line-by-line log |
+| Limitations + roadmap | `ROADMAP.md` | Retained |
+| Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | Preserved, audit-flagged (see §7) |
+| Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | Archived, standalone |
 
 **Originating 213-vs-214 report:** tracked as `0000-00-00-originating-213-vs-214-report`
 with status `unverified`. The game is unidentified — it must not be cited as fact until the
@@ -93,51 +94,52 @@ checklist in that record is satisfied.
 ## 3. Quick start
 
 ```bash
-# validate every canonical case (anti-hallucination rules enforced)
-python3 scripts/validate.py
+# current monitor + dashboard checks (standard library only)
+python3 -m unittest discover -s tests -v
+python3 -m monitor --check-data
+node --check assets/app.js
+node tests/dashboard-smoke.js
 
-# recompute statistics + rebuild the site data bundle
+# preview the current root dashboard and its linked historical catalog
+python3 -m http.server 8000
+
+# one current live collection cycle (needs network access)
+python3 -m monitor --live
+
+# earlier historical-data validator and generated collection/site bundle
+python3 scripts/validate.py
 python3 scripts/compute_stats.py
 python3 scripts/build_site_data.py
 
-# offline monitor self-test (no network; uses synthetic 213-vs-214 fixture)
+# earlier monitor offline self-test and manual historical backfill
 python3 scripts/monitor.py --self-test
-
-# live monitor (needs internet: ESPN + NBA CDN)
 python3 scripts/monitor.py --date 20250115 --lookback 1
-
-# preview the site
-cd docs && python3 -m http.server 8080
 ```
 
 ## 4. Repository map
 
 ```
-├── README.md                  ← you are here (read first, every session)
-├── VERIFICATION.md            ← methods, source hierarchy, line-by-line log (+ PR #2 appendix)
-├── ROADMAP.md                 ← limitations, next-session work, harmonization plan
-├── CONTRIBUTING.md            ← prior-session contribution guide (references data/schema.json)
-├── index.html                 ← root redirect to docs/ (prior session, still valid)
+├── README.md                   ← persistent brief; read first every session
+├── VERIFICATION.md / ROADMAP.md ← earlier research log, methods, limitations, and next work
+├── index.html + assets/        ← current root dashboard
+├── docs/                       ← preserved earlier historical catalog, linked from the root site
 ├── data/
-│   ├── cases-schema.json      ← canonical record contract (required fields, enums, rules)
-│   ├── cases/*.json           ← canonical store: one file per case; null = unknown, never guessed
-│   ├── cases.json             ← generated aggregate (do not hand-edit)
-│   ├── stats.json             ← generated stats (caveated: collection-only)
-│   ├── sources.json           ← reliability tiers + authoritative references
-│   ├── investigations.json    ← monitor's open/resolved detection log
-│   ├── schema.json            ← LEGACY schema for discrepancies.json (PR #2; kept for its tooling)
-│   ├── discrepancies.json     ← LEGACY store (PR #2; leads pending re-verification)
-│   ├── statistics.json        ← LEGACY stats (PR #2; see audit flags before citing)
-│   ├── latest_check.json      ← LEGACY monitor output (PR #2)
-│   └── live_alerts.json       ← LEGACY alerts (PR #2)
-├── scripts/                   ← canonical tooling (stdlib only): validate, compute_stats,
-│                                build_site_data, monitor (+ fixtures/)
-├── src/                       ← LEGACY tooling (PR #2; needs API keys; manual runs only)
-├── research/                  ← LEGACY case notes (PR #2; 1 of 12 listed files present)
-├── monitor/STATE.md           ← how canonical monitoring works, lifecycle, runbook
-├── archive/session-7b4d64dc-site/ ← PR #2 site + README, byte-identical, standalone
-├── docs/                      ← canonical GitHub Pages site (index.html, app.js, styles.css, data/)
-└── .github/workflows/         ← validate.yml, monitor.yml, pages.yml
+│   ├── reviewed-cases.json     ← current two-case evidence-reviewed dashboard sample
+│   ├── leads.json              ← unresolved 213/214 lead, excluded from case counts
+│   ├── cases/*.json            ← earlier per-case historical collection; preserve nulls/open questions
+│   ├── cases.json              ← generated aggregate for the earlier docs catalog (do not hand-edit)
+│   ├── cases-schema.json       ← earlier case contract; `scripts/validate.py` checks this collection
+│   ├── live-feed.json          ← current monitor's published scoreboard snapshot
+│   ├── monitor-state.json      ← current monitor's append-only investigation ledger and baselines
+│   ├── investigations.json    ← earlier monitor's investigation log
+│   ├── stats.json / sources.json ← earlier collection-only statistics and source tiers
+│   └── ...                     ← preserved legacy datasets, see §4 and §7
+├── monitor/                    ← current stdlib monitor package + earlier STATE.md runbook
+├── scripts/                    ← earlier validation, data generation, and historical monitor tools
+├── schemas/case.schema.json    ← schema for the current reviewed-case format
+├── tests/                      ← current unit, fixture, validation, and dashboard smoke tests
+├── archive/session-7b4d64dc-site/ ← PR #2 site + README, preserved byte-for-byte
+└── .github/workflows/          ← current CI/Pages monitor plus earlier validation/manual monitor
 ```
 
 ## 5. How to add or change a canonical case (no-hallucination workflow)
@@ -174,3 +176,15 @@ An earlier session merged a parallel implementation (PR #2). The merge kept it i
   the audit. Full findings: `VERIFICATION.md` §6.
 - **Tooling:** `src/` needs API keys for live use (per its own README); the canonical CI monitor
   is the keyless `scripts/monitor.py`. Harmonization plan: `ROADMAP.md` §5.
+
+## 8. Current root dashboard and monitor integration
+
+This Arena review adds the current root dashboard (`index.html` + `assets/`), a separate evidence-reviewed seed file at `data/reviewed-cases.json`, and a tested monitor package in `monitor/`. The root dashboard deliberately uses that two-case seed rather than silently importing or reclassifying the older 12-record historical collection in `data/cases.json` and `docs/`. The older collection and its published interface are preserved and linked as the **Historical catalog**; those partial records were not re-audited in this pass and must not be treated as equivalent to the current evidence-reviewed seed. The 2017 Robinson III correction remains a strong source-backed record in that preserved catalog.
+
+The current seed includes the 2024 Warriors–Trail Blazers and 2025 Cavaliers–Wizards postgame free-throw corrections. For Tre Johnson, the pre-correction player total is unknown in the reviewed game-night source; a later CBS page component showing 18 is retained only as a later observation with unknown update history, not asserted as his original total. The 213/214 report remains an unidentified lead and is not assigned a game or counted. See each case’s direct citations in `data/reviewed-cases.json`.
+
+The current monitor polls the NBA scoreboard and ESPN scoreboard, records source health and score comparisons, retrieves NBA play-by-play for mismatches, and stores mismatch/final-feed-revision investigation records without deciding which feed is correct. UTC observation time is the monitor poll time; it is not a provider publication time. HTTP `ETag`, `Last-Modified`, and SHA-256 response metadata are retained with discrepancy observations when available. ESPN documents that its own feed corrections can be delayed and are distinct from official NBA post-game changes ([ESPN stat-corrections guidance](https://support.espn.com/hc/en-us/articles/360056679592-Stat-corrections)), so a mismatch remains a candidate rather than proof of an NBA record error.
+
+`.github/workflows/pages-and-monitor.yml` is configured to check current feeds every five minutes and publish the root dashboard plus the preserved `docs/` catalog to GitHub Pages. The earlier `scripts/monitor.py` stays available for manual historical/backfill checks; its automated schedule is disabled to avoid two overlapping scheduled monitors. The old `pages.yml` deployment was replaced by the current combined workflow. A successful CI test run does **not** establish that a live source poll or Pages deployment has succeeded: after merge, check the Actions run, Pages environment/permissions, live-feed timestamp, and source health before describing the service as active.
+
+The current offline review passed 22 unit tests, the repository-data checks (2 confirmed current cases and 1 explicitly unverified lead), Python compilation, JavaScript syntax checks, the Node dashboard smoke test, `git diff --check`, and local HTTP checks for the dashboard/assets/data. No live NBA/ESPN poll or successful Pages deployment has been verified. Next: audit and reconcile the preserved historical collection into the current interface without losing its open questions, identify the 213/214 source pair, and verify the first scheduled live run end to end.

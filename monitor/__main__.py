@@ -1,0 +1,90 @@
+"""Command-line entry point: python -m monitor."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+from .runner import run_live, run_with_payloads
+from .validation import DataValidationError, validate_repository_data
+
+
+def _load_fixture(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DataValidationError(f"Could not read fixture {path}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise DataValidationError("Fixture root must be a JSON object")
+    return data
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python -m monitor",
+        description="Validate evidence data or run one NBA scoring-monitor cycle.",
+    )
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--check-data", action="store_true", help="validate repository JSON and evidence links")
+    mode.add_argument("--live", action="store_true", help="poll NBA and ESPN public scoreboards")
+    mode.add_argument("--fixtures", type=Path, help="run a deterministic local poll from a fixture JSON file")
+    parser.add_argument("--root", type=Path, default=Path("."), help="repository or output root (default: current directory)")
+    args = parser.parse_args(argv)
+
+    try:
+        if args.check_data:
+            errors = validate_repository_data(args.root)
+            if errors:
+                for error in errors:
+                    print(f"ERROR: {error}", file=sys.stderr)
+                return 1
+            cases = json.loads((args.root / "data" / "reviewed-cases.json").read_text(encoding="utf-8"))["cases"]
+            leads = json.loads((args.root / "data" / "leads.json").read_text(encoding="utf-8"))["leads"]
+            print(f"Data checks passed: {len(cases)} reviewed cases; {len(leads)} explicitly unverified lead(s).")
+            return 0
+
+        if args.fixtures:
+            fixture = _load_fixture(args.fixtures)
+            state, feed = run_with_payloads(
+                fixture.get("nba_payload"),
+                fixture.get("espn_payload"),
+                root=args.root,
+                observed_at=fixture.get("observed_at"),
+                nba_hash=fixture.get("nba_hash"),
+                espn_hash=fixture.get("espn_hash"),
+                pbp_payloads=fixture.get("pbp_payloads"),
+                source_errors=fixture.get("source_errors"),
+                response_metadata=fixture.get("response_metadata"),
+                pbp_metadata=fixture.get("pbp_metadata"),
+            )
+            print(
+                f"Fixture poll saved: feed={feed.get('status')}, "
+                f"games={len(feed.get('games', []))}, "
+                f"investigations={len(state.get('investigations', []))}."
+            )
+            return 0
+
+        state, feed = run_live(root=args.root)
+        print(
+            f"Live poll saved: feed={feed.get('status')}, "
+            f"games={len(feed.get('games', []))}, "
+            f"investigations={len(state.get('investigations', []))}, "
+            f"published_at={feed.get('last_updated_at')}."
+        )
+        for source, health in feed.get("source_health", {}).items():
+            print(f"  {source}: {health.get('status')} ({health.get('url')})")
+        if feed.get("status") != "healthy":
+            print("WARNING: one or more feeds were unavailable or invalid; this is not evidence of no games or no discrepancies.")
+        return 0
+    except DataValidationError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+    except Exception as exc:  # the scheduler needs a readable failure, never a false 'no anomalies' status
+        print(f"ERROR: monitor run failed safely: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

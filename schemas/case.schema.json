@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/schemas/case.schema.json",
+  "title": "ScoringDiscrepNBA evidence-linked case",
+  "type": "object",
+  "required": [
+    "id",
+    "record_kind",
+    "verification_status",
+    "lifecycle_status",
+    "official_record_status",
+    "incident_type",
+    "title",
+    "summary",
+    "game",
+    "event",
+    "scores",
+    "source_observations",
+    "timeline",
+    "cause",
+    "duration",
+    "unknowns",
+    "sources"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "record_kind": { "const": "confirmed_case" },
+    "verification_status": { "type": "string", "minLength": 1 },
+    "lifecycle_status": { "type": "string", "minLength": 1 },
+    "official_record_status": { "type": "string", "minLength": 1 },
+    "incident_type": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "game": {
+      "type": "object",
+      "required": ["date", "away_team", "home_team"],
+      "properties": {
+        "game_id": { "type": ["string", "null"] },
+        "date": { "type": "string", "format": "date" },
+        "competition": { "type": ["string", "null"] },
+        "away_team": { "$ref": "#/$defs/team" },
+        "home_team": { "$ref": "#/$defs/team" },
+        "official_game_url": { "type": ["string", "null"], "format": "uri" }
+      },
+      "additionalProperties": true
+    },
+    "event": {
+      "type": "object",
+      "required": ["period", "clock", "player", "team", "play", "score_before"],
+      "properties": {
+        "period": { "type": ["integer", "null"], "minimum": 1 },
+        "clock": { "type": ["string", "null"] },
+        "clock_precision": { "type": ["string", "null"] },
+        "player": { "type": ["string", "null"] },
+        "team": { "type": ["string", "null"] },
+        "play": { "type": ["string", "null"] },
+        "score_before": { "$ref": "#/$defs/scoreEvidence" },
+        "immediately_after_original_entry": { "$ref": "#/$defs/scoreEvidence" },
+        "immediately_after_corrected_entry": { "$ref": "#/$defs/scoreEvidence" }
+      },
+      "additionalProperties": true
+    },
+    "scores": {
+      "type": "object",
+      "required": ["originally_reported_final", "corrected_final", "final_official"],
+      "properties": {
+        "originally_reported_final": { "$ref": "#/$defs/score" },
+        "corrected_final": { "$ref": "#/$defs/score" },
+        "final_official": { "$ref": "#/$defs/score" },
+        "total_calculation_note": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "source_observations": { "type": "array", "items": { "type": "object", "required": ["source_id", "observation"] } },
+    "timeline": { "type": "array", "items": { "type": "object", "required": ["date", "event", "source_ids"] } },
+    "cause": { "type": "object", "required": ["status", "description", "source_ids"] },
+    "duration": { "type": "object", "required": ["seconds", "note"] },
+    "unknowns": { "type": "array", "items": { "type": "string" } },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "publisher", "url", "source_type", "supports"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "publisher": { "type": "string", "minLength": 1 },
+          "url": { "type": "string", "format": "uri" },
+          "source_type": { "type": "string", "minLength": 1 },
+          "supports": { "type": "array", "items": { "type": "string" } },
+          "accessed_on": { "type": "string", "format": "date" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "$defs": {
+    "team": {
+      "type": "object",
+      "required": ["name", "abbreviation"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "abbreviation": { "type": "string", "minLength": 2 }
+      },
+      "additionalProperties": true
+    },
+    "score": {
+      "type": "object",
+      "required": ["away", "home", "total", "source_ids"],
+      "properties": {
+        "away": { "type": "integer", "minimum": 0 },
+        "home": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "source_ids": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "scoreEvidence": {
+      "type": "object",
+      "required": ["away", "home", "evidence_kind", "source_ids"],
+      "properties": {
+        "away": { "type": "integer", "minimum": 0 },
+        "home": { "type": "integer", "minimum": 0 },
+        "evidence_kind": { "type": "string", "minLength": 1 },
+        "source_ids": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

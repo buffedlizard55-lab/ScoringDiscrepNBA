@@ -1,0 +1,29 @@
+{
+  "scoreboard": {
+    "gameDate": "2025-11-07",
+    "games": [
+      {
+        "gameId": "0022500029",
+        "gameEt": "2025-11-07T19:00:00Z",
+        "gameStatus": 2,
+        "gameStatusText": "Q2",
+        "period": 2,
+        "gameClock": "PT08M15.00S",
+        "awayTeam": {
+          "teamId": 1610612739,
+          "teamCity": "Cleveland",
+          "teamName": "Cavaliers",
+          "teamTricode": "CLE",
+          "score": 50
+        },
+        "homeTeam": {
+          "teamId": 1610612764,
+          "teamCity": "Washington",
+          "teamName": "Wizards",
+          "teamTricode": "WAS",
+          "score": 39
+        }
+      }
+    ]
+  }
+}

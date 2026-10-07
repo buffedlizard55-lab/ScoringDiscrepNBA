@@ -1,11 +1,8 @@
 name: Monitor live scores
 
 on:
-  schedule:
-    # Every 20 min during typical NBA game windows (22:00-05:59 UTC daily)
-    - cron: "*/20 22-23,0-5 * * *"
-    # Nightly backfill sweep (catches next-day corrections)
-    - cron: "17 11 * * *"
+  # The five-minute current-feed workflow is pages-and-monitor.yml. Keep this
+  # older lookback/quarter-total monitor available for deliberate manual backfills.
   workflow_dispatch:
     inputs:
       date:
@@ -24,9 +21,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      # Canonical monitor: stdlib-only, no API keys (ESPN scoreboard vs NBA liveData).
-      # The legacy src/monitor.py (PR #2) remains runnable manually but needs API keys
-      # per its README; see ROADMAP.md harmonization notes before re-enabling in CI.
+      # Earlier historical monitor: stdlib-only, no API keys (ESPN vs NBA liveData).
+      # It is manual/backfill only; current automatic comparisons run in pages-and-monitor.yml.
       - name: Run discrepancy monitor (target date + 7-day backfill)
         run: |
           if [ -n "${{ inputs.date }}" ]; then

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "last_state_change_at": null,
+  "source_health": {},
+  "final_score_baselines": {},
+  "investigations": [],
+  "note": "Seed state only; no successful live monitor run has been observed."
+}

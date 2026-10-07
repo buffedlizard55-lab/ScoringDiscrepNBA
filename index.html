@@ -1,11 +1,213 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=./docs/">
-  <title>Redirecting to NBA Scoring Discrepancy Research</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="An evidence-linked ledger of NBA scoring discrepancies, corrections, and conflicting score feeds.">
+  <title>ScoringDiscrepNBA — Score discrepancy research</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
 </head>
 <body>
-  <p>Redirecting to <a href="./docs/">docs/</a>...</p>
-  <script>window.location.href = "./docs/";</script>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner shell">
+      <a class="brand" href="#top" aria-label="ScoringDiscrepNBA home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-copy"><strong>SCORING</strong><span>DISCREP<span class="brand-accent">NBA</span></span></span>
+      </a>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a href="#monitor">Live monitor</a>
+        <a href="#cases">Research ledger</a>
+        <a href="docs/index.html">Historical catalog</a>
+        <a href="#method">Method &amp; limits</a>
+      </nav>
+      <a class="header-link" href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA" target="_blank" rel="noopener noreferrer">
+        Repository <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="main" class="shell" tabindex="-1">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-main">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> NBA score audit ledger</p>
+        <h1 id="hero-title">A score is a snapshot.<br><em>The change is the story.</em></h1>
+        <p class="hero-copy">Track reported scores, corrections, and feed conflicts with an evidence trail you can check yourself. Preserve the first number. Link the new one. Never mistake a mismatch for proof.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#cases">Explore verified cases <span aria-hidden="true">↓</span></a>
+          <a class="button button-quiet" href="#monitor">Monitor status</a>
+        </div>
+        <div class="hero-trust"><span class="trust-icon" aria-hidden="true">✓</span> Source-linked · uncertainty shown · original values retained</div>
+      </div>
+      <aside class="hero-panel" aria-label="Research collection snapshot">
+        <div class="hero-panel-top">
+          <span class="panel-kicker">RESEARCH COLLECTION</span>
+          <span class="sample-tag">SEED SET</span>
+        </div>
+        <div class="hero-number-row"><strong id="heroVerifiedCount">—</strong><span>confirmed<br>corrections</span></div>
+        <div class="hero-panel-rule"></div>
+        <p><strong id="heroOpenLeadCount">—</strong> unidentified lead held open, not counted as a case.</p>
+        <p class="panel-footnote">Examples found so far—not a complete history or a league-wide rate.</p>
+        <a href="#method" class="text-link">How we verify <span aria-hidden="true">→</span></a>
+      </aside>
+    </section>
+
+    <section class="stats-strip" aria-label="Statistics from the reviewed sample">
+      <article class="stat-cell">
+        <span class="stat-label">Verified examples</span>
+        <strong id="statCases">—</strong>
+        <span class="stat-note">in this seed collection</span>
+      </article>
+      <article class="stat-cell">
+        <span class="stat-label">Changed final score</span>
+        <strong id="statFinalScore">—</strong>
+        <span class="stat-note">within these confirmed examples</span>
+      </article>
+      <article class="stat-cell stat-cell-wide">
+        <span class="stat-label">Typical correction time</span>
+        <strong class="stat-unknown">Not measurable yet</strong>
+        <span class="stat-note">exact first-display and change times are incomplete</span>
+      </article>
+      <article class="stat-cell stat-cell-wide">
+        <span class="stat-label">NBA-wide frequency</span>
+        <strong class="stat-unknown">No rate published</strong>
+        <span class="stat-note">a complete games-monitored denominator is not available</span>
+      </article>
+    </section>
+    <section class="sample-type-wrap" aria-label="Incident types in the verified sample">
+      <div class="sample-type-heading"><span class="stat-label">Types represented in this file</span><span class="sample-type-caveat">Descriptive sample counts · not NBA-wide frequencies</span></div>
+      <div id="typeBreakdown" class="type-breakdown"><span>Loading verified type counts…</span></div>
+    </section>
+
+    <section class="section monitor-section" id="monitor" aria-labelledby="monitor-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">AUTOMATED CHECKS</p>
+          <h2 id="monitor-title">Current games &amp; monitor status</h2>
+        </div>
+        <span id="monitorStatus" class="status-pill status-neutral"><span class="status-light"></span> Checking status…</span>
+      </div>
+      <div class="monitor-grid">
+        <div class="feed-card">
+          <div class="card-heading-row">
+            <div>
+              <h3>Latest published scoreboard snapshot</h3>
+              <p id="feedTimestamp" class="muted-text">No successful poll has been published.</p>
+            </div>
+            <span class="source-label">NBA primary · ESPN secondary</span>
+          </div>
+          <p id="feedNotice" class="feed-notice" role="status">The monitor has not published a successful snapshot. An empty game list is not evidence that there are no games or discrepancies.</p>
+          <div id="currentGames" class="current-games" aria-live="polite">
+            <div class="empty-state"><span class="empty-state-mark" aria-hidden="true">◷</span><p>Waiting for the first published source snapshot.</p></div>
+          </div>
+          <div class="feed-footnote">Automated differences are unverified leads. A feed can lag, and the NBA record is not assumed to be correct or incorrect without evidence.</div>
+        </div>
+        <aside class="monitor-side-card">
+          <div class="side-icon" aria-hidden="true">↗</div>
+          <h3>Best effort, not real-time</h3>
+          <p>Scheduled checks depend on GitHub Actions and upstream data feeds. The site reports the latest <em>published observation</em>, not a guaranteed live connection.</p>
+          <a class="text-link" href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions" target="_blank" rel="noopener noreferrer">Review workflow runs <span aria-hidden="true">↗</span></a>
+          <div class="source-health" id="sourceHealth" aria-label="Source health"></div>
+        </aside>
+      </div>
+      <div id="investigationsPanel" class="investigations-panel" hidden>
+        <div class="investigations-header"><span class="investigation-indicator"></span><strong id="investigationsTitle">Investigation ledger</strong><span class="muted-text">Automated records · closure does not confirm the cause</span></div>
+        <div id="investigationsList"></div>
+      </div>
+    </section>
+
+    <section class="section ledger-section" id="cases" aria-labelledby="cases-title">
+      <div class="section-heading section-heading-ledger">
+        <div>
+          <p class="eyebrow">EVIDENCE FIRST</p>
+          <h2 id="cases-title">Research ledger</h2>
+          <p class="section-deck">Each record keeps the original report beside the correction and the current official value. Open a case for play context, timestamps, limitations, and source links.</p>
+        </div>
+        <div class="ledger-count"><strong id="ledgerCount">—</strong><span>verified<br>records</span></div>
+      </div>
+
+      <div class="filters" role="search" aria-label="Filter verified cases">
+        <label class="search-field">
+          <span class="sr-only">Search cases</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+          <input id="caseSearch" type="search" placeholder="Search teams, players, dates, or sources…" autocomplete="off">
+        </label>
+        <label class="select-field"><span class="sr-only">Filter by incident type</span>
+          <select id="typeFilter"><option value="all">All types</option></select>
+        </label>
+        <label class="select-field"><span class="sr-only">Filter by verification state</span>
+          <select id="verificationFilter">
+            <option value="all">All verified records</option>
+            <option value="confirmed">Confirmed by NBA evidence</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="caseList" class="case-list" aria-live="polite">
+        <div class="empty-state"><span class="empty-state-mark" aria-hidden="true">…</span><p>Loading source-linked case records…</p></div>
+      </div>
+      <p id="noCasesMessage" class="empty-filter-message" hidden>No verified cases match those filters. Try another search term.</p>
+    </section>
+
+    <section class="section lead-section" aria-labelledby="lead-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow eyebrow-amber">OPEN RESEARCH LEAD</p>
+          <h2 id="lead-title">213 vs 214: still unidentified</h2>
+        </div>
+        <span class="status-pill status-warning"><span class="status-light"></span> Not verified · excluded from metrics</span>
+      </div>
+      <div id="leadList" class="lead-card">
+        <div class="lead-number-pair"><span>213</span><i aria-hidden="true">↔</i><span>214</span></div>
+        <div class="lead-copy"><p>The project brief cites a game where sources showed totals of 213 and 214, but it does not identify the game, date, or providers. No unique incident is assigned without that evidence.</p><p class="muted-text">This is a prompt-supplied lead—not a confirmed incident. It is not included in any count or rate.</p><div id="leadDetails" class="lead-details"></div></div>
+        <span class="lead-mark" aria-hidden="true">?</span>
+      </div>
+    </section>
+
+    <section class="section method-section" id="method" aria-labelledby="method-title">
+      <div class="method-intro">
+        <p class="eyebrow">HOW TO READ THIS SITE</p>
+        <h2 id="method-title">Different numbers<br>need different explanations.</h2>
+        <p>A live scoreboard mismatch, an NBA correction, and a stale recap are not the same event. We label the source and the confidence before drawing a conclusion.</p>
+      </div>
+      <div class="method-steps">
+        <article class="method-step">
+          <span class="step-index">01</span><div><h3>Preserve the observation</h3><p>Keep the initial score, the source that showed it, and the time precision. Never replace old values with the current value.</p></div>
+        </article>
+        <article class="method-step">
+          <span class="step-index">02</span><div><h3>Compare source roles</h3><p>NBA records and announcements are primary for official status. A secondary feed can be delayed or internally inconsistent; a mismatch alone is not proof.</p></div>
+        </article>
+        <article class="method-step">
+          <span class="step-index">03</span><div><h3>Show what is unknown</h3><p>Missing timestamps, event-level scores, and causes stay marked unknown. Calculated values are labeled and their arithmetic is shown.</p></div>
+        </article>
+        <article class="method-step">
+          <span class="step-index">04</span><div><h3>Earn the statistics</h3><p>Rates and typical durations require full coverage and reliable timestamps. Until then, the dashboard shows sample counts and says what cannot be measured.</p></div>
+        </article>
+      </div>
+      <div class="rule-reference">
+        <span class="rule-icon" aria-hidden="true">§</span>
+        <p><strong>Official scoring reference</strong><br>NBA Rule No. 5 defines scoring and says the running score is official if a score discrepancy cannot be resolved.</p>
+        <a href="https://official.nba.com/rule-no-5-scoring-and-timing/" target="_blank" rel="noopener noreferrer">Read NBA Rule No. 5 <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="section limits-section" aria-labelledby="limits-title">
+      <div class="limits-icon" aria-hidden="true">i</div>
+      <div><h2 id="limits-title">Coverage note</h2><p id="coverageNote">This is an initial evidence-backed sample, not a comprehensive historical database. Do not interpret the current count as the number of scoring corrections in NBA history. <a href="docs/index.html">Browse the preserved historical catalog.</a></p></div>
+      <a href="README.md">Project scope &amp; limitations <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div class="footer-brand"><span class="footer-mark">S</span><div><strong>ScoringDiscrepNBA</strong><span>Evidence-led scoring research</span></div></div>
+      <p>Numbers are only as trustworthy as their source history.</p>
+      <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA" target="_blank" rel="noopener noreferrer">Open-source project <span aria-hidden="true">↗</span></a>
+    </div>
+  </footer>
+
+  <noscript><div class="noscript-notice">JavaScript is needed to load the linked research records and current monitor snapshot. The saved files remain available in the repository’s <a href="data/reviewed-cases.json">reviewed case dataset</a> and <a href="data/live-feed.json">feed snapshot</a>.</div></noscript>
 </body>
 </html>

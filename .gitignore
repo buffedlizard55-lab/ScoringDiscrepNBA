@@ -10,10 +10,12 @@ venv/
 *.egg-info/
 dist/
 build/
+.coverage
+.pytest_cache/
 
 # Logs
-data/logs/
 *.log
+data/logs/
 data/live_alerts.json
 data/latest_check.json
 
@@ -32,3 +34,6 @@ Thumbs.db
 
 # Node
 node_modules/
+
+# Generated Pages artifact
+_site/
