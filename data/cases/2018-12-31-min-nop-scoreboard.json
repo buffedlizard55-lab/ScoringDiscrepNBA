@@ -1,0 +1,105 @@
+{
+  "id": "2018-12-31-min-nop-scoreboard",
+  "title": "Timberwolves @ Pelicans — Arena scoreboard showed wrong score in final minute; Towns fouled thinking Wolves were down 7, not 8 (Dec 31, 2018)",
+  "status": "verified-partial",
+  "verification_level": "single-secondary",
+  "game_date": "2018-12-31",
+  "season": "2018-19",
+  "away_team": "Minnesota Timberwolves",
+  "home_team": "New Orleans Pelicans",
+  "venue": "Smoothie King Center, New Orleans",
+  "incident_summary": "In the final minute of the Pelicans' 123-114 win over the Timberwolves, the in-arena scoreboard displayed an incorrect score that credited Minnesota with an extra point. With about 22 seconds left and the shot clock off, Minnesota was actually down 8 but the board suggested the deficit was 7; Karl-Anthony Towns fouled Julius Randle, who made a free throw to push the lead to 9, and Towns fouled out with about 12 seconds left. The official score was always correct — only the arena display was wrong — but the bad display appears to have changed on-court behavior and the second-half betting result (Timberwolves +second-half spread did not cover).",
+  "classification": {
+    "type": "scoreboard-display-error",
+    "layer": "official-record-correct-secondary-wrong",
+    "outcome": "stands-ruled-correct"
+  },
+  "period_clock": "Q4, final minute (~0:22 remaining at the Towns foul)",
+  "scoring_play": "No single scoring play — a wrong arena scoreboard total (Minnesota +1 phantom point) during live play.",
+  "score_before": "Pelicans up 8 with ~22 seconds left (true score); scoreboard showed a 7-point deficit (per Action Network).",
+  "affected_player": "Karl-Anthony Towns (MIN) — fouled out with ~12 seconds left (12.5s per ESPN recap; :12.0 per FOX Sports key plays — minor clock-text difference, flagged below)",
+  "affected_team": "Minnesota Timberwolves",
+  "originally_reported": {
+    "value": "Arena scoreboard: Timberwolves down 7 (phantom +1 to Minnesota)",
+    "total": null,
+    "basis": "Action Network report on the scoreboard malfunction, Jan 1, 2019."
+  },
+  "corrected_value": {
+    "value": "True deficit was 8; no post-game score change was needed because the official book was correct",
+    "total": null,
+    "basis": "Action Network: the board was wrong, the official score stood; final 123-114 per ESPN recap."
+  },
+  "final_official": {
+    "value": "Pelicans 123, Timberwolves 114",
+    "total": 237,
+    "basis": "Final official score per ESPN game recap (gameId 401071222). Quarter line: MIN 22/29/38/25, NO 27/36/25/35."
+  },
+  "sources_disagreed": [
+    "Arena scoreboard display (Minnesota +1) vs. official scorebook (correct throughout)",
+    "FOX Sports key-play clock text (:12.0) vs. ESPN recap text (12.5s) for Towns' sixth foul — trivial feed-text difference, flagged for completeness"
+  ],
+  "cause": {
+    "determination": "unknown",
+    "detail": "The exact technical cause (operator keystroke vs. feed/display fault) was not documented in the reviewed sources. Do not assert a cause beyond 'arena scoreboard/display error'."
+  },
+  "official_record_was_wrong": "no",
+  "timeline": [
+    {
+      "date": "2018-12-31",
+      "event": "Timberwolves @ Pelicans at Smoothie King Center. Scoreboard shows Minnesota with an extra point in the final minute; Towns fouls Randle thinking the deficit is 7 (true: 8); Randle FT makes it 9; Towns fouls out; Pelicans win 123-114.",
+      "source_index": 0
+    },
+    {
+      "date": "2019-01-01",
+      "event": "Action Network publishes the scoreboard-malfunction / bad-beat report.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.actionnetwork.com/nba/pelicans-wolves-bad-beat-scoreboard-malfunction-12-31-2018",
+      "publisher": "Action Network",
+      "tier": "secondary-digital",
+      "confirms": "Scoreboard showed the wrong score in the final minute; Minnesota credited an extra point; down 8 displayed as down 7; Towns foul on Randle; second-half spread impact (Wolves -3.5 2H / +8.5 adjusted).",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/recap?gameId=401071222",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Final 123-114 Pelicans; quarter-by-quarter line; Towns 28/17 fouled out with 12.5s left; Holiday/Randle/Moore scoring; officials Collins/Fitzgerald/Goldenberg.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.foxsports.com/nba/boxscore?id=33838",
+      "publisher": "FOX Sports",
+      "tier": "secondary-digital",
+      "confirms": "Towns fouled out (key-play text Q4 :12.0); cross-check on foul-out timing wording.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [
+    {
+      "claim": "Clock reading attached to Towns' sixth foul",
+      "positions": [
+        "ESPN recap text: 'fouling out with 12.5 seconds left'.",
+        "FOX Sports key plays: '(Q4 :12.0) K.Towns (MIN) has fouled out'.",
+        "Assessment: immaterial feed-rounding/text difference; both agree he fouled out in the final ~12 seconds. Official play-by-play would resolve exactly."
+      ]
+    }
+  ],
+  "open_questions": [
+    "Corroboration of the scoreboard error beyond the single Action Network report (priority: broadcast footage, beat-writer accounts, or arena statement). Until then this case stays single-secondary.",
+    "Exact technical cause of the wrong display (operator vs. system) — undocumented.",
+    "Whether the display was fixed before the final horn or only noticed afterward — undocumented."
+  ],
+  "betting_notes": "Per Action Network: Timberwolves were -3.5 for the second half (+8.5 adjusted with the halftime score); the late foul/FT sequence meant Minnesota did not cover the second half. This is the project's clearest verified example of a display-only error moving a wagering result without touching the official score.",
+  "duration_note": "Transient display error observed during the final minute of play; total duration undocumented (Action Network). No post-game correction was needed.",
+  "reproduce_steps": [
+    "Read the Action Network report for the wrong-board claim and the 2H spread math.",
+    "Confirm the 123-114 final and quarter line on the ESPN recap page.",
+    "Seek broadcast footage of the final minute showing the arena board vs. the TV bug.",
+    "Pull the official play-by-play to confirm the true running score at 0:22 and the Towns foul sequence."
+  ],
+  "last_reviewed": "2026-10-07"
+}

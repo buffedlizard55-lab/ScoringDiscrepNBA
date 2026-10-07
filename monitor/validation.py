@@ -50,14 +50,14 @@ def _read_json(path: Path) -> Any:
 def validate_repository_data(root: str | Path = ".") -> list[str]:
     """Validate evidence links, calculations, IDs, and unverified-lead exclusion."""
     root_path = Path(root)
-    cases_doc = _read_json(root_path / "data" / "cases.json")
+    cases_doc = _read_json(root_path / "data" / "reviewed-cases.json")
     leads_doc = _read_json(root_path / "data" / "leads.json")
     feed = _read_json(root_path / "data" / "live-feed.json")
     state = _read_json(root_path / "data" / "monitor-state.json")
     errors: list[str] = []
 
     if not isinstance(cases_doc, dict) or not isinstance(cases_doc.get("cases"), list):
-        raise DataValidationError("data/cases.json must contain a cases array")
+        raise DataValidationError("data/reviewed-cases.json must contain a cases array")
     if not isinstance(leads_doc, dict) or not isinstance(leads_doc.get("leads"), list):
         raise DataValidationError("data/leads.json must contain a leads array")
     if not isinstance(feed, dict) or not isinstance(feed.get("games"), list):

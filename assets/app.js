@@ -2,7 +2,7 @@
   "use strict";
 
   const DATA_FILES = {
-    cases: "data/cases.json",
+    cases: "data/reviewed-cases.json",
     leads: "data/leads.json",
     feed: "data/live-feed.json",
     state: "data/monitor-state.json",

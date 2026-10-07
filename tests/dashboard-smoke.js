@@ -68,6 +68,7 @@ async function main() {
   assert.match(elements.get("caseList").innerHTML, /boxscore\/NBA_20251107_CLE@WAS/);
   assert.match(elements.get("typeBreakdown").innerHTML, /made free throw recorded as miss/);
   assert.equal(elements.get("typeFilter").children.length, 1);
+  assert.match(html, /href="docs\/index\.html"/, "root dashboard must link to the preserved historical catalog");
   assert.match(elements.get("leadDetails").innerHTML, /not counted/);
   assert.match(elements.get("monitorStatus").innerHTML, /Not yet active/);
   assert.equal(elements.get("investigationsPanel").hidden, true);

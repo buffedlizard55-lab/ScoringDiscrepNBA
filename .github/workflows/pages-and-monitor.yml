@@ -65,18 +65,18 @@ jobs:
           git push origin HEAD:main
 
       - name: Configure GitHub Pages
-        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/configure-pages@v5
 
       - name: Stage static dashboard files
-        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         run: |
           mkdir -p _site
           cp index.html README.md .nojekyll _site/
-          cp -R assets data _site/
+          cp -R assets data docs _site/
 
       - name: Upload static site
-        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -84,5 +84,5 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.changed == 'true'
         uses: actions/deploy-pages@v4

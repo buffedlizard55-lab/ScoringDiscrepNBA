@@ -1,0 +1,125 @@
+{
+  "id": "2024-10-23-gsw-por-melton-ft",
+  "title": "Warriors @ Trail Blazers — De'Anthony Melton free throw recorded as a miss, final score corrected 139-104 to 140-104 (Oct 23-24, 2024)",
+  "status": "verified-partial",
+  "verification_level": "official-nba-confirmed",
+  "game_date": "2024-10-23",
+  "season": "2024-25",
+  "away_team": "Golden State Warriors",
+  "home_team": "Portland Trail Blazers",
+  "venue": "Moda Center, Portland",
+  "incident_summary": "With 2:00 remaining in the third quarter, Warriors guard De'Anthony Melton shot two free throws. Statisticians recorded him as having missed both attempts, when in fact he made the first and missed the second (1-of-2). The game ended with an announced final of Warriors 139, Trail Blazers 104. The next day (Oct 24, 2024), the NBA announced the scoring error and updated the official final score to Warriors 140, Trail Blazers 104 — a one-point correction to the official record that also changed the game's combined total from 243 to 244.",
+  "classification": {
+    "type": "free-throw-entry-error",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-next-day"
+  },
+  "period_clock": "Q3, 2:00 remaining",
+  "scoring_play": "De'Anthony Melton (GSW) first free throw attempt of a two-shot sequence — made, but entered as missed.",
+  "score_before": "91-67 Warriors (per Bleacher Report, secondary — not confirmed by NBA.com/ESPN reports)",
+  "affected_player": "De'Anthony Melton (GSW)",
+  "affected_team": "Golden State Warriors",
+  "originally_reported": {
+    "value": "Warriors 139, Trail Blazers 104",
+    "total": 243,
+    "basis": "Announced final at end of game Oct 23, 2024, before correction (NBA.com, ESPN)."
+  },
+  "corrected_value": {
+    "value": "Warriors 140, Trail Blazers 104 (+1 GSW)",
+    "total": 244,
+    "basis": "NBA league announcement Oct 24, 2024: Melton credited with the made first free throw."
+  },
+  "final_official": {
+    "value": "Warriors 140, Trail Blazers 104",
+    "total": 244,
+    "basis": "Corrected official final score per NBA.com (AP) and ESPN, Oct 24, 2024."
+  },
+  "sources_disagreed": [
+    "In-arena stat crew game-night entry (miss-miss) vs. corrected league record (make-miss)",
+    "Secondary outlets briefly carried the 139-104 final before updating to 140-104"
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Human stat-entry error by game-night statisticians, who recorded two missed free throws instead of 1-of-2. Real-time league review did not catch it during the game; the error was found and announced the next day. (NBA.com/AP; ESPN.)"
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "2024-10-23",
+      "event": "Season opener at Moda Center; Melton's made first free throw with 2:00 left in Q3 is recorded as a miss. Game ends announced as Warriors 139, Trail Blazers 104.",
+      "source_index": 0
+    },
+    {
+      "date": "2024-10-24",
+      "event": "NBA announces the scoring error and updates the final score to Warriors 140, Trail Blazers 104. The @NBAOfficial account posts the correction statement.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.nba.com/news/nba-finds-scoring-error-warriors-blazers",
+      "publisher": "NBA.com (Associated Press)",
+      "tier": "official-nba",
+      "confirms": "Scoring error; Melton made FT with 2:00 left in Q3; final changed 139-104 to 140-104; statisticians recorded two misses; corrected final; scoring errors are rare.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/story/_/id/41990836/nba-acknowledges-error-adjusts-warriors-trail-blazers-score",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Same core facts; ESPN BET closed over-under 223.5 and Warriors -5.5 (no betting impact); scoring errors are rare with multiple statisticians plus real-time league review.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://x.com/NBAOfficial/status/1849643126752731470",
+      "publisher": "NBA Official (@NBAOfficial on X)",
+      "tier": "official-nba",
+      "confirms": "League's posted correction statement (embedded in the NBA.com article). Direct text not re-verified in this pass — see open questions.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://bleacherreport.com/articles/10140856-nba-announces-scoring-error-in-warriors-win-vs-blazers-adjusts-score-1-day-later",
+      "publisher": "Bleacher Report",
+      "tier": "secondary-digital",
+      "confirms": "Score was 91-67 at the time of the free throws; fourth 140-point season opener in Warriors franchise history; Melton 11 points after revision (disputed — see FanSided).",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://sports.yahoo.com/nba-changes-warriors-blazers-final-175854799.html",
+      "publisher": "Yahoo Sports (via NBC Sports Bay Area)",
+      "tier": "secondary-digital",
+      "confirms": "Game at Moda Center; Melton's debut line now includes 11 points (supports the 11-point position in the dispute).",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://fansided.com/nba-changed-final-score-warriors-opening-night-win-day-later",
+      "publisher": "FanSided",
+      "tier": "secondary-digital",
+      "confirms": "League quote on the 1-of-2 correction; reports the change raised Melton from 11 to 12 points (the opposing position in the dispute — unresolved).",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [
+    {
+      "claim": "De'Anthony Melton's final point total after the correction",
+      "positions": [
+        "Bleacher Report and NBC Sports Bay Area (via Yahoo) report 11 points after the revision.",
+        "FanSided reports the correction raised him from 11 to 12 points.",
+        "Resolution required: check the official NBA box score / Basketball-Reference game log. NOT resolved in this pass — do not cite either total as fact."
+      ]
+    }
+  ],
+  "open_questions": [
+    "Direct text of the @NBAOfficial correction post (X embeds were not independently re-verified in this pass).",
+    "Melton's exact corrected box-score line (points) per the official NBA box score.",
+    "Exact time of day the correction was issued (only 'Thursday' / Oct 24 confirmed)."
+  ],
+  "betting_notes": "Per ESPN: ESPN BET closed the game at over-under 223.5 with Warriors -5.5; the 139/140 change did not affect either side (both totals 243/244 sailed over).",
+  "reproduce_steps": [
+    "Open the NBA.com article and confirm the 139-104 to 140-104 change and the Melton 1-of-2 sequence.",
+    "Open the ESPN article and confirm the same facts plus the betting lines (223.5 / -5.5).",
+    "Pull the official NBA box score for game date 2024-10-23 GSW @ POR and confirm the 140-104 final and Melton's FT line.",
+    "Compare against an archived pre-correction box score (e.g., web archive from Oct 23) to show the original 139-104 value."
+  ],
+  "last_reviewed": "2026-10-07"
+}

@@ -1,0 +1,98 @@
+{
+  "id": "2014-11-13-sac-mem-lee-buzzer",
+  "title": "Kings @ Grizzlies — Courtney Lee buzzer-beater stands; Sacramento protest denied (Nov 13-28, 2014)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2014-11-13",
+  "season": "2014-15",
+  "away_team": "Sacramento Kings",
+  "home_team": "Memphis Grizzlies",
+  "venue": "FedExForum, Memphis",
+  "incident_summary": "With Sacramento leading 110-109 and 0.3 seconds left, Memphis inbounded via Vince Carter; Marc Gasol screened two Kings defenders and Courtney Lee scored a reverse layup at the horn for a 111-110 Grizzlies win. Sacramento protested that (a) center Ryan Hollins tipped the inbounds pass, which should have started the clock earlier, and (b) Lee's shot did not leave his hands before the buzzer. Commissioner Adam Silver denied the protest on Nov 28, 2014, finding the referees acted within their proper judgment and that no misapplication of the rules occurred. The basket and the 111-110 final stand.",
+  "classification": {
+    "type": "timing-buzzer-dispute",
+    "layer": "official-record-correct-secondary-wrong",
+    "outcome": "stands-protest-denied"
+  },
+  "period_clock": "Q4, 0:00.3 remaining (inbound) to 0:00.0 (buzzer)",
+  "scoring_play": "Courtney Lee (MEM) reverse layup off Vince Carter's inbounds pass at the final horn — counted; stands.",
+  "score_before": "Kings 110, Grizzlies 109 (0.3s left).",
+  "affected_player": "Courtney Lee (MEM) — game-winner stands; Ryan Hollins (SAC) — alleged tip",
+  "affected_team": "Sacramento Kings (protesting team)",
+  "originally_reported": {
+    "value": "Basket good; Grizzlies 111, Kings 110",
+    "total": 221,
+    "basis": "On-floor ruling Nov 13, 2014 (SI, Bleacher Report)."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction — protest denied; basket stands."
+  },
+  "final_official": {
+    "value": "Grizzlies 111, Kings 110",
+    "total": 221,
+    "basis": "Final official result; protest denied Nov 28, 2014 (Bleacher Report; SI; The Athletic protest-process recap)."
+  },
+  "sources_disagreed": [
+    "Kings' position (Hollins tipped the inbound so the clock started late; shot after the buzzer) vs. officials' judgment + Commissioner's ruling (shot on time; refs within proper judgment; no misapplication)"
+  ],
+  "cause": {
+    "determination": "unknown",
+    "detail": "No error was found. Whether Hollins tipped the pass is a judgment question the league resolved in Memphis's favor. Do not assert a tip occurred."
+  },
+  "official_record_was_wrong": "no",
+  "timeline": [
+    {
+      "date": "2014-11-13",
+      "event": "Kings @ Grizzlies; Lee's buzzer layup gives Memphis a 111-110 win after Sacramento blew a 26-point lead. Kings file a protest.",
+      "source_index": 1
+    },
+    {
+      "date": "2014-11-17",
+      "event": "NBA acknowledges the protest; Kings GM states he 'feels strongly' about it.",
+      "source_index": 1
+    },
+    {
+      "date": "2014-11-28",
+      "event": "Commissioner Silver denies the protest: referees acted within proper judgment.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://bleacherreport.com/articles/2282883-sacramento-kings-protest-of-loss-to-grizzlies-denied-by-nba",
+      "publisher": "Bleacher Report",
+      "tier": "secondary-digital",
+      "confirms": "111-110 final; protest denied Nov 28, 2014; Silver 'proper judgment' finding via Yahoo's Marc Spears; Hollins-tip and late-release arguments via USA Today/SI.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.si.com/nba/2014/11/17/kings-filed-protest-after-loss-grizzlies",
+      "publisher": "Sports Illustrated",
+      "tier": "major-sports-media",
+      "confirms": "Protest filed; 110-109/0.3s setup; Carter inbound, Gasol screen, Lee reverse layup; 26-point blown lead; D'Alessandro 'feels strongly' quote.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.nytimes.com/athletic/5224974/2024/01/24/nba-game-protest-process-history/",
+      "publisher": "The Athletic (NYT)",
+      "tier": "major-sports-media",
+      "confirms": "Protest protocol (fax/email within 48h); recap: shot ruled on time, not a misapplication; 111-110 Grizzlies win stands.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Primary NBA Nov 28, 2014 denial statement URL — priority to locate.",
+    "No Last Two Minute Report existed for this era's adjudication context (L2M program scope) — confirm whether any L2M-style review covered this game before asserting."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Confirm the 0.3s setup and protest arguments via SI.",
+    "Confirm the Nov 28 denial via Bleacher Report.",
+    "Confirm protest protocol and outcome recap via The Athletic.",
+    "Watch the final play footage; note the league's ruling is the final word for this record."
+  ],
+  "last_reviewed": "2026-10-07"
+}

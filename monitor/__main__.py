@@ -40,9 +40,9 @@ def main(argv: list[str] | None = None) -> int:
                 for error in errors:
                     print(f"ERROR: {error}", file=sys.stderr)
                 return 1
-            cases = json.loads((args.root / "data" / "cases.json").read_text(encoding="utf-8"))["cases"]
+            cases = json.loads((args.root / "data" / "reviewed-cases.json").read_text(encoding="utf-8"))["cases"]
             leads = json.loads((args.root / "data" / "leads.json").read_text(encoding="utf-8"))["leads"]
-            print(f"Data checks passed: {len(cases)} verified cases; {len(leads)} explicitly unverified lead(s).")
+            print(f"Data checks passed: {len(cases)} reviewed cases; {len(leads)} explicitly unverified lead(s).")
             return 0
 
         if args.fixtures:
