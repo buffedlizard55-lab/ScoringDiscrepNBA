@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#07131c">
+  <meta name="description" content="An evidence-first, source-traceable NBA score correction database and monitoring project.">
+  <title>ScoringDiscrepNBA — Every version stays</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Scoring Discrep NBA home">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="brand-name">SCORING<span class="brand-slash">/</span>DISCREP<span class="brand-nba">NBA</span></span>
+    </a>
+    <nav class="primary-nav" aria-label="Main navigation">
+      <a href="#watch">Live watch</a>
+      <a href="#records">Case records</a>
+      <a href="#method">Method</a>
+      <a class="nav-repo" href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA" target="_blank" rel="noopener noreferrer">Repository <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero page-wrap" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> EVIDENCE-FIRST · SOURCE-TRACEABLE</p>
+        <h1 id="hero-title">One point off.<br><em>Every version stays.</em></h1>
+        <p class="hero-deck">A research desk for NBA score discrepancies: what was first reported, what changed, who changed it, and which source can prove each step.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#records">Explore the records <span aria-hidden="true">↓</span></a>
+          <a class="button button-quiet" href="#watch">See the monitor <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="values-line"><span class="values-spark" aria-hidden="true">✳</span> <strong>Maximize P(Win).</strong> <span>Own the Outcome.</span></div>
+      </div>
+      <aside class="hero-note" aria-label="Research principles">
+        <div class="hero-note-top"><span class="tiny-label">THE RULE OF THE DESK</span><span class="pulse-mark" aria-hidden="true"></span></div>
+        <p>“A mismatch is a question.<br><span>Not a verdict.</span>”</p>
+        <div class="hero-note-bottom"><span>Original record</span><span class="note-arrow" aria-hidden="true">→</span><span>Correction</span><span class="note-arrow" aria-hidden="true">→</span><span>Evidence</span></div>
+      </aside>
+    </section>
+
+    <section class="metrics-strip page-wrap" aria-label="Research coverage summary">
+      <div class="metric-cell"><span class="metric-number" id="metric-confirmed">—</span><span class="metric-caption">confirmed NBA corrections<br><small>curated sample only</small></span></div>
+      <div class="metric-cell"><span class="metric-number" id="metric-pattern">—</span><span class="metric-caption">of this curated sample<br><small>made free throw first entered as missed</small></span></div>
+      <div class="metric-cell"><span class="metric-number metric-text" id="metric-denominator">—</span><span class="metric-caption">league-wide denominator<br><small>not established</small></span></div>
+      <div class="metric-cell"><span class="metric-number metric-text" id="metric-duration">—</span><span class="metric-caption">typical correction time<br><small>not responsibly measurable</small></span></div>
+    </section>
+
+    <section class="section page-wrap" id="watch" aria-labelledby="watch-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow section-eyebrow">01 / LIVE MONITOR</p>
+          <h2 id="watch-title">The watch</h2>
+        </div>
+        <p class="section-intro">Two public score feeds are checked on a schedule. A difference opens an <strong>unverified candidate</strong>—never an automatic accusation.</p>
+      </div>
+      <div class="watch-grid">
+        <article class="watch-card watch-status-card">
+          <div class="card-topline"><span class="tiny-label">LATEST PUBLISHED SNAPSHOT</span><span id="monitor-state-badge" class="status-badge status-idle">Checking…</span></div>
+          <h3 id="monitor-headline">Loading monitor status</h3>
+          <p id="monitor-summary" class="muted">The status is read from the latest published monitor snapshot.</p>
+          <div id="source-health" class="source-health" aria-live="polite"></div>
+          <p class="snapshot-time" id="snapshot-time"></p>
+        </article>
+        <article class="watch-card watch-feed-card">
+          <div class="card-topline"><span class="tiny-label">SCORE COMPARISON</span><span class="feed-indicator"><span class="feed-indicator-dot" aria-hidden="true"></span>NBA × ESPN</span></div>
+          <div id="live-games" class="live-games" aria-live="polite"><p class="muted">Waiting for the first published comparison.</p></div>
+          <div id="active-flags" class="active-flags" aria-live="polite"></div>
+        </article>
+      </div>
+      <div class="candidate-block">
+        <div class="subsection-heading"><div><p class="eyebrow section-eyebrow">INVESTIGATION QUEUE</p><h3>Open questions, kept open</h3></div><span id="candidate-count" class="count-pill">0 candidates</span></div>
+        <div id="candidate-list" class="candidate-list"><p class="empty-state">No automated divergence candidates have been recorded.</p></div>
+        <p class="watch-footnote">A later feed match closes the <em>monitoring divergence</em>, not the research question. Source error, latency, shared upstream data, and actual NBA-record errors must be distinguished before confirmation.</p>
+      </div>
+    </section>
+
+    <section class="section records-section" id="records" aria-labelledby="records-title">
+      <div class="page-wrap">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">02 / EVIDENCE LEDGER</p>
+            <h2 id="records-title">Case records</h2>
+          </div>
+          <p class="section-intro">Every figure is attached to a source and a point in time. Secondary-page inconsistencies stay visible; derived values are labelled.</p>
+        </div>
+        <div class="filter-panel" role="search" aria-label="Filter case records">
+          <label class="search-control"><span class="sr-only">Search teams, players, dates, causes, or sources</span><span class="search-icon" aria-hidden="true">⌕</span><input type="search" id="record-search" placeholder="Search team, player, date, source…" autocomplete="off"></label>
+          <label class="filter-control"><span class="sr-only">Filter evidence status</span><select id="evidence-filter"><option value="all">All evidence states</option><option value="confirmed">Confirmed records</option><option value="unverified">Unverified leads</option></select></label>
+          <label class="filter-control"><span class="sr-only">Filter by team</span><select id="team-filter"><option value="all">All teams</option></select></label>
+          <p id="results-count" class="results-count" aria-live="polite">Loading records…</p>
+        </div>
+        <div id="case-list" class="case-list" aria-live="polite"><p class="empty-state">Loading cited case records…</p></div>
+        <section id="lead-section" class="lead-section" aria-labelledby="lead-title">
+          <div class="lead-heading"><div><p class="eyebrow section-eyebrow">UNVERIFIED · NOT IN COUNTS</p><h3 id="lead-title">Research lead, not a case</h3></div><span class="status-badge status-review">Needs source</span></div>
+          <div id="lead-list" class="lead-list"><p class="muted">Loading leads…</p></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="section method-section page-wrap" id="method" aria-labelledby="method-title">
+      <div class="section-heading">
+        <div><p class="eyebrow section-eyebrow">03 / HOW TO READ THIS</p><h2 id="method-title">Evidence over inference.</h2></div>
+        <p class="section-intro">The record separates what the league corrected from what another scoreboard or story happened to display.</p>
+      </div>
+      <div class="method-grid">
+        <article class="method-card"><span class="method-index">A</span><h3>Preserve both states</h3><p>Original, corrected, and current final values sit side by side. A later value does not erase the earlier report.</p></article>
+        <article class="method-card"><span class="method-index">B</span><h3>Trace every claim</h3><p>Open the evidence detail on any case for claim-level citations, a time-aware timeline, source conflicts, and limitations.</p></article>
+        <article class="method-card"><span class="method-index">C</span><h3>Keep unknowns visible</h3><p>“Derived,” “unverified,” and “not independently captured” mean exactly that. No population rate is shown without a defensible denominator.</p></article>
+      </div>
+      <div class="feed-note"><span class="feed-note-mark" aria-hidden="true">i</span><p><strong>Coverage note.</strong> The confirmed records are a small, non-exhaustive research seed. Live monitoring begins with the first successful scheduled run; it cannot reconstruct earlier source versions or detect every change between polls.</p></div>
+      <div class="source-register-heading"><div><p class="eyebrow section-eyebrow">SOURCE REGISTER</p><h3>Start with the evidence</h3></div><p class="muted">Direct links for independent review. Endpoint documentation is not a league contract.</p></div>
+      <div id="source-register" class="source-register"><p class="muted">Loading source register…</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-wrap footer-inner">
+      <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span class="brand-name">SCORING<span class="brand-slash">/</span>DISCREP<span class="brand-nba">NBA</span></span></a>
+      <p>Maximize P(Win). <strong>Own the Outcome.</strong><br><span>Records, not rumors. Sources, not guesses.</span></p>
+      <a class="footer-top" href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+  <noscript><p class="noscript-note">This research interface needs JavaScript enabled to load and filter its source-linked JSON records.</p></noscript>
+</body>
+</html>

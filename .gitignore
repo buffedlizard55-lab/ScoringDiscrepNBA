@@ -1,0 +1,6 @@
+# Generated GitHub Pages artifact
+_site/
+
+# Python
+__pycache__/
+*.py[cod]

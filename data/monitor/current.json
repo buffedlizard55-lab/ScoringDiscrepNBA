@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "status": "not_run",
+  "generatedAt": null,
+  "lastSuccessfulAt": null,
+  "pollIntervalMinutes": 15,
+  "sourceStatus": {
+    "nba_official": { "ok": false, "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json", "error": "Scheduled monitoring has not run yet." },
+    "espn_secondary": { "ok": false, "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard", "error": "Scheduled monitoring has not run yet." }
+  },
+  "games": [],
+  "activeDiscrepancies": [],
+  "notes": [
+    "No automated poll has been published yet.",
+    "A future score divergence is a candidate for review, not proof that either source is wrong."
+  ]
+}

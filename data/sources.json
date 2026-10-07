@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-07",
+  "sourcePolicy": "A direct link is supplied for independent review. Reliability describes the source's role for the cited claim, not a blanket guarantee; stale provider fields and inaccessible pages are explicitly noted.",
+  "sources": [
+    {
+      "id": "nba-warriors-release",
+      "organization": "NBA.com / Associated Press",
+      "kind": "league-hosted report quoting the NBA's correction",
+      "url": "https://www.nba.com/news/nba-finds-scoring-error-warriors-blazers",
+      "claimRole": "Reports the official change 139–104 to 140–104 and the missed first free throw. The article is AP bylined and hosted on NBA.com; it is not a raw box-score revision log.",
+      "accessNote": "Fetched 2026-10-07; content accessible."
+    },
+    {
+      "id": "nba-warriors-official-x",
+      "organization": "NBA Official",
+      "kind": "league-operated social post",
+      "url": "https://x.com/NBAOfficial/status/1849643126752731470",
+      "claimRole": "Direct league announcement associated with the Warriors–Blazers correction.",
+      "accessNote": "NBA.com embeds this post; embed displays 2:44 AM, Oct. 25, 2024 without seconds."
+    },
+    {
+      "id": "nbc-warriors",
+      "organization": "NBC Sports Bay Area",
+      "kind": "secondary reporting",
+      "url": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/nba-error-score-change-trail-blazers/1797765/",
+      "claimRole": "Details the 91–67 score at the Q3 free-throw attempt and Melton's corrected 11-point line.",
+      "accessNote": "Fetched 2026-10-07; accessible."
+    },
+    {
+      "id": "espn-warriors-box",
+      "organization": "ESPN",
+      "kind": "secondary provider box score",
+      "url": "https://www.espn.com/nba/boxscore/_/gameId/401704638",
+      "claimRole": "Current table shows 140–104 and Melton with 11 points, 1/2 FT.",
+      "accessNote": "Fetched 2026-10-07; the current box is post-correction and cannot by itself prove the original NBA feed state."
+    },
+    {
+      "id": "espn-warriors-recap",
+      "organization": "ESPN / Associated Press",
+      "kind": "secondary page with embedded AP copy",
+      "url": "https://www.espn.com/nba/recap/_/gameId/401704638",
+      "claimRole": "Score table shows 140–104 while the embedded AP narrative still says 139–104.",
+      "accessNote": "Fetched/captured page contains internally inconsistent fields; preserve both rather than treating one as a separate NBA correction."
+    },
+    {
+      "id": "cbs-warriors-gametracker",
+      "organization": "CBS Sports",
+      "kind": "secondary provider gametracker",
+      "url": "https://www.cbssports.com/nba/gametracker/boxscore/NBA_20241023_GS@POR/",
+      "claimRole": "Captured scoreboard showed 139–104 and Melton 10 points/0-for-2 FT while embedded AP copy said 140–104.",
+      "accessNote": "Provider-page inconsistency; do not interpret its stale scoreboard as an additional NBA correction."
+    },
+    {
+      "id": "yahoo-ap-warriors",
+      "organization": "Yahoo Sports / Associated Press",
+      "kind": "secondary AP-hosted reporting",
+      "url": "https://sports.yahoo.com/nba-changes-final-score-of-warriors-blazers-game-after-realizing-scorekeepers-untabulated-free-throw-041942076.html",
+      "claimRole": "Accessible AP report describing the NBA's correction from 139–104 to 140–104 and the made free throw.",
+      "accessNote": "Fetched 2026-10-07; accessible."
+    },
+    {
+      "id": "nba-game-warriors",
+      "organization": "NBA.com",
+      "kind": "official historical game page",
+      "url": "https://www.nba.com/game/gsw-vs-por-0022400072/box-score",
+      "claimRole": "Canonical NBA historical game URL.",
+      "accessNote": "Historical fetch rendered unrelated 2026–27 schedule content during this research pass; no game-specific fact is attributed to that fetch."
+    },
+    {
+      "id": "nba-cavs-official-x",
+      "organization": "NBA Official",
+      "kind": "league-operated social post",
+      "url": "https://x.com/NBAOfficial/status/1987199646020870516",
+      "claimRole": "Direct league announcement associated with the Cavaliers–Wizards correction.",
+      "accessNote": "NBA Official status ID resolves to Nov. 8, 2025; timestamp recorded to minute only."
+    },
+    {
+      "id": "athletic-cavs",
+      "organization": "The Athletic",
+      "kind": "secondary reporting with attributed NBA League Operations statement",
+      "url": "https://www.nytimes.com/athletic/6790005/2025/11/08/nba-washington-wizards-cleveland-cavaliers-incorrect-score/",
+      "claimRole": "Reports the 50–39 score before Tre Johnson's 8:15 Q2 attempt, the 148–114 to 148–115 correction, corrected player line, and an attributed human-error explanation from NBA League Operations SVP Tim Frank.",
+      "accessNote": "Direct fetch returned HTTP 403; search-indexed text was available. Treat its causal attribution as secondary reporting and leave the inaccessible status visible."
+    },
+    {
+      "id": "hoopswire-cavs",
+      "organization": "Hoops Wire / Associated Press",
+      "kind": "secondary AP-sourced reporting",
+      "url": "https://hoopswire.com/nba-correctes-final-score-of-cavs-wizards-game-after-made-free-throw/",
+      "claimRole": "Accessible report of the made Tre Johnson free throw, NBA correction, corrected final, and 19-point/2-of-3 line.",
+      "accessNote": "Fetched 2026-10-07; accessible."
+    },
+    {
+      "id": "espn-cavs-box",
+      "organization": "ESPN",
+      "kind": "secondary provider box score",
+      "url": "https://www.espn.com/nba/boxscore/_/gameId/401809511",
+      "claimRole": "Current box-score table shows Cleveland 148, Washington 115.",
+      "accessNote": "Current post-correction provider view; not a preserved pre-correction NBA record."
+    },
+    {
+      "id": "espn-cavs-recap",
+      "organization": "ESPN / Associated Press",
+      "kind": "secondary page with embedded AP copy",
+      "url": "https://www.espn.com/nba/recap/_/gameId/401809511",
+      "claimRole": "Current score table says 148–115 but embedded AP prose says 148–114; page displays an AP update time of Nov. 7, 2025, 9:43 p.m. (timezone not printed in the captured page).",
+      "accessNote": "Fetched 2026-10-07; internal score-field mismatch preserved as provider inconsistency."
+    },
+    {
+      "id": "nba-game-cavs",
+      "organization": "NBA.com",
+      "kind": "official historical game page",
+      "url": "https://www.nba.com/game/cle-vs-was-0022500029/box-score",
+      "claimRole": "Canonical NBA historical game URL.",
+      "accessNote": "Historical fetch rendered unrelated 2026–27 schedule content during this research pass; no game-specific fact is attributed to that fetch."
+    },
+    {
+      "id": "nba-rule-5",
+      "organization": "NBA Official",
+      "kind": "official rulebook",
+      "url": "https://official.nba.com/rule-no-5-scoring-and-timing/",
+      "claimRole": "Rule 5 states a successful free throw counts one point; cited only for the explicitly labelled arithmetic-derived immediate post-play score.",
+      "accessNote": "Fetched 2026-10-07; scoring section accessible."
+    },
+    {
+      "id": "nba-rule-2",
+      "organization": "NBA Official",
+      "kind": "official rulebook",
+      "url": "https://official.nba.com/rule-no-2-duties-of-the-officials/",
+      "claimRole": "Official scorer-duty and correction-procedure context; not evidence of a specific incident or cause.",
+      "accessNote": "Source identified for project methodology; not used to infer an incident detail."
+    },
+    {
+      "id": "nba-live-scoreboard-feed",
+      "organization": "NBA CDN",
+      "kind": "public live JSON endpoint; undocumented integration",
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+      "claimRole": "Primary-side current scoreboard input to automated comparison, when reachable.",
+      "accessNote": "Public URL, but not validated as a stable NBA developer contract. Availability/schema can change; a feed response is an observation, not a historical correction notice."
+    },
+    {
+      "id": "espn-live-scoreboard-feed",
+      "organization": "ESPN",
+      "kind": "public JSON endpoint; undocumented integration",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+      "claimRole": "Secondary current scoreboard input to automated comparison, when reachable.",
+      "accessNote": "Public provider endpoint without a validated public integration contract; may change, lag, or become unavailable."
+    },
+    {
+      "id": "nba-live-pbp-feed",
+      "organization": "NBA CDN (schema described by community documentation)",
+      "kind": "public live JSON endpoint; undocumented integration",
+      "url": "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{gameId}.json",
+      "claimRole": "Optional nearby play-by-play context for an automated mismatch; never used alone to assign cause.",
+      "accessNote": "The `nba_api` community project documents this URL pattern and action fields. That documentation is not an NBA-issued API contract, and historical fetches failed in the research sandbox."
+    },
+    {
+      "id": "nba-api-live-pbp-doc",
+      "organization": "nba_api community project",
+      "kind": "community-maintained technical documentation",
+      "url": "https://github.com/swar/nba_api/blob/master/docs/nba_api/live/endpoints/playbyplay.md",
+      "claimRole": "Technical reference for a likely NBA CDN play-by-play JSON shape (period, clock, player, description, scores). Not primary evidence and not an official NBA integration specification.",
+      "accessNote": "Documentation fetched from GitHub; endpoint itself was not validated against a historical response."
+    },
+    {
+      "id": "ottoneu-kpj-lead",
+      "organization": "Ottoneu community forum",
+      "kind": "community research lead",
+      "url": "https://community.ottoneu.com/t/basketball-stat-corrections/10451",
+      "claimRole": "Unverified Kevin Porter Jr. 2021 player-stat lead only; not included in confirmed cases or statistics.",
+      "accessNote": "No primary confirmation or play-level evidence recovered in this pass."
+    }
+  ]
+}

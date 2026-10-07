@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "researchUpdatedAt": "2026-10-07",
+  "coverage": {
+    "description": "Curated, source-cited examples; not an exhaustive history of NBA games or corrections.",
+    "confirmedCaseCount": 2,
+    "populationDenominator": null,
+    "populationRate": null,
+    "durationStatistic": null,
+    "statisticsPolicy": "Only describe this observed sample. Do not infer a league-wide rate, rarity, average correction duration, or historical completeness."
+  },
+  "cases": [
+    {
+      "id": "nba-2024-10-23-gsw-por-score-correction",
+      "researchStatus": "confirmed",
+      "classification": "official_nba_record_corrected",
+      "correctionType": "made_free_throw_recorded_missed",
+      "game": {
+        "date": "2024-10-23",
+        "season": "2024-25",
+        "nbaGameId": "0022400072",
+        "awayTeam": { "code": "GSW", "name": "Golden State Warriors" },
+        "homeTeam": { "code": "POR", "name": "Portland Trail Blazers" },
+        "gamePage": "https://www.nba.com/game/gsw-vs-por-0022400072/box-score"
+      },
+      "scores": {
+        "displayOrder": ["GSW", "POR"],
+        "originalReported": { "away": 139, "home": 104, "total": 243, "status": "pre-correction official final, retrospectively stated by NBA.com" },
+        "corrected": { "away": 140, "home": 104, "total": 244, "status": "NBA-announced corrected final" },
+        "finalOfficial": { "away": 140, "home": 104, "total": 244, "status": "corrected NBA final; corroborated by current ESPN box score" },
+        "correctionAnnouncedAt": { "value": "2024-10-25 02:44 UTC", "precision": "minute", "basis": "The X status ID resolves to 02:44 UTC; NBA.com's embed displays 2:44 AM on Oct. 25 without seconds. Value is rounded to the minute." }
+      },
+      "affected": {
+        "player": "De'Anthony Melton",
+        "team": "Golden State Warriors",
+        "originalProviderLine": { "points": 10, "freeThrowsMade": 0, "freeThrowsAttempted": 2, "sourceIds": ["cbs-warriors-gametracker"], "qualification": "CBS's captured provider display showed 10 points and 0/2 FT; this is a secondary-source observation, not a preserved NBA pre-correction box score." },
+        "correctedLine": { "points": 11, "freeThrowsMade": 1, "freeThrowsAttempted": 2, "sourceIds": ["nbc-warriors", "espn-warriors-box"], "qualification": "NBC reports the corrected line includes all 11 points; ESPN's current box score shows 11 points and 1/2 FT." }
+      },
+      "playContext": {
+        "period": 3,
+        "clock": "2:00 remaining",
+        "event": "De'Anthony Melton made the first of two free throws; the original game record credited him with two misses.",
+        "scoreBefore": { "GSW": 91, "POR": 67, "sourceIds": ["nbc-warriors"] },
+        "scoreImmediatelyAfter": { "GSW": 92, "POR": 67, "isDerived": true, "derivation": "NBC reports 91–67 at the attempt and a successful one-point free throw; NBA Rule 5 assigns one point to a successful free throw. No independently captured live-feed row for 92–67 is cited.", "sourceIds": ["nbc-warriors", "nba-rule-5"] }
+      },
+      "cause": {
+        "status": "league_acknowledged_recording_error",
+        "summary": "The NBA said game statisticians recorded both free throws as missed even though Melton made the first; the league then changed the official final by one point.",
+        "individualOrProcessCause": "The source describes the incorrect entry but does not establish why it happened; no motive or broader process failure is inferred.",
+        "sourceIds": ["nba-warriors-release", "nbc-warriors"]
+      },
+      "timeline": [
+        { "at": "2024-10-23 (game date)", "precision": "date", "event": "Warriors win was initially recorded as 139–104; the NBA later identified the omitted made free throw.", "sourceIds": ["nba-warriors-release"] },
+        { "at": "2024-10-25 02:44 UTC", "precision": "minute", "event": "NBA Official announced that the final was changed to 140–104.", "sourceIds": ["nba-warriors-official-x", "nba-warriors-release"] },
+        { "at": "2024-10-25 (report updated 07:46; timezone not supplied on page)", "precision": "date/minute as displayed", "event": "NBA.com-hosted AP report explains the missed entry and the 139–104 to 140–104 correction.", "sourceIds": ["nba-warriors-release"] }
+      ],
+      "evidence": [
+        { "claim": "The NBA found an error and changed the final score from 139–104 to 140–104 after Golden State was not credited for a made third-quarter free throw.", "sourceIds": ["nba-warriors-release", "nba-warriors-official-x"] },
+        { "claim": "The NBA.com-hosted report says game statisticians recorded Melton as missing both free throws although he made the first.", "sourceIds": ["nba-warriors-release"] },
+        { "claim": "NBC Sports Bay Area reports the score was 91–67 at the attempt and says Melton's corrected line includes all 11 points.", "sourceIds": ["nbc-warriors"] },
+        { "claim": "ESPN's current box score shows 140–104 and Melton with 11 points and 1/2 FT.", "sourceIds": ["espn-warriors-box"] },
+        { "claim": "CBS's captured gametracker scoreboard still displayed 139–104 and Melton with 10 points/0-for-2 FT, while its embedded AP story text said 140–104.", "sourceIds": ["cbs-warriors-gametracker"] }
+      ],
+      "sourceDisagreements": [
+        {
+          "observedAt": "2026-10-07",
+          "observedAtPrecision": "research fetch date only; exact acquisition time was not retained",
+          "description": "ESPN's current score table shows 140–104 while embedded AP recap text says 139–104. CBS's gametracker likewise showed 139–104 while its embedded AP copy said 140–104. These are conflicting fields within secondary-source pages, not additional NBA corrections.",
+          "sourceObservations": [
+            { "sourceId": "espn-warriors-recap", "field": "score table / embedded AP recap", "values": ["140–104", "139–104"] },
+            { "sourceId": "cbs-warriors-gametracker", "field": "scoreboard / embedded AP copy", "values": ["139–104", "140–104"] }
+          ],
+          "sourceIds": ["espn-warriors-recap", "cbs-warriors-gametracker"]
+        }
+      ],
+      "sourceIds": ["nba-warriors-release", "nba-warriors-official-x", "nbc-warriors", "espn-warriors-box", "espn-warriors-recap", "cbs-warriors-gametracker", "yahoo-ap-warriors", "nba-rule-5", "nba-game-warriors"],
+      "limitations": [
+        "The NBA-hosted historical game page rendered unrelated current schedule content during research; no historical NBA box-score snapshot was recovered.",
+        "The original Melton line is retained as a CBS provider observation, not as an independently archived NBA stat feed.",
+        "The one-point score after the free throw is arithmetic-derived and labelled as such."
+      ]
+    },
+    {
+      "id": "nba-2025-11-07-cle-was-score-correction",
+      "researchStatus": "confirmed",
+      "classification": "official_nba_record_corrected",
+      "correctionType": "made_free_throw_recorded_missed",
+      "game": {
+        "date": "2025-11-07",
+        "season": "2025-26",
+        "nbaGameId": "0022500029",
+        "awayTeam": { "code": "CLE", "name": "Cleveland Cavaliers" },
+        "homeTeam": { "code": "WAS", "name": "Washington Wizards" },
+        "gamePage": "https://www.nba.com/game/cle-vs-was-0022500029/box-score"
+      },
+      "scores": {
+        "displayOrder": ["CLE", "WAS"],
+        "originalReported": { "away": 148, "home": 114, "total": 262, "status": "pre-correction final reported in NBA announcement coverage and stale AP recap text" },
+        "corrected": { "away": 148, "home": 115, "total": 263, "status": "NBA-announced corrected final" },
+        "finalOfficial": { "away": 148, "home": 115, "total": 263, "status": "corrected final; corroborated by ESPN's current box-score table" },
+        "correctionAnnouncedAt": { "value": "2025-11-08 16:44 UTC", "precision": "minute", "basis": "NBA Official X status ID resolves to 16:44 UTC; seconds are omitted here and the value is rounded to the minute." }
+      },
+      "affected": {
+        "player": "Tre Johnson",
+        "team": "Washington Wizards",
+        "originalPlayerLine": { "points": null, "freeThrowsMade": null, "freeThrowsAttempted": null, "qualification": "No independently preserved pre-correction official player line was located for this record." },
+        "correctedLine": { "points": 19, "freeThrowsMade": 2, "freeThrowsAttempted": 3, "sourceIds": ["athletic-cavs", "hoopswire-cavs"], "qualification": "The Athletic reports Johnson's corrected line; Hoops Wire's AP-sourced report also states 19 points and 2-of-3 FT." }
+      },
+      "playContext": {
+        "period": 2,
+        "clock": "8:15 remaining",
+        "event": "Tre Johnson made the first free throw, but it was entered as missed.",
+        "scoreBefore": { "CLE": 50, "WAS": 39, "sourceIds": ["athletic-cavs"] },
+        "scoreImmediatelyAfter": { "CLE": 50, "WAS": 40, "isDerived": true, "derivation": "The Athletic reports 50–39 before a successful one-point free throw; NBA Rule 5 assigns one point to a successful free throw. No independently captured live-feed row for 50–40 is cited.", "sourceIds": ["athletic-cavs", "nba-rule-5"] }
+      },
+      "cause": {
+        "status": "league_acknowledged_entry_error; attribution_reported_secondarily",
+        "summary": "The NBA's announcement identifies the first free throw as incorrectly entered as a miss and says the statistics were corrected. The Athletic reports that NBA League Operations SVP Tim Frank attributed it to human error and an in-arena statistician; the Athletic page returned HTTP 403 in this research pass, so that attribution is not treated as a directly inspected primary record.",
+        "individualOrProcessCause": "Reported by The Athletic, not stated in the accessible NBA Official X post; retain the attribution as secondary reporting rather than an independently verified causal finding.",
+        "sourceIds": ["nba-cavs-official-x", "athletic-cavs", "hoopswire-cavs"]
+      },
+      "timeline": [
+        { "at": "2025-11-07 (game date)", "precision": "date", "event": "Cleveland's initially reported final was 148–114; ESPN's embedded AP recap retains this value.", "sourceIds": ["espn-cavs-recap", "hoopswire-cavs"] },
+        { "at": "2025-11-08 16:44 UTC", "precision": "minute", "event": "NBA Official announced the scoring correction; the final became 148–115.", "sourceIds": ["nba-cavs-official-x", "athletic-cavs"] },
+        { "at": "2025-11-08 (ESPN page later captured)", "precision": "date", "event": "ESPN's current table shows 148–115 while its embedded AP prose still states 148–114.", "sourceIds": ["espn-cavs-recap", "espn-cavs-box"] }
+      ],
+      "evidence": [
+        { "claim": "NBA Official's post announces a score correction for Cavaliers–Wizards; The Athletic and AP-sourced reporting identify the change from 148–114 to 148–115.", "sourceIds": ["nba-cavs-official-x", "athletic-cavs", "hoopswire-cavs"] },
+        { "claim": "The league's statement says Tre Johnson's first free throw at 8:15 of Q2 was incorrectly entered as missed; the accessible reporting says it was made.", "sourceIds": ["nba-cavs-official-x", "athletic-cavs", "hoopswire-cavs"] },
+        { "claim": "The Athletic reports the pre-attempt score as Cleveland 50, Washington 39; 50–40 immediately after the make is a derived value, not a preserved live-feed observation.", "sourceIds": ["athletic-cavs", "nba-rule-5"] },
+        { "claim": "ESPN's current recap score table and box score show 148–115, while the recap's embedded AP prose says 148–114.", "sourceIds": ["espn-cavs-recap", "espn-cavs-box"] },
+        { "claim": "The Athletic reports the corrected Tre Johnson line as 19 points and 2-of-3 free throws; this is secondary reporting, not a recovered historical NBA box score.", "sourceIds": ["athletic-cavs", "hoopswire-cavs"] }
+      ],
+      "sourceDisagreements": [
+        {
+          "observedAt": "2026-10-07",
+          "observedAtPrecision": "research fetch date only; exact acquisition time was not retained",
+          "description": "ESPN's current table shows 148–115, but the AP story embedded on the same recap page still says 148–114. Treat this as stale copy inside a secondary-source page; the NBA announcement itself confirms a league correction.",
+          "sourceObservations": [
+            { "sourceId": "espn-cavs-recap", "field": "current score table / embedded AP narrative", "values": ["148–115", "148–114"] }
+          ],
+          "sourceIds": ["espn-cavs-recap"]
+        }
+      ],
+      "sourceIds": ["nba-cavs-official-x", "athletic-cavs", "hoopswire-cavs", "espn-cavs-box", "espn-cavs-recap", "nba-rule-5", "nba-game-cavs"],
+      "limitations": [
+        "The Athletic article returned HTTP 403 to the research fetcher; its indexed text was visible and is linked for independent checking. The accessible AP-sourced Hoops Wire report corroborates the correction.",
+        "NBA historical game-page fetches rendered unrelated current schedule content; no original or corrected raw NBA box-score snapshots were recovered.",
+        "The original Tre Johnson player-point total was not independently preserved and is therefore null. The post-play 50–40 score is arithmetic-derived."
+      ]
+    }
+  ]
+}

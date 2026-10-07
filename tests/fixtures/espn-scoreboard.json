@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "id": "401809511",
+      "date": "2025-11-08T00:00:00Z",
+      "competitions": [
+        {
+          "competitors": [
+            { "homeAway": "home", "score": "114", "team": { "abbreviation": "WSH", "displayName": "Washington Wizards" } },
+            { "homeAway": "away", "score": "148", "team": { "abbreviation": "CLE", "displayName": "Cleveland Cavaliers" } }
+          ],
+          "status": { "period": 4, "displayClock": "0:00", "type": { "state": "post", "detail": "Final" } }
+        }
+      ]
+    }
+  ]
+}

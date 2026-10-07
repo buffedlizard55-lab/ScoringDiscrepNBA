@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "leads": [
+    {
+      "id": "unidentified-213-vs-214-final-score",
+      "status": "unverified_lead",
+      "includeInConfirmedStatistics": false,
+      "leadAsReceived": "A 213-versus-214 final-score discrepancy was raised as a research lead, but no game, date, teams, provider, or direct source was attached.",
+      "game": null,
+      "values": { "reportedByOneSource": 213, "reportedByAnotherSource": 214 },
+      "verification": "Unidentified and not independently verified. Broad and exact searches in the current research pass did not identify an authoritative matching game or source; this is not evidence that no such event occurred.",
+      "nextSteps": [
+        "Obtain at least one direct source URL or the approximate game date/teams.",
+        "Identify both source versions and their capture/publication timestamps.",
+        "Check for an NBA correction or stable official box-score revision before classifying the case."
+      ]
+    },
+    {
+      "id": "kevin-porter-jr-2021-10-22-stat-correction",
+      "status": "unverified_lead",
+      "includeInConfirmedStatistics": false,
+      "reportedPlayer": "Kevin Porter Jr.",
+      "reportedGameDate": "2021-10-22",
+      "game": null,
+      "leadAsReceived": "A community forum raised a possible Kevin Porter Jr. player-stat correction for a 2021-10-22 game. The exact stat/play, teams, NBA record change, and cause have not been independently established.",
+      "verification": "Community-reported lead only. No primary NBA correction notice, recoverable play-level evidence, or confirmed before/after value was located in this research pass.",
+      "sourceIds": ["ottoneu-kpj-lead"],
+      "nextSteps": [
+        "Identify the game/opponent and the exact player statistic alleged to have changed.",
+        "Find an official NBA historical box score or contemporaneous versioned source supporting both values.",
+        "Keep excluded from confirmed-case counts until the correction and source chronology are independently verified."
+      ]
+    }
+  ]
+}

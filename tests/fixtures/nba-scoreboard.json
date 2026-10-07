@@ -1,0 +1,17 @@
+{
+  "scoreboard": {
+    "gameDate": "2025-11-08",
+    "games": [
+      {
+        "gameId": "0022500029",
+        "gameTimeUTC": "2025-11-08T00:00:00Z",
+        "gameStatus": 3,
+        "gameStatusText": "Final",
+        "period": 4,
+        "gameClock": "PT00M00.00S",
+        "awayTeam": { "teamTricode": "CLE", "teamName": "Cavaliers", "score": "148" },
+        "homeTeam": { "teamTricode": "WAS", "teamName": "Wizards", "score": "115" }
+      }
+    ]
+  }
+}
