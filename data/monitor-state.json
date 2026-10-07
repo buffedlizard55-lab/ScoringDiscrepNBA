@@ -1,8 +1,10 @@
 {
+  "coverage_gaps": [],
+  "final_game_checks": {},
   "final_score_baselines": {},
   "investigations": [],
-  "last_state_change_at": "2026-10-07T11:50:09Z",
-  "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause.",
+  "last_state_change_at": "2026-10-07T18:04:06Z",
+  "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause. Source outages are recorded as coverage gaps because no comparison can run while a source is unavailable.",
   "schema_version": 1,
   "source_health": {
     "espn": {
@@ -10,9 +12,26 @@
       "url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
     },
     "nba": {
-      "error": "Could not fetch or decode upstream JSON: HTTPError",
+      "error": "Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)",
       "status": "unavailable",
       "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+    }
+  },
+  "source_health_state": {
+    "espn": {
+      "first_failure_at": null,
+      "last_error": null,
+      "last_ok_at": "2026-10-07T18:04:06Z",
+      "role": "comparator",
+      "status": "ok"
+    },
+    "nba": {
+      "first_failure_at": "2026-10-07T18:04:06Z",
+      "last_error": "Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)",
+      "last_ok_at": null,
+      "role": "authoritative",
+      "status": "unavailable",
+      "unavailable_minutes": 0.0
     }
   }
 }
