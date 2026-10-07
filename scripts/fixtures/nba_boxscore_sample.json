@@ -1,0 +1,10 @@
+{
+  "_note": "SYNTHETIC fixture for offline self-test only. Models NBA-CDN showing 214 (111+103) vs ESPN 213 — a 213-vs-214-class conflict.",
+  "away": "FAK",
+  "home": "SYN",
+  "away_score": 111,
+  "home_score": 103,
+  "quarters": [30, 26, 28, 27],
+  "home_quarters": [25, 26, 24, 28],
+  "source": "nba-cdn"
+}
