@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "leads": [
+    {
+      "id": "unidentified-213-vs-214-final-total",
+      "title": "Unidentified 213-point vs 214-point final-total discrepancy",
+      "status": "unidentified_unverified_lead",
+      "origin": "The project brief says one source showed a 213-point final total while another showed 214.",
+      "known_details": {
+        "reported_totals": [213, 214],
+        "game_date": null,
+        "teams": null,
+        "game_id": null,
+        "source_a": null,
+        "source_b": null,
+        "observation_timestamps": null
+      },
+      "research_note": "No unique game/source pair can be assigned from the supplied details alone. This lead has not been matched to primary evidence and is not counted as a verified incident or used in any statistic.",
+      "next_evidence_needed": [
+        "Game date or approximate season",
+        "Teams, if known",
+        "The two source names or URLs, if known",
+        "Any screenshot or timestamp preserving the 213 and 214 observations"
+      ],
+      "source_ids": [],
+      "excluded_from_verified_statistics": true
+    }
+  ]
+}

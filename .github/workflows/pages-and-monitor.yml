@@ -1,0 +1,88 @@
+name: Publish research site and monitor NBA scores
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-and-monitor
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out default branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Run scheduled source comparison
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python3 -m monitor --live
+
+      - name: Run data integrity checks
+        run: |
+          python3 -m compileall -q monitor
+          python3 -m monitor --check-data
+
+      - name: Detect monitor-ledger updates
+        id: changes
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if git diff --quiet -- data/live-feed.json data/monitor-state.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Persist changed observation state
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live-feed.json data/monitor-state.json
+          git commit -m "chore: update NBA score observations"
+          git push origin HEAD:main
+
+      - name: Configure GitHub Pages
+        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Stage static dashboard files
+        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        run: |
+          mkdir -p _site
+          cp index.html README.md .nojekyll _site/
+          cp -R assets data _site/
+
+      - name: Upload static site
+        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+          include-hidden-files: true
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: github.event_name == 'push' || steps.changes.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4

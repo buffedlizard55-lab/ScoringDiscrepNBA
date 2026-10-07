@@ -1,0 +1,29 @@
+{
+  "game": {
+    "actions": [
+      {
+        "actionId": 1,
+        "period": 2,
+        "clock": "PT08M15.00S",
+        "teamTricode": "WAS",
+        "playerName": "Tre Johnson",
+        "description": "Tre Johnson makes free throw 1 of 2",
+        "isScoringPlay": true,
+        "scoreHome": "40",
+        "scoreAway": "50"
+      },
+      {
+        "actionId": 2,
+        "period": 2,
+        "clock": "PT08M12.00S",
+        "teamTricode": "CLE",
+        "playerName": "Player Example",
+        "description": "Defensive rebound",
+        "isScoringPlay": false,
+        "pointsTotal": 12,
+        "scoreHome": "40",
+        "scoreAway": "50"
+      }
+    ]
+  }
+}
