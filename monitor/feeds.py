@@ -10,9 +10,9 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -175,6 +175,25 @@ def _int_or_none(value: Any) -> int | None:
     return parsed if parsed >= 0 else None
 
 
+def _eastern_game_date(value: Any) -> str | None:
+    """Normalize a provider tipoff to NBA's Eastern calendar, not UTC date.
+
+    A date-only value is already a calendar date. Naive datetimes and malformed
+    values cannot establish a timezone and therefore do not establish a join.
+    """
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if len(value) == 10:
+            return parsed.date().isoformat()
+        if parsed.tzinfo is None:
+            return None
+        return parsed.astimezone(ZoneInfo("America/New_York")).date().isoformat()
+    except ValueError:
+        return None
+
+
 def _status_from_nba(game: dict[str, Any]) -> str:
     raw_status = game.get("gameStatus")
     if raw_status is not None:
@@ -236,12 +255,13 @@ def parse_nba_scoreboard(payload: dict[str, Any]) -> list[dict[str, Any]]:
         if not home_code or not away_code:
             raise FeedError(f"NBA scoreboard game at index {index} is missing a team abbreviation")
         game_date = str(
-            game.get("gameEt") or game.get("gameDateEst") or game.get("gameDate") or ""
+            game.get("gameEt") or game.get("gameDateEst") or game.get("gameDate")
+            or scoreboard.get("gameDate") or ""
         )
         if len(game_date) >= 10:
-            game_date = game_date[:10]
+            game_date = _eastern_game_date(game_date[:10])
         else:
-            game_date = None
+            game_date = _eastern_game_date(game.get("gameTimeUTC"))
         normalized.append(
             {
                 "game_id": str(game.get("gameId") or "").strip() or None,
@@ -316,7 +336,7 @@ def parse_espn_scoreboard(payload: dict[str, Any]) -> list[dict[str, Any]]:
         normalized.append(
             {
                 "game_id": str(event.get("id") or "").strip() or None,
-                "game_date": event_date[:10] if len(event_date) >= 10 else None,
+                "game_date": _eastern_game_date(event_date),
                 "status": _status_from_espn(event, competition),
                 "status_text": str(event_status_type.get("shortDetail") or ""),
                 "period": _int_or_none(event_status.get("period")),
@@ -354,25 +374,18 @@ def match_scoreboards(
     nba_games: list[dict[str, Any]], espn_games: list[dict[str, Any]]
 ) -> list[tuple[dict[str, Any], dict[str, Any] | None]]:
     """Join same-day feeds by home/away team pair; leave ambiguous matches unmatched."""
-    espn_by_pair: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
-    for game in espn_games:
+    def key(game):
         pair = _team_pair(game)
-        if pair:
-            espn_by_pair[pair].append(game)
+        date = game.get("game_date")
+        return (pair, date) if pair and date else None
 
-    result: list[tuple[dict[str, Any], dict[str, Any] | None]] = []
+    result = []
     for nba_game in nba_games:
-        pair = _team_pair(nba_game)
-        candidates = espn_by_pair.get(pair, []) if pair else []
-        if len(candidates) == 1:
-            result.append((nba_game, candidates[0]))
-            continue
-        if len(candidates) > 1 and nba_game.get("game_date"):
-            same_date = [g for g in candidates if g.get("game_date") == nba_game.get("game_date")]
-            if len(same_date) == 1:
-                result.append((nba_game, same_date[0]))
-                continue
-        result.append((nba_game, None))
+        identity = key(nba_game)
+        candidates = [g for g in espn_games if key(g) == identity] if identity else []
+        primary_count = sum(key(g) == identity for g in nba_games)
+        match = candidates[0] if len(candidates) == 1 and primary_count == 1 else None
+        result.append((nba_game, match))
     return result
 
 
@@ -417,30 +430,31 @@ def build_observations_from_sources(
     observed_at: str,
     source_hashes: dict[str, str | None] | None = None,
 ) -> list[dict[str, Any]]:
-    """Union every source's games, retaining missing values and refusing ambiguous joins.
+    """Union feeds only when the ordered matchup and Eastern game date agree.
 
-    The feeds do not expose a shared game identifier, so ordered home/away team
-    codes are the join key. A pair is joined only when every source in the
-    current response reports at most one game for that pair. If a source returns
-    duplicate pair rows, the rows remain separate and ``score_mismatch`` stays
-    ``None``: choosing a match by list order could create a false alert.
+    The feeds have no shared event identifier. A unique ordered home/away pair
+    on the same known game date is therefore only a best-effort join. Unknown
+    dates and duplicate same-day matchups remain separate observations: joining
+    by response order could manufacture a false comparison. Provider-specific
+    event IDs, dates, status, period, and clock are retained under each score so
+    an investigator can assess latency and identity uncertainty.
 
-    The first source that lists an unambiguous game supplies the row identity,
-    so the NBA game id is retained when present. Each source's score is stored
-    side by side under ``scores``; a missing or ambiguous comparison is not
-    agreement. Building a union instead of driving everything from the primary
-    feed also lets reachable secondary sources publish rows during primary-feed
-    outages, preserving single-provider arithmetic checks.
+    Rows are the union of every source that answered, so a reachable secondary
+    feed remains visible during a primary-feed outage. A missing or ambiguous
+    comparison is never reported as agreement.
     """
     hashes = source_hashes or {}
     source_hash_view = {key: hashes.get(key) for key in source_games}
-    grouped: dict[tuple[str, str], dict[str, list[dict[str, Any]]]] = {}
+    grouped: dict[
+        tuple[tuple[str, str], str | None], dict[str, list[dict[str, Any]]]
+    ] = {}
     for source_key, games in source_games.items():
         for game in games or []:
             pair = _team_pair(game)
             if pair is None:
                 continue
-            grouped.setdefault(pair, {}).setdefault(source_key, []).append(game)
+            date = game.get("game_date")
+            grouped.setdefault((pair, date), {}).setdefault(source_key, []).append(game)
 
     def new_row(game: dict[str, Any]) -> dict[str, Any]:
         return {
@@ -466,14 +480,18 @@ def build_observations_from_sources(
             "away": (game.get("away_team") or {}).get("score"),
             "home": (game.get("home_team") or {}).get("score"),
             "source_url": game.get("source_url"),
+            "game_id": game.get("game_id"),
+            "game_date": game.get("game_date"),
+            "status": game.get("status"),
+            "period": game.get("period"),
+            "clock": game.get("clock"),
         }
 
     observations: list[dict[str, Any]] = []
-    for by_source in grouped.values():
-        ambiguous = any(len(games) > 1 for games in by_source.values())
+    for (pair, date), by_source in grouped.items():
+        ambiguous = not date or any(len(games) > 1 for games in by_source.values())
         if ambiguous:
-            # Keep every provider's duplicate events as standalone observations.
-            # This preserves evidence without inventing a cross-source mapping.
+            # Preserve all rows but never infer a cross-source match.
             for source_key, games in by_source.items():
                 for game in games:
                     row = new_row(game)
@@ -503,7 +521,6 @@ def build_observations_from_sources(
                 for value in published.values()
             )
     return observations
-
 
 def deepcopy_source_hashes(source_hash_view: dict[str, Any]) -> dict[str, Any]:
     """Copy a per-source hash mapping without importing deepcopy for one use."""

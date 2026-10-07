@@ -8,6 +8,26 @@
 **GitHub Pages URL:** [`https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`](https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/).
 **Alerting scope, limitations, and verification steps:** [`ALERTING.md`](ALERTING.md).
 
+## Latest repository review — 2026-10-07
+
+**Read [the current audit and next-session plan](docs/REPOSITORY_REVIEW.md)**
+after the brief below. The earlier review added fail-closed, Eastern-date game
+matching, provider-specific evidence context, and summary-check fixes. Follow-up
+hardening now also covers impossible shooting cells, ambiguous delivery results,
+persistent human review closures, and poll-churn control. The integrated active
+test suite has **100 passing tests**; older checkpoint counts below are
+historical. GitHub reports the existing Pages deployment as built, and
+[scheduled run 37663924132](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37663924132)
+as successful. Neither fact proves live notification delivery or complete source
+coverage. NBA/news links could not be re-fetched in this restricted environment.
+No historical case was newly verified in this session.
+
+**Important preservation limitation:** the current compact investigation ledger
+keeps the first three and latest twenty observations, not every intermediate
+observation or original HTTP body. Full immutable evidence storage remains a
+requirement, not a completed feature. The brief's no-overwrite principle is the
+target; do not mistake current retention for a complete archive.
+
 ---
 
 ## 0. Founding brief (verbatim — the source of truth)
@@ -57,10 +77,12 @@
 ## 1. How we read the brief
 
 1. **A mismatch is not a correction.** Two numbers disagreeing is a *candidate*.
-   Only evidence outside the monitor (a league statement, a ruling, a documented
+   Only corroborating evidence (a league statement, a ruling, a documented
    box-score change) can move a record toward `verified`.
 2. **Preserve, never overwrite.** The first observed value, the source that
-   showed it, the poll time, and every later value stay in the ledger.
+   showed it, and the poll time must remain recoverable. Full retention of every
+   later value is the target; the compact ledger currently truncates intermediate
+   observations (see the latest audit).
 3. **No inference.** Unknown fields stay `null` with an `open_questions[]` entry;
    derived values carry their derivation and are labelled as derived.
 4. **State the blind spots.** A source outage is published as a coverage gap; an
@@ -76,7 +98,7 @@
 | Piece | Location | Status |
 |---|---|---|
 | Founding brief + operating rules | this README §0/§1 | Verbatim brief retained; read at the start of every session |
-| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (92 tests); **first live dispatch has not been observed yet** — see §8 |
+| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (100 tests); **first live dispatch has not been observed yet** — see §8 |
 | Alerting feasibility, limitations, verification | `ALERTING.md` | New in this session; every claim links to a source or a repository file |
 | Current live comparison monitor (NBA liveData vs ESPN + PBP context + final-game box-score arithmetic) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; the latest saved poll has ESPN only and records NBA HTTP 403 from both request profiles, so cross-source comparison did not run; snapshot freshness and sparse scheduling are limitations (§8) |
 | Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; Melton's exact corrected player total remains disputed (11 vs 12) |
@@ -216,7 +238,7 @@ visible rather than presented as a clean result.
 links, review steps, and delivery state; critical/high alerts are configured
 for GitHub issue delivery by `python3 -m monitor --dispatch-alerts --apply`, and
 an optional webhook (`SCORING_DISCREPANCY_WEBHOOK_URL`) can mirror them. Offline
-evidence: 92 unit tests (rules, lifecycle, dedupe, arithmetic, ambiguous-match
+evidence: 100 unit tests (rules, lifecycle, dedupe, arithmetic, ambiguous-match
 handling, delivery with a stubbed `gh`, issue refresh/closure/resolution behavior,
 unsafe-text escaping, webhook receipt, and coverage gaps) plus a deterministic
 end-to-end fixture run that
@@ -226,9 +248,9 @@ describe notifications as proven until `data/alert-dispatch-log.json` contains a
 
 **Automation boundary.** Scheduled collection, detection, investigation-ledger
 updates, alert dispatch, and Pages publishing are unattended. A literal
-zero-human research/adjudication system is not achieved: there is no verified
-machine-readable NBA correction stream, so a person must review evidence before
-calling a case an official-record error, assigning a cause, or promoting it to a
+zero-human research/adjudication system is not achieved: the project has not
+verified or integrated a machine-readable NBA correction stream, so a person
+must review evidence before calling a case an official-record error, assigning a cause, or promoting it to a
 confirmed research record. Alerts remain candidates, not conclusions.
 
 **Single-source operation (fixed this session).** The published game list used

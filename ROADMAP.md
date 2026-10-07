@@ -31,7 +31,7 @@ Ordered by P(Win): highest-evidence-value first.
    was no second live comparator as of that observation. This does not establish current endpoint
    health after the snapshot.
 5b. **Alert delivery is not yet proven in production.** The ledger, lifecycle, dedupe, severity,
-   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (92 tests,
+   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (100 tests,
    stubbed `gh`, local webhook receiver), but no scheduled run has produced a delivered alert. The
    latest scheduled snapshot contains only ESPN-reported scheduled games and has no open alerts to
    deliver; no `data/alert-dispatch-log.json` sent entry exists. Until a live alert produces a

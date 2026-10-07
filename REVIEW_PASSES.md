@@ -141,62 +141,99 @@ Found and fixed:
 
 ---
 
+## 2026-10-07 — session 09ce52af: reliability and feasibility audit
+
+### Pass 1 — inspect and implement
+
+Read the founding README before working. Baseline 82 tests passed. Confirmed
+existing Pages deployment and successful scheduled-run metadata through GitHub.
+Found active matchup joins ignored dates and ambiguous duplicates. Added
+Eastern-calendar normalization, unique-date joins, per-provider game context,
+regression tests, a visible dashboard feasibility panel and repository audit.
+Added `AGENTS.md` to reinforce the session-start rule and evidence standard.
+
+### Pass 2 — bugs and edge cases
+
+Reviewed summary orchestration: failed fetches can return `None`; skip them
+without claiming consistency. Replaced summary team-pair fallback with unique
+provider-ID matching. Fixed six-hour recheck lookup for NBA-keyed joined rows
+using ESPN request IDs. Added outage and cooldown regression tests. Documented
+retention truncation, absent raw evidence, provider recovery identity splits,
+post-final queue gaps, and duplicate Pages configuration. Replaced an unsupported
+universal claim about the absence of an official corrections API with the
+narrower verified statement that this project has not integrated one.
+
+### Pass 3 — request reconciliation and final checks
+
+Found another false-correction risk: a primary final could establish a final
+baseline for a still-live secondary source. Final-revision tracking now uses
+per-source status with legacy fallback, with a regression test for both status
+orderings. Validated NBA calendar date slices rather than accepting malformed
+strings. Re-read the changes against the brief; marked incomplete research and
+operational requirements explicitly instead of asserting completion.
+
+Final local gates at that checkpoint: **90 unit tests passed**, active data
+validator passed, 14 historical records validated, historical monitor self-test
+passed, both JS syntax checks passed, dashboard DOM smoke test passed, Python
+compilation passed, regenerated historical data had no drift, and
+`git diff --check` passed. No new historical cases or factual promotions. No
+NBA/news content could be re-fetched under that session's network policy. No
+browser screenshot audit or real notification receipt was obtained. See
+`docs/REPOSITORY_REVIEW.md` for scope, direct evidence links, unresolved
+irregularities and prioritized acceptance criteria. The complete product brief
+remains an ongoing target, not a claim that all requirements are satisfied.
+
+---
+
 ## 2026-10-07 repository review and alerting hardening (three passes)
 
-Scope: review the repository against the founding brief, assess alert feasibility and current
-production state, fix code defects found, and distinguish unattended collection from human
-confirmation. No new NBA incident facts were added or promoted in this review.
+Scope: review the repository against the founding brief, assess alert feasibility
+and current production state, fix code defects found, and distinguish unattended
+collection from human confirmation. No new NBA incident facts were added or
+promoted in this review.
 
 ### Pass 1 — inventory and baseline verification
 
-- [x] Read `README.md` first and confirm §0 still preserves the founding brief; verify the root
-      dashboard has alert, feed, research, and source-review sections.
-- [x] Inspect monitor, workflow, dispatch, data, and tests; confirm detection and notification code
-      already exists rather than duplicating it.
-- [x] Check GitHub state: Pages API reports the site as built at
-      `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`; scheduled run
-      [37663924132](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37663924132)
-      completed successfully. Its saved feed snapshot at `2026-10-07T18:04:06Z` has ESPN only,
-      NBA HTTP 403 under both request profiles, five ESPN-only game rows, and no open alerts.
-- [x] Verify the requested schedule against `gh run list`: the 10 returned workflow runs contained
-      only two scheduled events, at 11:49:59Z and 18:03:53Z; this is not a reliable five-minute
-      service in observed practice.
-- [x] Run baseline tests and validators; discovered 82 pre-existing tests passed before changes.
+- [x] Read `README.md` first and confirm §0 preserves the founding brief; inspect the
+      dashboard, monitor, workflow, dispatch, data and tests.
+- [x] Check GitHub state: the saved feed snapshot at `2026-10-07T18:04:06Z` has
+      ESPN only, NBA HTTP 403 under both request profiles, five ESPN-only rows and no
+      open alerts. This is a historical observation, not current health.
+- [x] Verify the queried workflow history: 10 runs returned, only two scheduled,
+      about 6 hours 14 minutes apart despite the requested five-minute cadence.
+- [x] Run baseline tests and validators; 82 pre-existing tests passed before changes.
 
 ### Pass 2 — adversarial review and fixes
 
 Found and fixed:
 
-1. **Impossible shooting components could be missed or mislabeled “consistent.”** When 3PT makes
-   exceeded total FG makes, arithmetic returned `None`, and the checker treated a missing difference
-   like agreement. Numeric but impossible cells were also dropped as unparseable. The checker now
-   retains them and emits an unverified inconsistency candidate for makes exceeding attempts,
-   negative values, 3PT makes exceeding total FG makes, or 3PT attempts exceeding total FGA.
-2. **Ambiguous same-matchup rows could be joined by response order.** The live union builder now
-   leaves every row for that pair unpaired when a source returns duplicate ordered team pairs,
-   rather than inventing a cross-source mapping.
-3. **A successful `gh` exit without a valid HTTPS issue URL could falsely say `sent`.** It now records
-   `failed` / “delivery outcome unknown” and does not blindly retry, avoiding duplicate issue risk.
-4. **Polling heartbeat fields caused avoidable Git churn.** Per-poll `last_ok_at` and elapsed outage
-   values are stripped from persisted state; source-outage alert text is stable between configured
-   thresholds and occurrence milestones. Runtime durations still drive alert eligibility.
-5. **The prior “no manual input” statement was too broad.** Polling, validation, dispatch, and
-   publishing are unattended; adjudicating whether the official NBA record was wrong and assigning
-   a cause still requires external evidence review. README/ALERTING now state this boundary.
-6. **A reviewed alert could reopen on the next identical poll.** Manual closure now fingerprints the
-   condition/evidence: identical observations preserve the review closure, while materially changed
-   evidence or a new condition generation can reopen it. A lifecycle regression test covers both.
+1. **Impossible shooting components could be missed or mislabeled “consistent.”**
+   Numeric but impossible cells are retained and produce an unverified candidate for
+   makes exceeding attempts, negative values, 3PT makes exceeding total FG makes, or
+   3PT attempts exceeding total FGA.
+2. **Ambiguous or cross-date rows could be compared by response order.** The integrated
+   builder now requires a known matching Eastern game date and unique ordered matchup;
+   ambiguous and unknown-date rows remain separate observations.
+3. **An issue-create success without a valid HTTPS URL could falsely say `sent`.** The
+   dispatcher records an unknown/failed outcome and avoids blind retry.
+4. **Polling heartbeat fields caused avoidable Git churn.** Per-poll elapsed fields are
+   stripped from persisted state and source-outage alert text is stable between material
+   milestones; runtime durations still drive thresholds.
+5. **“No manual input” was too broad.** Collection, detection, dispatch and publishing
+   are unattended; attribution and promotion still require independent evidence review.
+6. **A reviewed alert could reopen on an identical poll.** Manual closure now fingerprints
+   evidence and condition generation; unchanged observations preserve the closure, while
+   materially changed evidence or a new generation can reopen it.
 
-### Pass 3 — full-request recheck and final verification
+### Pass 3 — full-request recheck and integration verification
 
-- [x] Verify tests cover arithmetic false-negative, full-poll alert creation, duplicate matchup
-      refusal, ambiguous delivery outcomes, and no-churn source outages.
-- [x] Run **92 Python tests**; run current-data and historical validators, historical monitor
-      self-test, Python compile, active/historical JavaScript checks, dashboard smoke test,
-      generated statistics/site-data drift checks, and `git diff --check`.
-- [x] Recheck site/production honesty: Pages is built; latest saved poll is a historical snapshot,
-      not current endpoint health; source comparison was unavailable; no alert dispatch has been
-      observed in production and the committed alert ledger is empty.
-- [x] Recheck scope: no new game facts; the 213/214 and Kevin Porter Jr. records remain
-      unverified; historical counts remain a small collection, not league-wide rates.
-- [ ] PR/merge status: update this line after checks and any requested merge are complete.
+- [x] Recheck the requested boundaries: no new game facts; the 213/214 and Kevin Porter
+      Jr. records remain unverified; collection statistics remain small-sample only.
+- [x] Verify that Pages, feed health, scheduler cadence, and production dispatch claims
+      are presented as observed facts/limitations, not guarantees.
+- [x] Pre-integration checkpoint: 92 tests and repository gates passed before the
+      upstream PR #11 changes were incorporated.
+- [x] After integrating PR #11, rerun **100 Python tests**, current and historical
+      validation, monitor self-test, JavaScript syntax and dashboard smoke tests, Python
+      compilation, deterministic stats/site-data generation with no drift, and `git diff --check`.
+- [ ] PR #12 checks/merge status: update after the requested integration completes.

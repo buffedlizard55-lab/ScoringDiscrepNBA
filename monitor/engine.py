@@ -338,12 +338,15 @@ def _process_final_score_revisions(
     been wrong and then fixed its own feed.
     """
     for observation in observations:
-        if observation.get("status") != "final":
-            continue
         game_key = _game_identity(observation)
         baselines = state.setdefault("final_score_baselines", {})
         for source_key, source_score in sorted((observation.get("scores") or {}).items()):
             if not isinstance(source_score, dict):
+                continue
+            # One feed can be final while another is still live. Its ongoing
+            # scoring is not a revision to a previously published final.
+            # Legacy observations without per-source status use the row status.
+            if source_score.get("status", observation.get("status")) != "final":
                 continue
             if source_score.get("away") is None or source_score.get("home") is None:
                 continue

@@ -22,11 +22,11 @@ about any specific game unless a link is attached.
 
 | Question | Answer | Why |
 | --- | --- | --- |
-| Can we detect that two published sources disagree on a score? | **Yes**, when two feeds are both reachable | [`monitor/feeds.py`](monitor/feeds.py) unions every source's games into one row per game and flags disagreement; right now only one source (ESPN) is reachable from the runner |
+| Can we detect that two published sources disagree on a score? | **Yes**, when two feeds are both reachable | [`monitor/feeds.py`](monitor/feeds.py) unions every source's games into one row per game and flags disagreement; the latest saved poll had only ESPN reachable, a historical observation rather than current health |
 | Can we detect that a source changed a score it had already published as final? | **Yes** | [`monitor/engine.py`](monitor/engine.py) keeps a per-source baseline of the first final score it saw |
 | Can we detect that one provider's final score contradicts the box score that same provider publishes? | **Yes** | [`monitor/consistency.py`](monitor/consistency.py) recomputes `2 × (FGM − 3PM) + 3 × 3PM + FTM` from the provider's own cells. This detector works while the primary feed is down, because rows are now built from every source that answered |
 | Can we notify someone automatically? | **Yes**, as GitHub issues with the repository's `GITHUB_TOKEN`, and optionally to a webhook | [`monitor/dispatch.py`](monitor/dispatch.py) + the scheduled workflow |
-| Can the system confirm that the NBA's *official* record was wrong? | **No** | There is no machine-readable official correction feed; see §3.1 |
+| Can the system confirm that the NBA's *official* record was wrong? | **No** | No dedicated official correction feed has been verified or integrated here; see §3.1 |
 | Can it see arena scoreboard / TV graphics errors? | **No** | Those are not published through the feeds we can read; see §3.5 |
 | Can it find historical cases before this monitor existed? | **No, not automatically** | We only observe feeds forward in time; historical cases come from archive research; see §3.4 |
 | Does "no alerts" mean "no discrepancies"? | **No** | Outages, poll delay, and consistent errors all produce silence; see §3.6 |
@@ -80,11 +80,12 @@ entries, the review note, and the delivery record.
 
 ## 3. Limitations that are real today
 
-### 3.1 There is no machine-readable official correction feed
+### 3.1 No dedicated official correction feed has been verified here
 
 The NBA announces scoring corrections as prose: game recaps, league statements,
-and posts from the official account. There is no public endpoint that says
-"game 0022400072 was corrected from 139-104 to 140-104". Consequently the
+and posts from the official account in the linked seed cases. This project has
+not verified or integrated a dedicated correction endpoint; that does not prove
+no such product exists. With the currently integrated feeds, the
 system can produce a *candidate* and attach evidence, but a human (or an agent
 under review) must confirm whether the league's record changed. The two
 confirmed examples in this project both required reading a published statement:
@@ -93,8 +94,8 @@ and the [NBA Official post for November 2025](https://x.com/NBAOfficial/status/1
 
 ### 3.2 The primary feed (NBA CDN) is not reachable from the scheduled runner
 
-This is currently the single biggest limitation, and it is observed, not
-assumed:
+This was the largest source-coverage limitation in the latest reviewed snapshot;
+its status is observed in that artifact, not assumed to persist unchanged:
 
 - The scheduled run recorded at
   [commit `99cae832`](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/commit/99cae8322239b52486fe26777fa70f33565f3959)
@@ -234,17 +235,20 @@ events are still persisted deliberately (`tests/test_runner.py::test_repeated_so
 
 ### 3.11 Feed matching is a heuristic, not a shared game identifier
 
-The NBA and ESPN adapters do not use a shared event ID, so the monitor joins
-observations by ordered home/away team codes. It now refuses to pair a matchup
-when either source returns duplicate rows for that same ordered pair; those
-rows remain visible as `Not compared` rather than being joined by list order
-(`tests/test_feeds.py::test_union_builder_keeps_duplicate_matchups_unmatched`).
-When each source returns only one row for a pair, the pair-based join is still
-a best-effort mapping: a source's date/time conventions, postponed games, or a
-same-pair event in a broad scoreboard response could make the rows refer to
-different events. This can suppress or create a *candidate* comparison; it
-cannot confirm which source is right. A provider-supported common event key or
-reliable normalized start time would improve this.
+The NBA and ESPN adapters do not expose a shared event ID. The monitor now
+requires a **known matching Eastern-calendar game date** and a unique ordered
+home/away team pair within each source before joining. Duplicate same-day rows
+and unknown-date rows remain visible as separate `Not compared` observations;
+response order is never used to choose a match. The adapters retain each
+provider's event ID, date, status, period and clock alongside its score so
+source-local timing can be reviewed (`tests/test_feeds.py` covers cross-date,
+unknown-date, duplicate and context-preservation cases).
+
+This date-and-team join is still a best-effort mapping: postponed games,
+provider date conventions, or an incorrect date can suppress or create a
+*candidate* comparison. A common poll time is not a common provider publication
+time, and no mismatch proves which source is right. A provider-supported shared
+event key plus durable canonical IDs would improve identity.
 
 ## 4. Verifying the system yourself
 

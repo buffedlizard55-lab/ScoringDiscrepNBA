@@ -384,7 +384,8 @@ No NBA incident facts were added, promoted, or externally re-researched in this 
   order; an issue-creation process without a valid HTTPS URL is not recorded as delivered; volatile
   outage fields/text no longer force heartbeat-only writes; reviewed closures persist across
   identical polls and reopen for changed evidence or a new condition generation.
-- Verification: 92 Python tests passed; `python3 -m monitor --check-data`, `python3 scripts/validate.py`,
+- Verification: 100 Python tests passed after integrating PR #11's date-aware feed matching;
+  `python3 -m monitor --check-data`, `python3 scripts/validate.py`,
   `python3 scripts/monitor.py --self-test`, JavaScript syntax and dashboard smoke tests, Python
   compilation, deterministic historical data generation/drift check, and `git diff --check` passed.
   (If a later CI run differs, its result supersedes this local check.)
