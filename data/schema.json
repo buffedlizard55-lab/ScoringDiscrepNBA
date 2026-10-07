@@ -1,177 +1,91 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/blob/main/data/schema.json",
-  "title": "NBA Scoring Discrepancy Case Record",
-  "description": "Schema for one verified or under-investigation scoring-discrepancy case. Anti-hallucination rules: every factual claim must be traceable to an entry in `sources`; unknown values must use null plus an entry in `open_questions`; never invent timestamps, scores, or causes.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NBA Scoring Discrepancy Record",
   "type": "object",
-  "required": [
-    "id",
-    "title",
-    "status",
-    "verification_level",
-    "game_date",
-    "season",
-    "away_team",
-    "home_team",
-    "incident_summary",
-    "classification",
-    "originally_reported",
-    "corrected_value",
-    "final_official",
-    "official_record_was_wrong",
-    "timeline",
-    "sources",
-    "open_questions",
-    "last_reviewed"
-  ],
+  "required": ["id", "game_id", "date", "teams", "incident_type", "description", "original_value", "corrected_value", "final_official_value", "sources", "verification_status", "nba_official_record_incorrect"],
   "properties": {
-    "id": {
-      "type": "string",
-      "description": "Stable slug, e.g. 2024-10-23-gsw-por-melton-ft",
-      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$"
-    },
-    "title": { "type": "string", "minLength": 10 },
-    "status": {
-      "type": "string",
-      "enum": ["verified", "verified-partial", "under-investigation", "unverified", "disputed", "not-a-discrepancy"],
-      "description": "verified = every required field corroborated by >=1 reliable source. verified-partial = core facts verified, some fields still open. under-investigation = monitoring flagged it, research in progress. unverified = report exists but no reliable corroboration yet. disputed = reliable sources disagree. not-a-discrepancy = investigated and closed as no error (kept for transparency)."
-    },
-    "verification_level": {
-      "type": "string",
-      "enum": ["official-nba-confirmed", "multi-secondary-confirmed", "single-secondary", "unverified-report"],
-      "description": "Strength of sourcing. official-nba-confirmed = NBA/NBA.com/NBAOfficial/AP-via-league statement confirms the error and correction."
-    },
-    "game_date": { "type": ["string", "null"], "description": "YYYY-MM-DD in the venue's local date. null only when unknown (must be in open_questions)." },
-    "season": { "type": ["string", "null"], "description": "e.g. 2024-25. null only when unknown." },
-    "away_team": { "type": ["string", "null"] },
-    "home_team": { "type": ["string", "null"] },
-    "venue": { "type": ["string", "null"] },
-    "incident_summary": { "type": "string", "minLength": 50 },
-    "classification": {
+    "id": {"type": "string", "description": "Unique case identifier, e.g. DISC-20241023-GSW-POR-001"},
+    "game_id": {"type": "string", "description": "NBA Game ID or date+teams"},
+    "date": {"type": "string", "format": "date", "description": "Game date YYYY-MM-DD"},
+    "teams": {
       "type": "object",
-      "required": ["type", "layer", "outcome"],
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "missed-made-basket",
-            "free-throw-entry-error",
-            "two-vs-three-point-ruling",
-            "scoreboard-display-error",
-            "official-scorer-book-error",
-            "stat-correction-non-scoring",
-            "stat-correction-denied",
-            "timing-buzzer-dispute",
-            "data-feed-conflict",
-            "unknown"
-          ]
-        },
-        "layer": {
-          "type": "string",
-          "enum": ["official-record-wrong-then-corrected", "official-record-wrong-stands", "official-record-correct-secondary-wrong", "unresolved"],
-          "description": "The single most important determination: was the NBA's own official record wrong, or only a secondary source?"
-        },
-        "outcome": {
-          "type": "string",
-          "enum": ["corrected-next-day", "corrected-in-game", "corrected-via-replay", "stands-protest-denied", "stands-no-review", "stands-ruled-correct", "pending", "unknown"]
-        }
+        "home": {"type": "string"},
+        "away": {"type": "string"},
+        "home_abbr": {"type": "string"},
+        "away_abbr": {"type": "string"}
       }
     },
-    "period_clock": { "type": ["string", "null"], "description": "Period and game clock of the scoring play, exactly as sourced, e.g. 'Q3, 2:00 remaining'." },
-    "scoring_play": { "type": ["string", "null"] },
-    "score_before": { "type": ["string", "null"], "description": "Score immediately before the play, with source attribution in notes when secondary-only." },
-    "affected_player": { "type": ["string", "null"] },
-    "affected_team": { "type": ["string", "null"] },
-    "originally_reported": {
+    "season": {"type": "string"},
+    "period_clock": {"type": "string", "description": "Period and game clock when incident occurred, e.g. Q3 2:00"},
+    "relevant_scoring_play": {"type": "string"},
+    "score_before": {"type": "string"},
+    "score_after_original": {"type": "string"},
+    "score_after_corrected": {"type": "string"},
+    "original_value": {
       "type": "object",
-      "required": ["value", "basis"],
       "properties": {
-        "value": { "type": ["string", "null"] },
-        "total": { "type": ["integer", "null"] },
-        "basis": { "type": "string" }
+        "final_score": {"type": "string"},
+        "total_points": {"type": "integer"},
+        "player_stat": {"type": "string"}
       }
     },
     "corrected_value": {
       "type": "object",
-      "required": ["value", "basis"],
       "properties": {
-        "value": { "type": ["string", "null"] },
-        "total": { "type": ["integer", "null"] },
-        "basis": { "type": "string" }
+        "final_score": {"type": "string"},
+        "total_points": {"type": "integer"},
+        "player_stat": {"type": "string"}
       }
     },
-    "final_official": {
+    "final_official_value": {
       "type": "object",
-      "required": ["value", "basis"],
       "properties": {
-        "value": { "type": ["string", "null"] },
-        "total": { "type": ["integer", "null"] },
-        "basis": { "type": "string" }
+        "final_score": {"type": "string"},
+        "total_points": {"type": "integer"}
       }
     },
-    "sources_disagreed": { "type": "array", "items": { "type": "string" } },
-    "cause": {
+    "affected_player": {"type": "string"},
+    "affected_team": {"type": "string"},
+    "sources_that_disagreed": {"type": "array", "items": {"type": "string"}},
+    "timestamps": {
       "type": "object",
-      "required": ["determination", "detail"],
       "properties": {
-        "determination": { "type": "string", "enum": ["confirmed", "suspected", "unknown"] },
-        "detail": { "type": "string" }
+        "game_time": {"type": "string"},
+        "detection_time": {"type": "string"},
+        "correction_announced": {"type": "string"},
+        "correction_applied": {"type": "string"}
       }
     },
-    "official_record_was_wrong": {
-      "type": "string",
-      "enum": ["yes-temporarily", "yes-stands", "no", "undetermined"],
-      "description": "yes-temporarily = official record was wrong but later corrected. yes-stands = wrong and never corrected (disputed). no = official record was always correct; only secondary/display wrong."
-    },
-    "timeline": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["date", "event"],
-        "properties": {
-          "date": { "type": "string" },
-          "event": { "type": "string" },
-          "source_index": { "type": ["integer", "null"] }
-        }
-      }
-    },
+    "what_changed": {"type": "string"},
+    "when_changed": {"type": "string"},
+    "cause": {"type": "string", "description": "Confirmed or suspected cause"},
+    "cause_confidence": {"type": "string", "enum": ["confirmed", "suspected", "under_investigation", "disputed"]},
+    "incident_type": {"type": "string", "enum": ["free_throw_not_counted", "three_pointer_misclassified", "scorebook_foul_miscount", "illegal_substitution", "buzzer_beater_disputed", "throw_in_location_error", "technical_foul_miscount", "lane_violation_misapplication", "scoreboard_data_feed_error", "scorebug_timeout_error", "other"]},
+    "nba_official_record_incorrect": {"type": "boolean", "description": "True if NBA's official record itself was incorrect, false if only secondary source"},
+    "secondary_source_error": {"type": "boolean"},
+    "impact_on_final_total": {"type": "boolean"},
+    "impact_points": {"type": "integer"},
+    "protest_filed": {"type": "boolean"},
+    "protest_upheld": {"type": "boolean"},
+    "resolution": {"type": "string"},
     "sources": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["url", "publisher", "tier", "confirms"],
         "properties": {
-          "url": { "type": "string" },
-          "publisher": { "type": "string" },
-          "tier": {
-            "type": "string",
-            "enum": ["official-nba", "wire-ap", "major-sports-media", "team-beat", "secondary-digital", "tertiary-unverified"]
-          },
-          "confirms": { "type": "string" },
-          "accessed": { "type": "string" }
+          "url": {"type": "string", "format": "uri"},
+          "title": {"type": "string"},
+          "publisher": {"type": "string"},
+          "type": {"type": "string", "enum": ["official_nba", "official_team", "espn", "ap", "news", "forum", "video", "other"]},
+          "archived_url": {"type": "string"},
+          "access_date": {"type": "string"}
         }
       }
     },
-    "disputed_points": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["claim", "positions"],
-        "properties": {
-          "claim": { "type": "string" },
-          "positions": { "type": "array", "items": { "type": "string" } }
-        }
-      }
-    },
-    "open_questions": { "type": "array", "items": { "type": "string" } },
-    "betting_notes": { "type": ["string", "null"] },
-    "duration_note": {
-      "type": ["string", "null"],
-      "description": "Coarse duration statement (e.g. replay months later) when exact day-granularity lag cannot be derived from the timeline. Must be sourced or labeled approximate."
-    },
-    "reproduce_steps": { "type": "array", "items": { "type": "string" } },
-    "last_reviewed": { "type": "string", "description": "YYYY-MM-DD of last line-by-line verification pass." }
+    "verification_status": {"type": "string", "enum": ["verified", "partially_verified", "unverified", "disputed", "requires_investigation"]},
+    "investigation_status": {"type": "string", "enum": ["detected", "investigating", "corrected", "resolved", "closed"]},
+    "notes": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}}
   }
 }

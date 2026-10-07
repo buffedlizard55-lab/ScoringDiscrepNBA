@@ -27,6 +27,14 @@ jobs:
         run: |
           python3 scripts/compute_stats.py
           python3 scripts/build_site_data.py
+      # Keep the prior session's (PR #2) datasets downloadable from the deployed site.
+      - name: Bundle legacy datasets for download
+        run: |
+          mkdir -p docs/legacy
+          for f in discrepancies.json statistics.json latest_check.json live_alerts.json; do
+            cp "data/$f" "docs/legacy/$f" 2>/dev/null || echo "absent: data/$f"
+          done
+          ls -lh docs/ docs/legacy/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -71,8 +71,8 @@ date current feed.
 
 | Piece | Location | Status |
 |---|---|---|
-| Case database (11 verified-partial + 1 unverified stub) | `data/cases/*.json` → `data/cases.json` | ✅ Live |
-| Record schema + validation | `data/schema.json`, `scripts/validate.py` | ✅ Live |
+| Canonical case database (12 verified-partial + 1 unverified stub) | `data/cases/*.json` → `data/cases.json` | ✅ Live |
+| Canonical record schema + validation | `data/cases-schema.json`, `scripts/validate.py` | ✅ Live |
 | Collection statistics (regenerated, caveated) | `data/stats.json` via `scripts/compute_stats.py` | ✅ Live |
 | Source reliability tiers | `data/sources.json` | ✅ Live |
 | Continuous monitor (ESPN vs NBA liveData + PBP) | `scripts/monitor.py`, `monitor/STATE.md` | ✅ Live (runs in CI; self-test passes offline) |
@@ -83,6 +83,8 @@ date current feed.
 | CI: Pages deploy | `.github/workflows/pages.yml` | ✅ Live (needs Pages → GitHub Actions enabled once) |
 | Verification log + methods | `VERIFICATION.md` | ✅ Live |
 | Limitations + roadmap | `ROADMAP.md` | ✅ Live |
+| Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | ⚠️ Preserved, audit-flagged (see §7) |
+| Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | 📦 Archived, standalone |
 
 **Originating 213-vs-214 report:** tracked as `0000-00-00-originating-213-vs-214-report`
 with status `unverified`. The game is unidentified — it must not be cited as fact until the
@@ -91,7 +93,7 @@ checklist in that record is satisfied.
 ## 3. Quick start
 
 ```bash
-# validate every case (anti-hallucination rules enforced)
+# validate every canonical case (anti-hallucination rules enforced)
 python3 scripts/validate.py
 
 # recompute statistics + rebuild the site data bundle
@@ -112,28 +114,35 @@ cd docs && python3 -m http.server 8080
 
 ```
 ├── README.md                  ← you are here (read first, every session)
-├── VERIFICATION.md            ← methods, source hierarchy, line-by-line log
-├── ROADMAP.md                 ← limitations, next-session work, known gaps
+├── VERIFICATION.md            ← methods, source hierarchy, line-by-line log (+ PR #2 appendix)
+├── ROADMAP.md                 ← limitations, next-session work, harmonization plan
+├── CONTRIBUTING.md            ← prior-session contribution guide (references data/schema.json)
+├── index.html                 ← root redirect to docs/ (prior session, still valid)
 ├── data/
-│   ├── schema.json            ← record contract (required fields, enums, rules)
-│   ├── cases/*.json           ← one file per case; null = unknown, never guessed
+│   ├── cases-schema.json      ← canonical record contract (required fields, enums, rules)
+│   ├── cases/*.json           ← canonical store: one file per case; null = unknown, never guessed
 │   ├── cases.json             ← generated aggregate (do not hand-edit)
 │   ├── stats.json             ← generated stats (caveated: collection-only)
 │   ├── sources.json           ← reliability tiers + authoritative references
-│   └── investigations.json    ← monitor's open/resolved detection log
-├── scripts/
-│   ├── validate.py            ← schema + anti-hallucination gate (CI-enforced)
-│   ├── compute_stats.py       ← stats with scope caveats baked in
-│   ├── build_site_data.py     ← aggregates cases, mirrors data → docs/data/
-│   └── monitor.py             ← live discrepancy detector (+ offline self-test)
-├── monitor/STATE.md           ← how monitoring works, lifecycle, runbook
-├── docs/                      ← GitHub Pages site (index.html, app.js, styles.css, data/)
+│   ├── investigations.json    ← monitor's open/resolved detection log
+│   ├── schema.json            ← LEGACY schema for discrepancies.json (PR #2; kept for its tooling)
+│   ├── discrepancies.json     ← LEGACY store (PR #2; leads pending re-verification)
+│   ├── statistics.json        ← LEGACY stats (PR #2; see audit flags before citing)
+│   ├── latest_check.json      ← LEGACY monitor output (PR #2)
+│   └── live_alerts.json       ← LEGACY alerts (PR #2)
+├── scripts/                   ← canonical tooling (stdlib only): validate, compute_stats,
+│                                build_site_data, monitor (+ fixtures/)
+├── src/                       ← LEGACY tooling (PR #2; needs API keys; manual runs only)
+├── research/                  ← LEGACY case notes (PR #2; 1 of 12 listed files present)
+├── monitor/STATE.md           ← how canonical monitoring works, lifecycle, runbook
+├── archive/session-7b4d64dc-site/ ← PR #2 site + README, byte-identical, standalone
+├── docs/                      ← canonical GitHub Pages site (index.html, app.js, styles.css, data/)
 └── .github/workflows/         ← validate.yml, monitor.yml, pages.yml
 ```
 
-## 5. How to add or change a case (no-hallucination workflow)
+## 5. How to add or change a canonical case (no-hallucination workflow)
 
-1. Create/edit `data/cases/<YYYY-MM-DD>-<slug>.json` following `data/schema.json`.
+1. Create/edit `data/cases/<YYYY-MM-DD>-<slug>.json` following `data/cases-schema.json`.
 2. Every factual claim needs a `sources[]` entry with a direct `https://` link, publisher, tier,
    and `confirms` text. Unknown fields stay `null` with an `open_questions[]` entry.
 3. Rule first on `classification.layer`: was the NBA's official record wrong, or only secondary?
@@ -142,10 +151,26 @@ cd docs && python3 -m http.server 8080
 5. Run `compute_stats.py` + `build_site_data.py`, review the diff, open a PR.
 6. Never promote `unverified` → `verified-partial` without dated evidence attached; never use
    `verified` unless ≥2 sources (incl. a strong tier) corroborate and zero questions remain.
+7. To adopt a PR #2 lead: re-verify every fact independently (the 2017 Robinson III case is the
+   template), then write a fresh `data/cases/` record. Never bulk-import `discrepancies.json`.
 
 ## 6. Verification & provenance
 
 - Methods, tier definitions, and the line-by-line review log: **`VERIFICATION.md`**.
-- Each case embeds `reproduce_steps` so a stranger can re-derive it from the cited evidence.
+- Each canonical case embeds `reproduce_steps` so a stranger can re-derive it from the cited evidence.
 - Statistics carry a machine-readable scope caveat: **collection-only, never league-wide rates**.
 - See **`ROADMAP.md`** for limitations, known gaps, and the suggested next-session plan.
+
+## 7. Prior-session implementation (PR #2) — preserved, not deleted
+
+An earlier session merged a parallel implementation (PR #2). The merge kept it intact:
+
+- **Valuable and credited:** its leads surfaced the verifiable 2017 Robinson III correction
+  (now a canonical case) and the league-official “only six upheld protests” record, which
+  corrected this project's own USA Today-based “3 since 1952” note. Its per-case verification
+  steps are preserved verbatim in `VERIFICATION.md` Appendix A.
+- **Audit-flagged (do not cite as fact):** `DISC-20241107-CLE-WAS-001` carries a wrong year
+  (2024 vs demonstrated 2025); `research/` lists 12 files but ships 1; legacy stats predate
+  the audit. Full findings: `VERIFICATION.md` §6.
+- **Tooling:** `src/` needs API keys for live use (per its own README); the canonical CI monitor
+  is the keyless `scripts/monitor.py`. Harmonization plan: `ROADMAP.md` §5.

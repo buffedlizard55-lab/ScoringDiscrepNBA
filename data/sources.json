@@ -66,6 +66,11 @@
       "note": "Elias has been the NBA's official statistician since 1970-71. Corrections flow through the league + Elias pipeline."
     },
     {
+      "url": "https://www.nba.com/news/nba-protest-process-mavericks-await-news",
+      "publisher": "NBA.com",
+      "note": "League protest-process explainer: per best-available records only six protests ever upheld (none won since 2007-08); 13.6% success rate; misapplication-vs-judgment bar."
+    },
+    {
       "url": "https://support.espn.com/hc/en-us/articles/360056679592-Stat-corrections",
       "publisher": "ESPN Support",
       "note": "ESPN documents three distinct mechanisms: (1) live-scoring updates as better league data arrives, (2) post-game NBA adjustments, (3) ESPN feed-data corrections. This taxonomy is adopted by the monitor to classify detections."

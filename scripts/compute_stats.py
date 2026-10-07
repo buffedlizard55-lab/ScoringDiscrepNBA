@@ -141,7 +141,7 @@ def main():
         "rarity_notes": [
             "Post-game changes to an NBA final score are rare: the league, Elias Sports Bureau, and sportsbooks all characterize corrections as 'rare' (ESPN, Feb 24 2022), and the NBA's own correction notices call scoring errors rare.",
             "This collection documents 2 next-day one-point final-total corrections (Oct 2024: 243->244; Nov 2025: 262->263).",
-            "Uphold-grade protests with replays are rarer still: 3 granted since 1952 entering 2014 (USA Today) — 2 of the 3 are documented in this collection (1982-83 Lakers-Spurs, 2007-08 Heat-Hawks). The third (a Nets-76ers game; date not captured in this pass) is a known research gap; denied protests (2014 Kings-Grizzlies, 2019 Rockets-Spurs) are also documented.",
+            "Uphold-grade protests with replays are rarer still: only 6 upheld per the league's best-available records (NBA.com protest-process explainer; none won since the 2007-08 Shaq case). This collection documents 2 of the 6 (1982-83 Lakers-Spurs, 2007-08 Heat-Hawks); denied protests (2014 Kings-Grizzlies, 2019 Rockets-Spurs) are also documented. (A 2014 USA Today research note saying '3 since 1952' is contradicted by the league's own records — see VERIFICATION.md.)",
             "The originating 213-vs-214 cross-source conflict remains UNVERIFIED (game unidentified) — its rarity cannot be quantified until identified.",
         ],
     }
