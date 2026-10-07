@@ -1,0 +1,13 @@
+{
+  "status": "superseded-audit-flagged",
+  "superseded_by": "data/stats.json",
+  "description": "The legacy PR #2 statistics summary is not a current or canonical source of counts. Its verification labels predate the cross-session audit and are not used by the active site or monitor. The prior Kevin Porter Jr. record has been downgraded to an unverified lead; both the Kevin Porter Jr. and 213/214 leads are excluded from canonical confirmed-case statistics.",
+  "unverified_leads_excluded": [
+    "DISC-20211022-PORTER-STAT-001",
+    "0000-00-00-kpj-player-stat-correction-lead",
+    "0000-00-00-originating-213-vs-214-report",
+    "unverified-2021-kevin-porter-jr-stat-correction",
+    "unidentified-213-vs-214-final-total"
+  ],
+  "historical_snapshot": "The previous legacy statistics file is preserved in archive/session-7b4d64dc-site/statistics.json for historical context only; do not cite it as a verified dataset summary."
+}

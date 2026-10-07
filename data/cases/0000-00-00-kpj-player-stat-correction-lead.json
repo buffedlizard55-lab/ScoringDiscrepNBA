@@ -1,0 +1,83 @@
+{
+  "id": "0000-00-00-kpj-player-stat-correction-lead",
+  "title": "UNVERIFIED: Kevin Porter Jr. player-stat correction lead (game and exact stat unknown)",
+  "status": "unverified",
+  "verification_level": "unverified-report",
+  "game_date": null,
+  "season": null,
+  "away_team": null,
+  "home_team": null,
+  "venue": null,
+  "incident_summary": "A prior legacy record and a community forum discussion raised a possible Kevin Porter Jr. player-stat correction. The legacy record labeled the game as 2021-10-22, but the date, game identity, exact play, original and corrected player statistics, NBA record change, and cause have not been independently verified in this review. The earlier specific points/assists values are therefore not repeated as facts. This is a research lead only and is excluded from confirmed-case statistics.",
+  "classification": {
+    "type": "unknown",
+    "layer": "unresolved",
+    "outcome": "pending"
+  },
+  "period_clock": null,
+  "scoring_play": null,
+  "score_before": null,
+  "affected_player": "Kevin Porter Jr. (named in the unverified report)",
+  "affected_team": null,
+  "originally_reported": {
+    "value": "Possible player-stat correction; exact original value unknown",
+    "total": null,
+    "basis": "Community/legacy research lead only. The prior exact player-stat values have not been independently established and are not asserted here."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction value is admitted without a preserved, independently verifiable source observation."
+  },
+  "final_official": {
+    "value": null,
+    "total": null,
+    "basis": "Game not independently identified; no final official value admitted."
+  },
+  "sources_disagreed": [],
+  "cause": {
+    "determination": "unknown",
+    "detail": "Unknown. The earlier legacy claim that points and assists were exchanged on a specific play is unverified; no cause is assigned."
+  },
+  "official_record_was_wrong": "undetermined",
+  "timeline": [
+    {
+      "date": "Undated lead record (legacy entry labels 2021-10-22; not verified)",
+      "event": "A community/legacy lead was retained for investigation. This record does not establish a specific game, correction, source disagreement, or changed statistic.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://community.ottoneu.com/t/basketball-stat-corrections/10451",
+      "publisher": "Ottoneu community forum",
+      "tier": "tertiary-unverified",
+      "confirms": "A community discussion is a research lead only; it does not independently establish the game, before/after values, NBA correction, or cause recorded in the prior legacy entry.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://basketball.fantasysports.yahoo.com/nba/444/statcorrections",
+      "publisher": "Yahoo Fantasy",
+      "tier": "tertiary-unverified",
+      "confirms": "Candidate dynamic correction-log URL retained for follow-up; no specific Kevin Porter Jr. correction row or historical snapshot is independently established in this record.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "What exact game is being reported? Verify the date, opponent, NBA game ID, and teams from independent evidence before filling them in.",
+    "What exact play and player statistic allegedly changed, with preserved original and corrected source observations?",
+    "Can an official NBA correction record or contemporaneous NBA box-score revision be recovered?",
+    "Which sources displayed each value, and what are their direct URLs, capture times, and archived snapshots?",
+    "Was the NBA record itself corrected, or did a fantasy/secondary provider alone change its display?",
+    "What cause, if any, is explicitly supported by the evidence? Do not infer a points-to-assists reclassification."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Open the Ottoneu discussion and record only what its dated text actually says; do not copy the unverified legacy values as facts.",
+    "Inspect the Yahoo corrections page or an archived copy for a dated Kevin Porter Jr. entry, preserving the capture timestamp and exact fields.",
+    "Once a game is identified, compare the official NBA box score/play-by-play across original and revised snapshots and add a new source-traceable timeline.",
+    "Keep this lead unverified and outside confirmed statistics until independent evidence supports the specific correction."
+  ],
+  "last_reviewed": "2026-10-06"
+}

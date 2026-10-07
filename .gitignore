@@ -1,6 +1,39 @@
-# Generated GitHub Pages artifact
-_site/
-
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+.coverage
+.pytest_cache/
+
+# Logs
+*.log
+data/logs/
+data/live_alerts.json
+data/latest_check.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arena
+.arena/
+
+# Node
+node_modules/
+
+# Generated Pages artifact
+_site/

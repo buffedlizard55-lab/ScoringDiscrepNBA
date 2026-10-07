@@ -1,0 +1,127 @@
+{
+  "id": "2025-11-07-cle-was-johnson-ft",
+  "title": "Cavaliers @ Wizards — Tre Johnson made free throw recorded as a miss, final score corrected 148-114 to 148-115 (Nov 7-8, 2025)",
+  "status": "verified-partial",
+  "verification_level": "official-nba-confirmed",
+  "game_date": "2025-11-07",
+  "season": "2025-26",
+  "away_team": "Cleveland Cavaliers",
+  "home_team": "Washington Wizards",
+  "venue": "Washington, D.C. (Wizards home arena)",
+  "incident_summary": "With 8:15 remaining in the second quarter, Wizards rookie Tre Johnson shot two free throws and made both, but the first attempt was incorrectly entered as a miss. The game ended with an announced final of Cavaliers 148, Wizards 114. The next morning (Nov 8, 2025), the NBA acknowledged the error in a statement and updated the official final score to Cavaliers 148, Wizards 115 — a one-point correction that changed the combined total from 262 to 263. Johnson's line was updated to 19 points on 2-of-3 free throws.",
+  "classification": {
+    "type": "free-throw-entry-error",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-next-day"
+  },
+  "period_clock": "Q2, 8:15 remaining",
+  "scoring_play": "Tre Johnson (WAS) first free throw attempt of a two-shot sequence — made, but entered as missed. He made both attempts.",
+  "score_before": "Cavaliers led 50-39 before the attempt (reported by The Athletic; its page returned HTTP 403 to the research fetcher, and Bleacher Report also reports 50-39).",
+  "affected_player": "Tre Johnson (WAS)",
+  "affected_team": "Washington Wizards",
+  "originally_reported": {
+    "value": "Cavaliers 148, Wizards 114",
+    "total": 262,
+    "basis": "Announced final at end of game Nov 7, 2025, before correction (The Athletic, Bleacher Report, HoopsWire)."
+  },
+  "corrected_value": {
+    "value": "Cavaliers 148, Wizards 115 (+1 WAS)",
+    "total": 263,
+    "basis": "NBA statement Nov 8, 2025 as quoted by multiple outlets: Johnson's first FT 'was incorrectly entered as a missed free throw, when in fact he made both' and 'game statistics have been corrected.'"
+  },
+  "final_official": {
+    "value": "Cavaliers 148, Wizards 115",
+    "total": 263,
+    "basis": "Corrected official final per The Athletic, Bleacher Report, HoopsWire, Nov 8-9, 2025."
+  },
+  "sources_disagreed": [
+    "In-arena stat crew game-night entry (first FT missed) vs. corrected league record (both made)",
+    "Secondary outlets briefly carried the 148-114 final before updating to 148-115",
+    "ESPN recap page at 2026-10-07 capture: current score table showed 148-115 while embedded AP narrative retained 148-114; provider-page inconsistency, not a separate NBA correction."
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Human error by the in-arena statistician, who missed the made free throw. NBA SVP of league-operations communications Tim Frank told The Athletic it was 'just a case of human error' and 'not something that happens a lot'; the league's stats auditors missed it in real time and caught it in the full post-game review."
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "2025-11-07",
+      "event": "Cavaliers @ Wizards in D.C.; Johnson's made first free throw with 8:15 left in Q2 is entered as a miss and the scoreboard does not move. Game ends announced as 148-114 Cavaliers.",
+      "source_index": 0
+    },
+    {
+      "date": "2025-11-08 16:44 UTC (minute precision; official post ID timestamp, seconds not claimed)",
+      "event": "NBA issues a statement acknowledging the error and the game statistics are corrected to a 148-115 final. Johnson's line becomes 19 points, 2-of-3 FTs.",
+      "source_index": 3
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.nytimes.com/athletic/6790005/2025/11/08/nba-washington-wizards-cleveland-cavaliers-incorrect-score/",
+      "publisher": "The Athletic (NYT)",
+      "tier": "major-sports-media",
+      "confirms": "Full incident: 8:15 Q2, Johnson made both FTs, first entered as miss, 148-114 to 148-115, NBA statement text, Tim Frank 'human error' quote, auditor process, 19 pts / 2-of-3 FTs, records (CLE 6-3, WAS 1-8).",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://bleacherreport.com/articles/25286861-nba-makes-scoring-change-cavaliers-wizards-over-tre-johnson-free-throw",
+      "publisher": "Bleacher Report",
+      "tier": "secondary-digital",
+      "confirms": "Correction 148-114 to 148-115; 50-39 score at time; Johnson to 19 points; notes similar 2024-25 Warriors-Blazers adjustment; rarity note.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://hoopswire.com/nba-correctes-final-score-of-cavs-wizards-game-after-made-free-throw/",
+      "publisher": "HoopsWire",
+      "tier": "secondary-digital",
+      "confirms": "Same core facts; scoreboard did not move; next-morning league acknowledgment; McCollum 25 / Mitchell 24 scoring leaders.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://x.com/NBAOfficial/status/1987199646020870516",
+      "publisher": "NBA Official (@NBAOfficial on X)",
+      "tier": "official-nba",
+      "confirms": "The league's post states Tre Johnson's first free throw at 8:15 of Q2 was incorrectly entered as missed though he made both, and that game statistics were corrected. The post does not provide a preserved pre-correction box-score snapshot.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/boxscore/_/gameId/401809511",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Current post-correction box table shows Cleveland 148, Washington 115; it is not a preserved pre-correction NBA record.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/recap/_/gameId/401809511",
+      "publisher": "ESPN / Associated Press",
+      "tier": "secondary-digital",
+      "confirms": "Current score table says 148-115 while embedded AP narrative retains 148-114; the page also showed an AP update time of Nov. 7, 2025, 9:43 p.m. without a printed timezone.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://official.nba.com/rule-no-5-scoring-and-timing/",
+      "publisher": "NBA Official Rule No. 5",
+      "tier": "official-nba",
+      "confirms": "A successful free throw is worth one point. This rule is used only for an explicitly labelled arithmetic-derived post-play score, not as evidence of the incident itself.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "The direct NBA Official correction post is now linked; preserve an independent archival capture if it becomes inaccessible.",
+    "Exact original Johnson free-throw line before correction was not preserved. The reported corrected line is 2-of-3; an original 1-of-3 value is arithmetic-derived, not a direct observation.",
+    "Verify the corrected player line against a historical official NBA box-score snapshot; current ESPN and secondary reports do not preserve the original record state.",
+    "Betting lines/total for this game were not found in the reviewed sources — do not assert any wagering impact.",
+    "The X post timestamp is retained only to the minute from the official post ID; no seconds-level timestamp is asserted."
+  ],
+  "betting_notes": null,
+  "reproduce_steps": [
+    "Open the @NBAOfficial post and confirm the league statement about Johnson's made first free throw at 8:15 Q2 and corrected statistics.",
+    "Open The Athletic report and HoopsWire's AP-sourced article to cross-check the 148-114 to 148-115 change and the reported corrected player line; The Athletic's direct page returned HTTP 403 in the review.",
+    "Compare ESPN's current 148-115 box/table with its embedded AP narrative that still says 148-114; treat the mismatch as a provider-page inconsistency.",
+    "Retrieve a historical official NBA box-score snapshot if possible; do not infer the original Johnson free-throw line from the correction alone."
+  ],
+  "last_reviewed": "2026-10-06",
+  "score_after_play": "50-40 Cavaliers (arithmetic-derived from The Athletic-reported 50-39 pre-attempt score and one made free throw; no live-feed observation was preserved)."
+}

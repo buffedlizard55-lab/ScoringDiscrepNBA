@@ -1,0 +1,116 @@
+{
+  "generated": "2026-10-07",
+  "generated_timezone": "UTC",
+  "scope_caveat": "Within-collection statistics only. This repository is a growing research collection, not a census of all NBA games, so these shares describe the collection \u2014 not league-wide incidence rates. Do not cite them as 'X% of NBA games'.",
+  "collection_size": 14,
+  "verified_count": 12,
+  "verified_count_scope": "Includes status `verified` and `verified-partial`; this is not a count of fully verified cases only. See verification_status_counts.",
+  "fully_verified_count": 0,
+  "verified_partial_count": 12,
+  "verification_status_counts": {
+    "unverified": 2,
+    "verified-partial": 12
+  },
+  "status_counts": {
+    "unverified": 2,
+    "verified-partial": 12
+  },
+  "verified_type_counts": {
+    "official-scorer-book-error": 2,
+    "timing-buzzer-dispute": 1,
+    "two-vs-three-point-ruling": 2,
+    "scoreboard-display-error": 1,
+    "missed-made-basket": 1,
+    "stat-correction-non-scoring": 2,
+    "stat-correction-denied": 1,
+    "free-throw-entry-error": 2
+  },
+  "verified_layer_counts": {
+    "official-record-wrong-then-corrected": 7,
+    "official-record-correct-secondary-wrong": 3,
+    "official-record-wrong-stands": 2
+  },
+  "verified_outcome_counts": {
+    "corrected-via-replay": 2,
+    "stands-protest-denied": 2,
+    "corrected-next-day": 5,
+    "stands-ruled-correct": 2,
+    "stands-no-review": 1
+  },
+  "verified_official_record_counts": {
+    "yes-temporarily": 7,
+    "no": 3,
+    "undetermined": 1,
+    "yes-stands": 1
+  },
+  "verified_level_counts": {
+    "multi-secondary-confirmed": 7,
+    "official-nba-confirmed": 3,
+    "single-secondary": 2
+  },
+  "final_score_changed_ids": [
+    "1982-11-30-lal-san-nixon-ft",
+    "2007-12-19-mia-atl-shaq-foul",
+    "2017-01-20-ind-lal-robinson-2v3",
+    "2024-10-23-gsw-por-melton-ft",
+    "2025-11-07-cle-was-johnson-ft"
+  ],
+  "corrected_box_value_ids": [
+    "1982-11-30-lal-san-nixon-ft",
+    "2007-12-19-mia-atl-shaq-foul",
+    "2017-01-20-ind-lal-robinson-2v3",
+    "2022-01-24-uta-phx-paul-assist",
+    "2022-01-27-min-gsw-edwards-steal",
+    "2024-10-23-gsw-por-melton-ft",
+    "2025-11-07-cle-was-johnson-ft"
+  ],
+  "total_changed_ids": [
+    "1982-11-30-lal-san-nixon-ft",
+    "2007-12-19-mia-atl-shaq-foul",
+    "2017-01-20-ind-lal-robinson-2v3",
+    "2024-10-23-gsw-por-melton-ft",
+    "2025-11-07-cle-was-johnson-ft"
+  ],
+  "one_point_total_change_ids": [
+    "2017-01-20-ind-lal-robinson-2v3",
+    "2024-10-23-gsw-por-melton-ft",
+    "2025-11-07-cle-was-johnson-ft"
+  ],
+  "resolution_lag_days": {
+    "2007-12-19-mia-atl-shaq-foul": 80,
+    "2014-11-13-sac-mem-lee-buzzer": 15,
+    "2017-01-20-ind-lal-robinson-2v3": 7,
+    "2019-12-03-hou-san-harden-dunk": 6,
+    "2022-01-24-uta-phx-paul-assist": 1,
+    "2022-01-27-min-gsw-edwards-steal": 1,
+    "2024-10-23-gsw-por-melton-ft": 1
+  },
+  "duration_notes": [
+    "Next-day corrections (1 day, game to corrected record): 3 cases \u2014 2022-01-24-uta-phx-paul-assist, 2022-01-27-min-gsw-edwards-steal, 2024-10-23-gsw-por-melton-ft.",
+    "Resolution lag 6 days (game to final ruling/replay): 2019-12-03-hou-san-harden-dunk.",
+    "Resolution lag 7 days (game to final ruling/replay): 2017-01-20-ind-lal-robinson-2v3.",
+    "Resolution lag 15 days (game to final ruling/replay): 2014-11-13-sac-mem-lee-buzzer.",
+    "Resolution lag 80 days (game to final ruling/replay): 2007-12-19-mia-atl-shaq-foul.",
+    "1982-11-30-lal-san-nixon-ft: Approximate: protest upheld December 1982 and the finish was replayed in April 1983 \u2014 roughly 4-5 months from game to replayed finish (month granularity only; LA Times, China Daily).",
+    "2018-12-31-min-nop-scoreboard: Transient display error observed during the final minute of play; total duration undocumented (Action Network). No post-game correction was needed.",
+    "Duration unknown or not applicable (stands unreviewed / transient display / single-date record): 2019-06-13-gsw-tor-green-2v3, 2022-02-09-chi-cha-lavine-assist, 2025-11-07-cle-was-johnson-ft."
+  ],
+  "headline": {
+    "official_record_wrong_share": 0.667,
+    "secondary_only_share": 0.25,
+    "final_changed_share": 0.417,
+    "most_common_types": [
+      "official-scorer-book-error",
+      "two-vs-three-point-ruling",
+      "stat-correction-non-scoring",
+      "free-throw-entry-error"
+    ],
+    "most_common_type_count": 2
+  },
+  "rarity_notes": [
+    "Post-game changes to an NBA final score are rare: the league, Elias Sports Bureau, and sportsbooks all characterize corrections as 'rare' (ESPN, Feb 24 2022), and the NBA's own correction notices call scoring errors rare.",
+    "This collection documents 2 next-day one-point final-total corrections (Oct 2024: 243->244; Nov 2025: 262->263).",
+    "Uphold-grade protests with replays are rarer still: only 6 upheld per the league's best-available records (NBA.com protest-process explainer; none won since the 2007-08 Shaq case). This collection documents 2 of the 6 (1982-83 Lakers-Spurs, 2007-08 Heat-Hawks); denied protests (2014 Kings-Grizzlies, 2019 Rockets-Spurs) are also documented. (A 2014 USA Today research note saying '3 since 1952' is contradicted by the league's own records \u2014 see VERIFICATION.md.)",
+    "The originating 213-vs-214 cross-source conflict remains UNVERIFIED (game unidentified) \u2014 its rarity cannot be quantified until identified."
+  ]
+}

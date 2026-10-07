@@ -1,0 +1,30 @@
+{
+  "total_cases": 12,
+  "by_type": {
+    "free_throw_not_counted": 2,
+    "three_pointer_misclassified": 1,
+    "scorebook_foul_miscount": 1,
+    "lane_violation_misapplication": 1,
+    "technical_foul_miscount": 1,
+    "throw_in_location_error": 1,
+    "buzzer_beater_disputed": 1,
+    "illegal_substitution": 1,
+    "scorebug_timeout_error": 2,
+    "other": 1
+  },
+  "by_verification": {
+    "verified": 11,
+    "partially_verified": 1
+  },
+  "official_record_incorrect_count": 10,
+  "secondary_source_error_count": 2,
+  "impact_on_final_total_count": 8,
+  "impact_on_final_total_percent": 66.7,
+  "official_incorrect_percent": 83.3,
+  "protest_upheld_count": 6,
+  "one_point_discrepancies": 3,
+  "one_point_percent": 25.0,
+  "avg_points_impact": 7.5,
+  "max_points_impact": 38,
+  "rarity_note": "1-point total discrepancies (like 213 vs 214) represent 25.0% of all verified cases. In our dataset of 12 cases, 3 are 1-point differences."
+}

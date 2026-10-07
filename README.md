@@ -1,101 +1,195 @@
-# ScoringDiscrepNBA
+# NBA Scoring Discrepancies — Verified Research & Live Monitor
 
-An evidence-first, source-traceable research database and monitor for NBA scoring discrepancies and official score corrections.
+> **Session-start rule: read this README first, every time we work on the project.**
+> It holds the founding brief, the operating values, and the no-hallucination policy.
+> Build, research, suggest, and implement against it. Own the outcome end to end.
 
-> **Maximize P(Win). Own the Outcome.** The point is better information and accountable follow-through—not a flashy count. Preserve what each source said, show what changed, and never turn an unverified mismatch into an accusation.
+**GitHub Pages URL:** `https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`.
+The `pages-and-monitor.yml` deployment for merged commit `4e3360a` completed successfully (workflow run [37575179479](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37575179479); Pages API status: `built`). The sandbox did not fetch the external page itself. The earlier historical catalog remains available under `docs/` and is copied into the same Pages artifact.
 
-## Project prompt (preserved for future sessions)
+---
 
-The full project brief carried forward from the original request is:
+## 1. Founding brief (the mission — do not drift)
 
-> Build ScoringDiscrepNBA into a source-traceable research database and monitoring system for NBA score discrepancies/corrections, including historical and current games. Records must preserve original observations and later changes; capture the game, date, teams, period/clock, play and score context, reported/corrected/final official values, affected player/team, disagreeing sources and timestamps, what/when changed, and confirmed or suspected cause; distinguish an incorrect NBA record from secondary-source error/delay. Do not infer missing facts: label unverified/disputed items and flag anomalies. Provide a clear, accessible GitHub Pages site for browsing/searching/filtering/verifying records, meaningful historical statistics with transparent denominators and coverage, and continuous automated comparison/detection that tracks investigations through resolution. Put the full project prompt in README and reread it at the beginning of each project session. User also requests creating a PR and merging to main if feasible, suggestions/limitations, and three implementation/review passes.
->
-> Keep Arena values **“Maximize P(Win)”** and **“Own the Outcome”** central to implementation, research, upgrades, and recommendations. Work autonomously; do not make the user manually check routine scores. Verify factual claims against reliable sources, include direct links, preserve original and corrected observations, identify whether the NBA record or only a secondary source was wrong/delayed, and label unknowns. Reread this README at the start of each project session. Complete Pass 1 implementation/verification, Pass 2 defect and missing-requirement review/fixes, and Pass 3 full-request recheck/improvements. Create a PR and merge it to `main` if feasible.
+### NBA Scoring Discrepancy Research
 
-This charter is intentionally retained in the README so the next contributor can reread the scope before changing code or records.
+Build this project as a comprehensive, continuously updated database and monitoring system for
+**NBA scoring discrepancies, scoring corrections, and conflicting score data**. The original use
+case is an incident where one source showed a **213-point final total while another showed 214**,
+so the system must be capable of finding, documenting, and explaining events like this rather than
+simply displaying the current final score. Research both historical and current NBA games and
+identify every verifiable case possible where the official score, play-by-play, box score,
+scoreboard, official scorer record, or third-party data feed was incorrect, temporarily different,
+or later corrected.
 
-## What is here
+For every case, capture the **game, date, teams, period/game clock, relevant scoring play, score
+before and after the event, originally reported value, corrected value, final official value,
+affected player/team, sources that disagreed, timestamps when available, what changed, when it
+changed, and the confirmed or suspected cause**. Preserve the original observation and correction
+rather than overwriting historical data. Most importantly, determine whether the **NBA's official
+record itself was incorrect** or whether only a secondary source/data provider was incorrect or
+delayed. Every factual claim must be traceable to a reliable source with a direct link for
+independent review. Never infer missing information or present an assumption as fact; clearly label
+anything unverified, disputed, or requiring further investigation.
 
-- A static, keyboard-accessible GitHub Pages research interface with search, filters, evidence links, original-versus-corrected score views, a live-monitor panel, and explicit coverage caveats.
-- A small curated seed set of **two confirmed NBA score corrections**, each linked to primary league statements and corroborating reporting/provider pages. In this curated set, **2/2** involve a successful free throw first entered as missed; that sample proportion is not a league-wide rate.
-- Explicitly **unverified** research leads for the unidentified 213/214 report and Kevin Porter Jr.'s 2021 player-stat claim, excluded from every confirmed-case count.
-- A dependency-free Python monitor that compares the NBA live scoreboard with ESPN's publicly exposed scoreboard feed, records meaningful score/status transitions, and opens/updates unverified candidate investigations. Monitoring convergence is separate from human evidence-backed investigation status; see [`docs/INVESTIGATION_WORKFLOW.md`](docs/INVESTIGATION_WORKFLOW.md). An NBA play-by-play feed may be attached as nearby context; it is never treated as proof of cause by itself.
-- JSON data validation and unit tests using local fixtures; no scores are manually re-keyed by the monitor.
+The system must continuously monitor current NBA games and automatically detect potential
+discrepancies between authoritative and secondary sources, create an investigation record, and track
+it through detection, investigation, correction, and resolution. The website should make the entire
+research collection easy for someone unfamiliar with the project to understand, search, filter,
+compare, and independently verify. Include historical statistics showing **how often scoring
+discrepancies/corrections occur, what types are most common, how long they typically last, how
+often they affect the final score/total, and how rare incidents like the 213/214 discrepancy
+are**. The final product should allow a new person with no knowledge of this conversation to
+understand exactly what happened in each case, reproduce the research from the cited evidence, and
+see the difference between the original data, the correction, and the final official result.
 
-## Evidence rules
+It should solve the problem of having to manually check everything ourselves and having an up to
+date current feed.
 
-1. **Prefer the NBA's own correction/record.** An NBA correction is distinct from a score disagreement between third-party feeds. A provider's stale table or story text is recorded as a provider inconsistency, not counted as another NBA correction.
-2. **Keep observations immutable in meaning.** Historical records retain original and corrected values and the source/time basis for each. The automated monitor stores timestamped observations when a score/status signature changes; it does not overwrite an earlier observation with a later value.
-3. **Do not infer the missing pieces.** The displayed score after a play is labelled *derived* if it is only arithmetic; a suspected cause stays suspected; an inaccessible or undocumented endpoint is not described as a validated integration.
-4. **Source every material claim.** Case records link to a source register (`data/sources.json`) and expose claim-level citations. A source's limitations or internal contradictions are shown beside its claims.
-5. **No unsupported rate or duration claims.** Two curated examples are not a league-wide denominator. A 213/214 anecdote with no identified game/source remains an unverified lead.
+### Core values (kept as a focal point for every decision)
 
-## Seed evidence (scope: curated examples only)
+- **Maximize P(Win)** — “Maximize the Probability of Winning”: our decision-making framework. In
+  every decision, we weigh tradeoffs, assess risk, and choose the path that maximizes the
+  probability of success. We set aside emotion and make tough calls to maximize P(Win).
+- **Own the Outcome** — We own results end to end, not just our slice. When problems arise and we
+  have the means to act, we act without waiting for permission or assignment. We treat failure and
+  success as signals and use them to improve. We stay accountable to the final outcome.
 
-- **Warriors–Trail Blazers, 2024-10-23:** the NBA reported that De'Anthony Melton's made third-quarter free throw was entered as a miss and changed the final from **GSW 139–104 POR** to **GSW 140–104 POR**. NBC Sports Bay Area supplies the 91–67 pre-attempt score and the corrected 11-point player line. CBS and ESPN pages also expose stale embedded values alongside updated values; those are catalogued as provider-page inconsistencies, not extra league corrections. The score immediately after the free throw (92–67) is arithmetic derived from the cited pre-play score and one successful free throw, not a captured live-feed row.
-- **Cavaliers–Wizards, 2025-11-07:** the NBA announced that Tre Johnson's made second-quarter free throw at 8:15 was entered as missed, and the final changed from **CLE 148–114 WAS** to **CLE 148–115 WAS**. ESPN's recap has a corrected score table but stale Associated Press prose, so both observations are preserved. The 50–39 pre-play score is reported by The Athletic; the post-play 50–40 value is derived, not independently captured.
+### Operating rules (binding on every session)
 
-The record-level citations, time precision, and known source conflicts are in [`data/cases.json`](data/cases.json) and [`data/sources.json`](data/sources.json). NBA rules are included for scoring/scorer-duty context, not as proof of an individual incident.
+1. **Work line by line, verifying from official, verified, trusted sources. Provide links for
+   manual review.** No manual input is required from the user; work autonomously to completion.
+2. **Flag any irregularities for review. No hallucinations. Verify no hallucinations.**
+3. The goal is a **full list that follows the requirements above — verified line by line**.
+4. **Run every task through multiple passes:** Pass 1 implement + verify → Pass 2 hunt bugs, gaps,
+   wrong assumptions, edge cases, fix all → Pass 3 re-check against this brief, improve accuracy /
+   reliability / completeness / quality. Never stop after Pass 1.
 
-## Run locally
+---
 
-Requires Python 3.10+; there are no third-party Python packages.
+## 2. What exists today
+
+| Piece | Location | Status |
+|---|---|---|
+| Earlier historical collection (12 verified-partial records + 2 unverified stubs) | `data/cases/*.json` → `data/cases.json`; also `docs/` | Preserved with source/open-question caveats; collection stats are 12 of 14, not a league-wide rate |
+| Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; the exact corrected Melton player total remains disputed (11 vs 12) |
+| Current unresolved research leads (213/214 and 2021 Kevin Porter Jr.) | `data/leads.json` | Both explicitly unverified; excluded from confirmed-case counts and statistics |
+| Earlier case schema, validation, and collection statistics | `data/cases-schema.json`, `scripts/validate.py`, `data/stats.json` | Historical collection; 12 verified-partial records of 14 total, with explicit coverage caveats |
+| Earlier historical monitor (ESPN vs NBA liveData, PBP, quarter totals) | `scripts/monitor.py`, `monitor/STATE.md`, `data/monitor/current.json` | Manual/backfill only; checked-in snapshot is intentionally `not-run` |
+| Current live comparison monitor (NBA scoreboard vs ESPN + PBP context) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; snapshot remains `not_started`; no successful live poll observed yet |
+| Current root dashboard (search, filter, source comparison) | `index.html`, `assets/` | Pages workflow succeeded after PR #5; external page content was not fetched in this sandbox |
+| Historical catalog / previous dashboard | `docs/` | Preserved and linked from the root dashboard |
+| CI for current and retained historical monitors/dashboard | `.github/workflows/ci.yml`, `.github/workflows/validate.yml` | 47 offline unit tests plus repository-data, JS, Python, and generated-data checks at the latest local run |
+| Current Pages publishing and five-minute monitor workflow | `.github/workflows/pages-and-monitor.yml` | Configured; requires successful run and Pages permissions |
+| Earlier data validation and manual monitor workflows | `.github/workflows/validate.yml`, `.github/workflows/monitor.yml` | Retained; see runbook and limitations below |
+| Verification log + methods | `VERIFICATION.md` | Retained; includes the earlier line-by-line log |
+| Limitations + roadmap + three-pass review log | `ROADMAP.md`, `REVIEW_PASSES.md` | Retained; Pass 3 is recorded only after final integration and merge checks |
+| Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | Preserved, audit-flagged (see §7) |
+| Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | Archived, standalone |
+
+**Originating 213-vs-214 report:** tracked as `0000-00-00-originating-213-vs-214-report`
+with status `unverified`. The game is unidentified — it must not be cited as fact until the
+checklist in that record is satisfied. The Kevin Porter Jr. 2021 item is likewise a lead only;
+its game, stat change, and source history remain unknown.
+
+## 3. Quick start
 
 ```bash
-python -m unittest discover -s tests -v
-python tools/validate_data.py
-python tools/build_site.py --root . --output _site
-python -m http.server 4173 --bind 0.0.0.0
+# current monitor + dashboard checks (standard library only)
+python3 -m unittest discover -s tests -v
+python3 -m monitor --check-data
+node --check assets/app.js
+node tests/dashboard-smoke.js
+
+# preview the current root dashboard and its linked historical catalog
+python3 -m http.server 8000
+
+# one current live collection cycle (needs network access)
+python3 -m monitor --live
+
+# earlier historical-data validator and generated collection/site bundle
+python3 scripts/validate.py
+python3 scripts/compute_stats.py
+python3 scripts/build_site_data.py
+
+# earlier monitor offline self-test and manual historical backfill
+python3 scripts/monitor.py --self-test
+python3 scripts/monitor.py --date 20250115 --lookback 1
 ```
 
-Open `http://localhost:4173` in a local browser. The monitor can be run once with:
+## 4. Repository map
 
-```bash
-python tools/monitor_scores.py --root .
+```
+├── README.md                   ← persistent brief; read first every session
+├── VERIFICATION.md / ROADMAP.md / REVIEW_PASSES.md ← methods, gaps, and three-pass log
+├── index.html + assets/        ← current root dashboard
+├── docs/                       ← preserved earlier historical catalog, linked from the root site
+├── data/
+│   ├── reviewed-cases.json     ← current two-case evidence-reviewed dashboard sample
+│   ├── leads.json              ← unverified 213/214 + KPJ leads, excluded from case counts
+│   ├── cases/*.json            ← earlier per-case historical collection; preserve nulls/open questions
+│   ├── cases.json              ← generated aggregate for the earlier docs catalog (do not hand-edit)
+│   ├── cases-schema.json       ← earlier case contract; `scripts/validate.py` checks this collection
+│   ├── live-feed.json          ← current monitor snapshot (`not_started` until a live poll succeeds)
+│   ├── monitor-state.json      ← current monitor's append-only investigation ledger and baselines
+│   ├── statistics.json         ← superseded/audit-flagged manifest; use `stats.json` for the historical collection
+│   ├── investigations.json    ← earlier monitor's investigation log
+│   ├── stats.json / sources.json ← historical collection-only statistics and source tiers
+│   ├── monitor/current.json    ← earlier manual monitor snapshot; current state is intentionally `not-run`
+│   └── ...                     ← preserved legacy datasets, see §4 and §7
+├── monitor/                    ← current stdlib monitor package + earlier STATE.md runbook
+├── scripts/                    ← earlier validation, data generation, and historical monitor tools
+├── schemas/case.schema.json    ← schema for the current reviewed-case format
+├── tests/                      ← current unit, fixture, validation, and dashboard smoke tests
+├── archive/session-7b4d64dc-site/ ← PR #2 site + README, preserved byte-for-byte
+└── .github/workflows/          ← current CI/Pages monitor plus earlier validation/manual monitor
 ```
 
-That command contacts live public feeds. To test the monitor without network access, run the unit suite; tests use fixtures. A failed/unavailable source is recorded as unavailable, not silently treated as a zero score or a resolved discrepancy.
+## 5. How to add or change a canonical case (no-hallucination workflow)
 
-## Automated monitoring and GitHub Pages
+1. Create/edit `data/cases/<YYYY-MM-DD>-<slug>.json` following `data/cases-schema.json`.
+2. Every factual claim needs a `sources[]` entry with a direct `https://` link, publisher, tier,
+   and `confirms` text. Unknown fields stay `null` with an `open_questions[]` entry.
+3. Rule first on `classification.layer`: was the NBA's official record wrong, or only secondary?
+4. Run `python3 scripts/validate.py` — it fails on placeholder URLs, illegal enums, missing
+   questions, and status/source mismatches. For the current root dashboard, edit
+   `data/reviewed-cases.json` only after source review and run `python3 -m monitor --check-data`.
+5. Run `compute_stats.py` + `build_site_data.py` for the historical catalog, review the diff, open a PR.
+6. Never promote `unverified` → `verified-partial` without dated evidence attached; never use
+   `verified` unless ≥2 sources (incl. a strong tier) corroborate and zero questions remain.
+7. To adopt a PR #2 lead: re-verify every fact independently (the 2017 Robinson III case is the
+   template), then write a fresh `data/cases/` record. Never bulk-import `discrepancies.json`.
 
-`.github/workflows/monitor-and-pages.yml` runs on a 15-minute schedule (GitHub may delay scheduled runs), on `main` updates, and on manual dispatch. It checks out the fixed Arena session branch, syncs current `main` content into it, polls both providers, persists only meaningful observation/candidate changes on that same branch, builds a small Pages artifact, and deploys it with GitHub Actions. It never pushes monitoring commits to `main`. The session branch must remain available and writable by the workflow token for durable history; a branch-protection rule that blocks Actions pushes will stop persistence/deployment. The static page displays the snapshot from the latest successful deployment; it is not a streaming scoreboard.
+## 6. Verification & provenance
 
-Enable **Settings → Pages → Build and deployment → Source: GitHub Actions** once for the repository. The workflow needs the standard repository `GITHUB_TOKEN` permissions shown in its YAML; it uses no external secret. `.github/workflows/tests.yml` runs the deterministic test and data-validation suite on pushes and pull requests.
+- Methods, tier definitions, and the line-by-line review log: **`VERIFICATION.md`**.
+- Each canonical case embeds `reproduce_steps` so a stranger can re-derive it from the cited evidence.
+- Statistics carry a machine-readable scope caveat: **collection-only, never league-wide rates**.
+- See **`ROADMAP.md`** for limitations, known gaps, and the suggested next-session plan.
 
-## Monitoring limits and interpretation
+## 7. Prior-session implementation (PR #2) — preserved, not deleted
 
-- The monitor compares only team scores exposed by two current public feeds. A difference is an **unverified source divergence**, not proof the NBA is wrong. A feed may lag, fail, revise a value, or share the same underlying error as another source. Player-stat-only corrections that do not change the team score are outside this comparator; the Kevin Porter Jr. lead remains unverified.
-- Polling is every 15 minutes when GitHub Actions runs; events corrected entirely between polls, errors shared by both feeds, historical mismatches absent from current feeds, and games unavailable in either feed can be missed. The poll interval is not a measured error duration.
-- The NBA CDN endpoints are publicly accessible but not an NBA-published developer contract. The NBA play-by-play URL/shape is documented by the community-maintained `nba_api` project; that documentation is technical context, not primary incident evidence. ESPN's JSON endpoint is likewise an undocumented provider feed. Both may change or block automated access.
-- Play-by-play rows shown beside a flag are *nearby feed context only*. The monitor does not assert that a nearby event caused the score divergence.
-- An automated candidate moves to **feed-converged** if the two feeds later agree. That operational transition does **not** establish which feed was correct or resolve the root cause; human/source review remains required before promotion to a confirmed case.
-- Historical coverage is a small, hand-researched, non-exhaustive seed, not a census of NBA games or all corrections. The Kevin Porter Jr. player-stat lead and unidentified 213/214 report remain unverified and are excluded from counts. No league-wide incident rate, rarity, average time-to-correction, or completeness claim is justified by this dataset.
-- Historical NBA.com game pages could not be reliably retrieved during this research pass (they rendered unrelated current schedule content); do not treat those fetches as verification of an old box score.
+An earlier session merged a parallel implementation (PR #2). The merge kept it intact:
 
-## Repository map
+- **Valuable and credited:** its leads surfaced the verifiable 2017 Robinson III correction
+  (now a canonical case) and the league-official “only six upheld protests” record, which
+  corrected this project's own USA Today-based “3 since 1952” note. Its per-case verification
+  steps are preserved verbatim in `VERIFICATION.md` Appendix A.
+- **Audit-flagged (do not cite as fact):** `DISC-20241107-CLE-WAS-001` carries a wrong year
+  (2024 vs demonstrated 2025); `research/` lists 12 files but ships 1; legacy stats predate
+  the audit. Full findings: `VERIFICATION.md` §6.
+- **Tooling:** `src/` needs API keys for live use (per its own README). The current scheduled
+  keyless monitor is `monitor/`; `scripts/monitor.py` is retained for deliberate historical/backfill
+  checks only. Harmonization notes: `ROADMAP.md` §5.
 
-```text
-index.html, styles.css, app.js     Accessible GitHub Pages interface
- data/cases.json                   Curated, evidence-cited confirmed cases + scope note
- data/leads.json                   Unverified leads (excluded from confirmed statistics)
- data/sources.json                 Direct source register and limitations
- data/monitor/current.json         Last published poll snapshot (workflow artifact updates it)
- data/monitor/candidates.json      Durable automatic divergence investigations
- data/monitor/state.json           Last meaningful source signatures for change detection
- data/monitor/observations.jsonl   Append-only meaningful monitor observations
- tools/monitor_scores.py           Feed parsing, comparison, candidate lifecycle
- tools/validate_data.py             Static dataset integrity checks
- tools/build_site.py                Minimal Pages artifact builder
- tests/                            Offline unit tests and JSON fixtures
- .github/workflows/                CI and scheduled monitoring/Pages deployment
- docs/INVESTIGATION_WORKFLOW.md      Evidence-backed candidate review and resolution states
- REVIEW_PASSES.md                   Pass 1, Pass 2, Pass 3 verification log
-```
+## 8. Current root dashboard and monitor integration
 
-## Next research / improvement opportunities
+This Arena review adds the current root dashboard (`index.html` + `assets/`), a separate evidence-reviewed seed file at `data/reviewed-cases.json`, and a tested monitor package in `monitor/`. The root dashboard deliberately uses that two-case seed rather than silently importing or reclassifying the 12-record historical collection in `data/cases.json` and `docs/`. The older collection and its published interface are preserved and linked as the **Historical catalog**. This integration updated the 2024 and 2025 source trails and the two unverified stubs, but did not re-audit every historical case; their partial status and open questions must remain visible. The 2017 Robinson III correction remains a strong source-backed record in that preserved catalog.
 
-- Independently retrieve preserved NBA box-score/play-by-play snapshots for both confirmed incidents, especially the original pre-correction player/stat lines.
-- Add a third genuinely independent, documented source or a revision-history-capable archive before making stronger claims about provider reliability or detection coverage.
-- Expand historical research with a defined search protocol and denominator, preserving capture timestamps and source versions.
-- Add manual source-review fields (reviewer, disposition, evidence citations, correction/resolution time) before promoting any automated candidate into the confirmed-case table.
-- Consider an alert destination (e.g. an issue per candidate) only after the lifecycle, duplicate prevention, rate limits, and permissions are tested. The current monitor writes its durable state on the session branch and does not ask the user to check every routine score.
+The current seed includes the 2024 Warriors–Trail Blazers and 2025 Cavaliers–Wizards postgame free-throw corrections. The 2024 team-score change is confirmed, but Melton’s exact corrected player total remains unresolved: NBC Sports Bay Area and ESPN report/show 11, while FanSided reports 12; no corrected official NBA player-line snapshot was recovered. The 2025 NBA Official X post and NBA Gamebook are linked; The Athletic’s separate “human error” explanation remains attributed to that secondary report. For Tre Johnson, no contemporaneous pre-correction player total was verified; a later CBS component showing 18 is not presented as the game-night value. Both the unidentified 213/214 report and the 2021 Kevin Porter Jr. item remain explicitly unverified leads, with unknown facts left null and both excluded from all confirmed-case counts/statistics. See direct citations in `data/reviewed-cases.json`, `data/leads.json`, and the historical case files.
+
+The current monitor polls the NBA scoreboard and ESPN scoreboard, records source health and score comparisons, retrieves NBA play-by-play for mismatches, and stores mismatch/final-feed-revision investigation records without deciding which feed is correct. UTC observation time is the monitor poll time; it is not a provider publication time. HTTP `ETag`, `Last-Modified`, and SHA-256 response metadata are retained with discrepancy observations when available. ESPN documents that its own feed corrections can be delayed and are distinct from official NBA post-game changes ([ESPN stat-corrections guidance](https://support.espn.com/hc/en-us/articles/360056679592-Stat-corrections)), so a mismatch remains a candidate rather than proof of an NBA record error.
+
+`.github/workflows/pages-and-monitor.yml` is configured to check current feeds every five minutes and publish the root dashboard plus the preserved `docs/` catalog to GitHub Pages. The earlier `scripts/monitor.py` stays available for manual historical/backfill checks; its automated schedule is disabled to avoid two overlapping scheduled monitors. The old `pages.yml` deployment was replaced by the current combined workflow. A successful CI test run does **not** establish that a live source poll has succeeded. The post-merge Pages deployment did complete successfully, but check the Actions run, Pages environment/permissions, live-feed timestamp, and source health before describing automated monitoring as active.
+
+The latest local offline review passed 47 unit tests, current and historical data validators, the monitor self-test, Python compilation, JavaScript syntax checks, the Node dashboard smoke test, and generated-data drift checks. No live NBA/ESPN poll has been verified; `data/live-feed.json` remains `not_started` and `data/monitor/current.json` remains the earlier monitor’s intentional `not-run` baseline. The Pages workflow previously completed successfully for commit `4e3360a`, but this repository state still requires PR CI, merge confirmation, and a post-merge deployment/live-monitor check. Next: identify the 213/214 source pair, continue primary-source review, and verify the first scheduled live run end to end.

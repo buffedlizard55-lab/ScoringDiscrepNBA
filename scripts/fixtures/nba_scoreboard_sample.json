@@ -1,0 +1,4 @@
+{
+  "_note": "SYNTHETIC fixture, already in parsed form {gameId: meta}.",
+  "0123456789": { "away": "FAK", "home": "SYN", "status": "Final", "is_final": true }
+}

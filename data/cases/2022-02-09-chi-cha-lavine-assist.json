@@ -1,0 +1,78 @@
+{
+  "id": "2022-02-09-chi-cha-lavine-assist",
+  "title": "Bulls vs Hornets — Zach LaVine assist request reviewed and NOT granted; league states postgame assist policy (Feb 9, 2022)",
+  "status": "verified-partial",
+  "verification_level": "single-secondary",
+  "game_date": "2022-02-09",
+  "season": "2021-22",
+  "away_team": null,
+  "home_team": null,
+  "venue": null,
+  "incident_summary": "In the Feb 9, 2022 Bulls-Hornets game, Zach LaVine made what appeared to be a routine assist (a chest pass to DeMar DeRozan) but was not credited with the assist. Bettors holding over-5.5-assists LaVine wagers hoped for a stat correction that never came. In response to a fan inquiry, an NBA representative wrote that assists are credited at the discretion of the arena's in-game statisticians and that NBA Operations does not credit or remove assists postgame — only assists credited to the wrong player are updated. This negative case is kept to document the boundary of the correction pipeline: judgment-call assists are final as scored in-arena.",
+  "classification": {
+    "type": "stat-correction-denied",
+    "layer": "official-record-correct-secondary-wrong",
+    "outcome": "stands-ruled-correct"
+  },
+  "period_clock": null,
+  "scoring_play": "LaVine chest pass to DeRozan — assist was not credited (judgment call by in-arena statisticians).",
+  "score_before": null,
+  "affected_player": "Zach LaVine (CHI)",
+  "affected_team": "Chicago Bulls",
+  "originally_reported": {
+    "value": "No assist credited to LaVine on the play",
+    "total": null,
+    "basis": "Game-night official box score (ESPN)."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction issued — the league declined to add the assist."
+  },
+  "final_official": {
+    "value": "No assist (stands as scored in-arena)",
+    "total": null,
+    "basis": "League policy response; no postgame change (ESPN)."
+  },
+  "sources_disagreed": [
+    "Bettors/fans (assist should have been credited) vs. in-arena statisticians + NBA Operations (judgment stands; policy bars postgame assist creation)"
+  ],
+  "cause": {
+    "determination": "unknown",
+    "detail": "No error was found or acknowledged. The non-credit reflects the in-arena statisticians' real-time judgment, which the league treats as final for assists except wrong-player attribution."
+  },
+  "official_record_was_wrong": "no",
+  "timeline": [
+    {
+      "date": "2022-02-09",
+      "event": "Bulls-Hornets; LaVine not credited with an assist on the DeRozan pass. LaVine assists over/under was 5.5 at sportsbooks.",
+      "source_index": 0
+    },
+    {
+      "date": "2022-02",
+      "event": "NBA representative emails the assist-credit policy in reply to a fan: in-arena discretion; no postgame crediting/removal; only wrong-player assists updated.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.espn.com/espn/print?id=33355887",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "LaVine chest pass to DeRozan not credited; 5.5 assists line; correction hoped-for but never came; full NBA email policy quote; Elias 'far fewer corrections' rarity context.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Home/away designation and venue for this game — intentionally left null (immaterial to the policy point; add from box score if needed).",
+    "Whether the specific play was a pass leading directly to a basket (ESPN calls it 'routine' assist-appearing) — footage review could confirm but would not change the outcome."
+  ],
+  "betting_notes": "Per ESPN: sportsbooks offered LaVine assists over/under 5.5; the un-credited assist left over-ticket holders hoping for a correction that never came.",
+  "reproduce_steps": [
+    "Read the ESPN Feb 24, 2022 article for the LaVine play, the 5.5 line, and the NBA email quote.",
+    "Confirm the box score shows no added LaVine assist for this game.",
+    "Contrast with the Paul/Bridges case (wrong-player assist: corrected) to show the policy boundary."
+  ],
+  "last_reviewed": "2026-10-07"
+}

@@ -1,0 +1,87 @@
+{
+  "id": "2022-01-27-min-gsw-edwards-steal",
+  "title": "Timberwolves @ Warriors — Steal wrongly credited to Towns, re-assigned to Anthony Edwards next day (Jan 27-28, 2022)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2022-01-27",
+  "season": "2021-22",
+  "away_team": "Minnesota Timberwolves",
+  "home_team": "Golden State Warriors",
+  "venue": null,
+  "incident_summary": "Early in the first quarter of the Timberwolves-Warriors game of Jan 27, 2022, Anthony Edwards intercepted a Stephen Curry pass (Curry was being pressured by Karl-Anthony Towns near the sideline). The steal was initially credited to Towns. After bettors posted over-0.5-steals Edwards wagers and questioned the play on social media, the NBA corrected the box score the next day (Jan 28): the steal was taken from Towns and credited to Edwards. The game score/total was never in dispute — a non-scoring stat correction documenting the league's post-game pipeline.",
+  "classification": {
+    "type": "stat-correction-non-scoring",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-next-day"
+  },
+  "period_clock": "Q1, early (exact clock undocumented)",
+  "scoring_play": "Edwards interception of a Curry pass near the sideline with Towns pressuring — steal attribution, not a scoring play.",
+  "score_before": null,
+  "affected_player": "Karl-Anthony Towns (MIN) — steal removed; Anthony Edwards (MIN) — steal added",
+  "affected_team": "Minnesota Timberwolves",
+  "originally_reported": {
+    "value": "Steal credited to Karl-Anthony Towns; Edwards 0 steals",
+    "total": null,
+    "basis": "Game-night official box score, Jan 27, 2022 (ESPN)."
+  },
+  "corrected_value": {
+    "value": "Steal taken from Towns, credited to Anthony Edwards (over 0.5 steals cashes on corrected books)",
+    "total": null,
+    "basis": "NBA post-game correction, Jan 28, 2022 (ESPN)."
+  },
+  "final_official": {
+    "value": "Steal: Anthony Edwards (corrected box score)",
+    "total": null,
+    "basis": "Corrected official box score (ESPN). Game final score was never disputed and is out of scope — not asserted here."
+  },
+  "sources_disagreed": [
+    "Game-night box score (Towns steal) vs. corrected box score (Edwards steal)",
+    "Sportsbook grading split: FanDuel honored the correction (paid overs; left unders as winners) while BetMGM/DraftKings-style day-of-box settlement would not move"
+  ],
+  "cause": {
+    "determination": "suspected",
+    "detail": "Suspected real-time attribution error by the in-game stat crew on a shared defensive play (two defenders involved). Exact crew-level cause undocumented."
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "2022-01-27",
+      "event": "Timberwolves @ Warriors; Edwards' early-Q1 interception is credited to Towns in the game-night box score.",
+      "source_index": 0
+    },
+    {
+      "date": "2022-01-28",
+      "event": "NBA issues the week's second correction: steal moved from Towns to Edwards. FanDuel honors the change for over-0.5-steals wagers.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.espn.com/sports-betting/story/_/id/33169135/nba-issues-second-stat-correction-week",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Full play description (Edwards intercepted Curry pressured by Towns near sideline, early Q1); Towns-to-Edwards correction Friday; bettor screenshots of over-0.5 wagers; sportsbook settlement split.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/espn/print?id=33355887",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Recap of the Edwards steal correction three days after the Paul correction; Elias/NBA rarity context.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Exact clock time of the steal (only 'early in the first quarter' documented).",
+    "Game final score — intentionally not asserted (never disputed).",
+    "Primary NBA correction notice URL, if published."
+  ],
+  "betting_notes": "Per ESPN: FanDuel honored the correction and paid out over-0.5-steals Edwards wagers on the change, while under-0.5 wagers already graded as winners were left alone. BetMGM/DraftKings typically settle on the day-of box score.",
+  "reproduce_steps": [
+    "Read the ESPN Jan 28 article for the play description and the Towns-to-Edwards correction.",
+    "Compare an archived Jan 27 box score against the current corrected box score.",
+    "Watch first-quarter footage to locate the Curry/Edwards/Towns sideline interception."
+  ],
+  "last_reviewed": "2026-10-07"
+}

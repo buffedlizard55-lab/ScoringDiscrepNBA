@@ -1,15 +1,29 @@
 {
   "game": {
     "actions": [
-      { "period": 2, "clock": "8:21", "description": "Jump ball", "scoreHome": "39", "scoreAway": "50" },
-      { "period": 2, "clock": "8:15", "description": "Tre Johnson Free Throw 1 of 2", "playerName": "Tre Johnson", "scoreHome": "39", "scoreAway": "50" },
-      { "period": 2, "clock": "8:15", "description": "Timeout Washington", "scoreHome": "39", "scoreAway": "50" },
-      { "period": 2, "clock": "8:05", "description": "Field Goal made", "scoreHome": "41", "scoreAway": "50" },
-      { "period": 2, "clock": "7:58", "description": "Rebound", "scoreHome": "41", "scoreAway": "50" },
-      { "period": 2, "clock": "7:41", "description": "Turnover", "scoreHome": "41", "scoreAway": "50" },
-      { "period": 2, "clock": "7:20", "description": "Field Goal made", "scoreHome": "43", "scoreAway": "50" },
-      { "period": 2, "clock": "7:09", "description": "Foul", "scoreHome": "43", "scoreAway": "50" },
-      { "period": 2, "clock": "6:58", "description": "Free throw made", "scoreHome": "44", "scoreAway": "50" }
+      {
+        "actionId": 1,
+        "period": 2,
+        "clock": "PT08M15.00S",
+        "teamTricode": "WAS",
+        "playerName": "Tre Johnson",
+        "description": "Tre Johnson makes free throw 1 of 2",
+        "isScoringPlay": true,
+        "scoreHome": "40",
+        "scoreAway": "50"
+      },
+      {
+        "actionId": 2,
+        "period": 2,
+        "clock": "PT08M12.00S",
+        "teamTricode": "CLE",
+        "playerName": "Player Example",
+        "description": "Defensive rebound",
+        "isScoringPlay": false,
+        "pointsTotal": 12,
+        "scoreHome": "40",
+        "scoreAway": "50"
+      }
     ]
   }
 }

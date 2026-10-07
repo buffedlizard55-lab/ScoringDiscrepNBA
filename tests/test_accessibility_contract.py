@@ -17,11 +17,13 @@ class MarkupContract(HTMLParser):
         self.labelled_by: list[str] = []
         self.controls: list[tuple[str, str | None, bool, bool]] = []
         self.label_depth = 0
-        self.summary_count = 0
         self.skip_link_found = False
+        self.document_language: str | None = None
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
+        if tag == "html":
+            self.document_language = attributes.get("lang")
         if tag == "label":
             self.label_depth += 1
         element_id = attributes.get("id")
@@ -31,15 +33,17 @@ class MarkupContract(HTMLParser):
             self.ids.add(element_id)
         if tag == "a" and (attributes.get("href") or "").startswith("#"):
             self.local_links.append(attributes["href"][1:])
-            if attributes.get("class") == "skip-link":
+            if "skip-link" in (attributes.get("class") or "").split():
                 self.skip_link_found = True
         if attributes.get("aria-labelledby"):
             self.labelled_by.extend(attributes["aria-labelledby"].split())
         if tag in {"input", "select", "textarea", "button"}:
-            has_native_label = self.label_depth > 0 or bool(attributes.get("aria-label")) or bool(attributes.get("aria-labelledby"))
-            self.controls.append((tag, attributes.get("id"), has_native_label, bool(attributes.get("type") == "hidden")))
-        if tag == "summary":
-            self.summary_count += 1
+            has_native_label = (
+                self.label_depth > 0
+                or bool(attributes.get("aria-label"))
+                or bool(attributes.get("aria-labelledby"))
+            )
+            self.controls.append((tag, attributes.get("id"), has_native_label, attributes.get("type") == "hidden"))
 
     def handle_endtag(self, tag):
         if tag == "label" and self.label_depth:
@@ -49,29 +53,73 @@ class MarkupContract(HTMLParser):
 class AccessibilityContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.html = (ROOT / "index.html").read_text(encoding="utf-8")
+        cls.html = (ROOT / "docs/index.html").read_text(encoding="utf-8")
+        cls.javascript = (ROOT / "docs/app.js").read_text(encoding="utf-8")
         cls.parser = MarkupContract()
         cls.parser.feed(cls.html)
 
-    def test_ids_and_internal_anchors_resolve(self):
+    def test_document_language_skip_link_and_internal_references(self):
+        self.assertEqual(self.parser.document_language, "en")
+        self.assertTrue(self.parser.skip_link_found, "keyboard users need a skip-to-main-content link")
         self.assertFalse(self.parser.duplicates, f"duplicate IDs: {self.parser.duplicates}")
         missing_links = set(self.parser.local_links) - self.parser.ids
         self.assertFalse(missing_links, f"unresolved local links: {missing_links}")
         missing_labels = set(self.parser.labelled_by) - self.parser.ids
         self.assertFalse(missing_labels, f"unresolved aria-labelledby references: {missing_labels}")
+        self.assertIn('id="main-content"', self.html)
 
-    def test_interactive_controls_have_accessible_labels_and_details(self):
-        unlabeled = [tag for tag, element_id, labelled, hidden in self.parser.controls if not labelled and not hidden]
+    def test_search_and_filter_controls_have_accessible_names(self):
+        unlabeled = [tag for tag, _element_id, labelled, hidden in self.parser.controls if not labelled and not hidden]
         self.assertEqual(unlabeled, [])
-        self.assertTrue(self.parser.skip_link_found, "a keyboard skip link should be present")
-        javascript = (ROOT / "app.js").read_text(encoding="utf-8")
-        self.assertIn('node("summary"', javascript, "case evidence uses native disclosure widgets")
+        self.assertIn('aria-live="polite"', self.html)
+        self.assertIn('aria-label="Case evidence details"', self.html)
 
-    def test_javascript_selectors_have_static_targets(self):
-        javascript = (ROOT / "app.js").read_text(encoding="utf-8")
-        selectors = set(re.findall(r'el\("#([A-Za-z0-9_-]+)"\)', javascript))
-        missing = selectors - self.parser.ids
+    def test_dynamic_case_cards_support_keyboard_and_dialog_focus(self):
+        self.assertIn('e.key === "Enter" || e.key === " "', self.javascript)
+        self.assertIn('closeButton.focus()', self.javascript)
+        self.assertIn('LAST_FOCUSED_CARD.focus()', self.javascript)
+        self.assertIn('e.key !== "Tab"', self.javascript)
+        selectors = set(re.findall(r'el\("([A-Za-z0-9_-]+)"\)', self.javascript))
+        dynamic_targets = {"detail-close", "clear-filters"}
+        missing = selectors - self.parser.ids - dynamic_targets
         self.assertFalse(missing, f"JavaScript targets without HTML IDs: {missing}")
+
+    def test_site_links_to_review_workflow_and_source_data(self):
+        self.assertIn('href="INVESTIGATION_WORKFLOW.md"', self.html)
+        for payload in ("data/cases.json", "data/stats.json", "data/investigations.json"):
+            self.assertIn(payload, self.html)
+        self.assertIn('rel="noopener"', self.javascript)
+
+
+class RootDashboardAccessibilityContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.html = (ROOT / "index.html").read_text(encoding="utf-8")
+        cls.javascript = (ROOT / "assets/app.js").read_text(encoding="utf-8")
+        cls.parser = MarkupContract()
+        cls.parser.feed(cls.html)
+
+    def test_root_dashboard_has_language_skip_link_and_valid_references(self):
+        self.assertEqual(self.parser.document_language, "en")
+        self.assertTrue(self.parser.skip_link_found)
+        self.assertFalse(self.parser.duplicates, f"duplicate root IDs: {self.parser.duplicates}")
+        self.assertIn("main", self.parser.ids)
+        self.assertEqual(set(self.parser.local_links) - self.parser.ids, set())
+        self.assertEqual(set(self.parser.labelled_by) - self.parser.ids, set())
+
+    def test_root_filter_controls_have_names_and_live_regions(self):
+        unlabeled = [tag for tag, _element_id, labelled, hidden in self.parser.controls if not labelled and not hidden]
+        self.assertEqual(unlabeled, [])
+        self.assertIn('aria-live="polite"', self.html)
+        self.assertIn('id="leadList"', self.html)
+        self.assertIn("Excluded from confirmed-case metrics", self.html)
+
+    def test_dynamic_root_rendering_escapes_text_and_limits_external_links(self):
+        self.assertIn('const escapeHtml', self.javascript)
+        self.assertIn('const safeExternalUrl', self.javascript)
+        self.assertIn('rel="noopener noreferrer"', self.javascript)
+        self.assertIn('data/leads.json', self.javascript)
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,102 @@
+{
+  "id": "1982-11-30-lal-san-nixon-ft",
+  "title": "Lakers @ Spurs — Norm Nixon free-throw fake mishandled; protest upheld, last 3 seconds replayed, Spurs win 117-114 (Nov 30, 1982 - Apr 1983)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "1982-11-30",
+  "season": "1982-83",
+  "away_team": "Los Angeles Lakers",
+  "home_team": "San Antonio Spurs",
+  "venue": "San Antonio (Spurs home arena)",
+  "incident_summary": "With San Antonio leading 116-114 and seconds left in regulation, Lakers guard Norm Nixon faked his second free-throw attempt, drawing players from both teams into the lane. The officials called a double lane violation and ordered a jump ball (at halfcourt/center court) instead of requiring Nixon to re-shoot the free throw. The Lakers won the tap and Nixon scored the tying basket at the buzzer to force overtime; Los Angeles eventually won 137-132 in double overtime. San Antonio protested that the officials misapplied the rules; in December 1982 Commissioner Larry O'Brien upheld the protest. The final three seconds of regulation were replayed before the teams' next scheduled meeting in April 1983, and the Spurs won the replayed finish 117-114.",
+  "classification": {
+    "type": "official-scorer-book-error",
+    "layer": "official-record-wrong-then-corrected",
+    "outcome": "corrected-via-replay"
+  },
+  "period_clock": "Q4, ~0:03 remaining in regulation",
+  "scoring_play": "Nixon second free-throw attempt (faked; never properly re-shot) followed by a jump ball and Nixon's tying field goal at the buzzer — the tying basket was later voided by the upheld protest and replay.",
+  "score_before": "Spurs 116, Lakers 114, seconds left in regulation (USA Today).",
+  "affected_player": "Norm Nixon (LAL)",
+  "affected_team": "San Antonio Spurs (protesting team); Los Angeles Lakers (original winners)",
+  "originally_reported": {
+    "value": "Lakers 137, Spurs 132 (2OT)",
+    "total": 269,
+    "basis": "Announced final Nov 30, 1982, later overturned (LA Times, USA Today, China Daily/AP)."
+  },
+  "corrected_value": {
+    "value": "Final 3 seconds of regulation replayed in April 1983; Spurs won the replayed finish",
+    "total": null,
+    "basis": "NBA-ordered replay after upheld protest (LA Times, China Daily)."
+  },
+  "final_official": {
+    "value": "Spurs 117, Lakers 114",
+    "total": 231,
+    "basis": "Post-replay official final per LA Times and USA Today. FLAG: replay date (April 1983; day unverified) and final via retrospective reporting — corroborate against an archive."
+  },
+  "sources_disagreed": [
+    "On-floor ruling (double lane violation + jump ball) vs. correct rule application (Nixon re-shoots the second free throw) — the league agreed with San Antonio",
+    "Original 137-132 2OT result (overturned) vs. replay-decided 117-114 final"
+  ],
+  "cause": {
+    "determination": "confirmed",
+    "detail": "Confirmed misapplication of the playing rules by the officiating crew: faking a free throw should have resulted in Nixon re-shooting rather than a jump ball. (USA Today protest-history recap; LA Times.)"
+  },
+  "official_record_was_wrong": "yes-temporarily",
+  "timeline": [
+    {
+      "date": "1982-11-30",
+      "event": "Lakers @ Spurs; Nixon fake and jump-ball ruling; tying basket forces OT; Lakers win announced 137-132 in 2OT. Spurs protest.",
+      "source_index": 0
+    },
+    {
+      "date": "1982-12",
+      "event": "Commissioner Larry O'Brien upholds San Antonio's protest and orders the final three seconds of regulation replayed.",
+      "source_index": 1
+    },
+    {
+      "date": "1983-04",
+      "event": "Replay held before the teams' scheduled April meeting; Spurs win 117-114 (Rambis 90-foot heave at the horn misses). Exact day NOT verified in this pass.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.latimes.com/archives/la-xpm-2008-jan-12-sp-replay12-story.html",
+      "publisher": "Los Angeles Times (AP contributed)",
+      "tier": "major-sports-media",
+      "confirms": "Nixon fake; double lane violation + jump ball; Abdul-Jabbar tip to Magic to Nixon tying shot; 137-132 2OT overturned; replay of final 3 seconds in April 1983; 117-114 Spurs; Rambis heave.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://eu.usatoday.com/story/sports/nba/2014/11/24/sacramento-kings-vs-memphis-grizzlies-protest-game-history-76ers-nets/70046986/",
+      "publisher": "USA Today",
+      "tier": "major-sports-media",
+      "confirms": "116-114 Spurs with seconds left; correct ruling was Nixon re-shoot; replayed finish won 117-114 by Spurs. (Its '3 upheld since 1952' research note is CONTRADICTED by the league's own records of 6 upheld — see VERIFICATION.md §6; do not cite the '3'.)",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.chinadaily.com.cn/sports/2008-01/13/content_6390063.htm",
+      "publisher": "China Daily (Shanghai Daily/Agencies)",
+      "tier": "wire-ap",
+      "confirms": "First granted protest since Dec 1982; Spurs-Lakers finished in April 1983 with San Antonio winning 117-114.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [],
+  "open_questions": [
+    "Exact replay date in April 1983 (a Reddit post cites an NYT article for April 13, 1983 — NOT verified; do not cite until the NYT/archival source is confirmed).",
+    "Primary 1982-83 league ruling text — archival research required.",
+    "Jump-ball location wording differs slightly between outlets (halfcourt vs center) — immaterial; recorded as reported.",
+    "NOTE: classification.type uses official-scorer-book-error as the closest enum for a rules-misapplication replay; a dedicated 'rules-misapplication-replay' type is proposed for schema v2 (see ROADMAP)."
+  ],
+  "betting_notes": null,
+  "duration_note": "Approximate: protest upheld December 1982 and the finish was replayed in April 1983 — roughly 4-5 months from game to replayed finish (month granularity only; LA Times, China Daily).",
+  "reproduce_steps": [
+    "Confirm the 116-114 setup and correct-ruling analysis via USA Today.",
+    "Confirm the overturn, replay, and 117-114 final via the LA Times and China Daily.",
+    "Corroborate the 117-114 final and replay date via newspaper archives (NYT Dec 1982 / Apr 1983) and Basketball-Reference.",
+    "Record the archival URLs here when found."
+  ],
+  "last_reviewed": "2026-10-07"
+}

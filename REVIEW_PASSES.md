@@ -17,11 +17,15 @@ This log enforces the requested Pass 1 → Pass 2 → Pass 3 sequence. Evidence 
 - [x] Check accessible labels, focus visibility, small-screen layout, search/filter behavior, and safe text/link rendering; add automated HTML-ID/control-label/selector checks.
 - [x] Fix defects found and rerun the complete test suite.
 
-**Pass 2 findings/fixes:** kept the KPJ claim as a second explicitly unverified lead; added dates and precision notes to captured provider conflicts; surfaced partial ESPN date-query failures; validated arithmetic-derived scores and source references; prevented source outages from resolving candidates; separated feed convergence from human investigation status; preserved reviewed resolutions in history when a new divergence reopens; and linked PBP context to a game-specific URL only when available. Final Pass 2 suite: 17 tests passed, data validation passed, and the Pages artifact built.
+**Pass 2 findings/fixes:** kept the KPJ claim as a second explicitly unverified lead; added dates and precision notes to captured provider conflicts; surfaced partial ESPN date-query failures; validated arithmetic-derived scores and source references; prevented source outages from resolving candidates; separated feed convergence from human investigation status; preserved reviewed resolutions in history when a new divergence reopens; and linked PBP context to a game-specific URL only when available. Initial Pass 2 checkpoint: 17 tests passed, data validation passed, and the Pages artifact built. During integration with the newer `main` monitor package, adversarial tests exposed a Python import collision: the historical monitor test imported `monitor` by ambiguous module name after the current `monitor/` package had loaded. The test now loads `scripts/monitor.py` explicitly by path. The integrated suite currently passes 47 tests.
 
 ## Pass 3 — full-request recheck and further improvements
 
-- [ ] Crosswalk every retained user requirement, limitation, recommendation, and three-pass instruction against the implementation.
-- [ ] Verify all confirmed facts have direct links and source-specific qualifications; check leads are excluded from counts and no ungrounded rate/duration is presented.
-- [ ] Build and inspect the Pages artifact locally; inspect the final diff and repository status.
-- [ ] Run any final fixes, tests, and build again; record remaining deployment/API limitations.
+- [x] Crosswalk the founding brief, source-preservation rules, historical/current scope, statistics caveats, accessibility, monitoring, and operating values against the integrated repository.
+- [x] Keep both the 213/214 report and 2021 Kevin Porter Jr. item explicitly unverified and outside confirmed-case statistics; retain nulls and evidence needed.
+- [x] Recheck source roles and disagreements: NBA correction vs ESPN/CBS page inconsistency; preserve Melton's exact corrected player total as unresolved (11 vs 12); add the direct NBA Official post for the 2025 correction while attributing the separate human-error explanation.
+- [x] Run active + historical validators, both dashboard JavaScript syntax checks, monitor self-test, Python compilation, 47 offline tests, deterministic stats/site generation, and Pages artifact smoke checks.
+- [x] Confirm honest live-monitor baselines: current monitor `not_started`, historical monitor `not-run`; no unverified poll is described as successful.
+- [ ] Integrate latest `origin/main` ancestry, push the fixed Arena branch, recheck PR CI/mergeability, and verify the successful merge and post-merge Pages/monitor workflow.
+
+Pass 3 remains **pending only on GitHub integration and post-merge confirmation**; do not mark it complete until those outcomes are confirmed.

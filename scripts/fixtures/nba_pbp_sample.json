@@ -1,0 +1,10 @@
+{
+  "_note": "SYNTHETIC fixture. Final running score 110-103 (sides with ESPN 213 against the boxscore 214).",
+  "game": {
+    "actions": [
+      { "actionNumber": 1, "scoreAway": "2", "scoreHome": "0" },
+      { "actionNumber": 2, "scoreAway": "2", "scoreHome": "3" },
+      { "actionNumber": 99, "scoreAway": "110", "scoreHome": "103" }
+    ]
+  }
+}

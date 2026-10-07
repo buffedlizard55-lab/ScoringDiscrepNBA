@@ -2,14 +2,26 @@
   "events": [
     {
       "id": "401809511",
-      "date": "2025-11-08T00:00:00Z",
+      "date": "2025-11-08T00:00Z",
+      "status": {
+        "displayClock": "8:15",
+        "period": 2,
+        "type": { "state": "in", "shortDetail": "2nd Quarter" }
+      },
       "competitions": [
         {
           "competitors": [
-            { "homeAway": "home", "score": "114", "team": { "abbreviation": "WSH", "displayName": "Washington Wizards" } },
-            { "homeAway": "away", "score": "148", "team": { "abbreviation": "CLE", "displayName": "Cleveland Cavaliers" } }
-          ],
-          "status": { "period": 4, "displayClock": "0:00", "type": { "state": "post", "detail": "Final" } }
+            {
+              "homeAway": "away",
+              "team": { "abbreviation": "CLE", "displayName": "Cleveland Cavaliers" },
+              "score": "50"
+            },
+            {
+              "homeAway": "home",
+              "team": { "abbreviation": "WSH", "displayName": "Washington Wizards" },
+              "score": "38"
+            }
+          ]
         }
       ]
     }

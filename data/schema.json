@@ -1,0 +1,367 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NBA Scoring Discrepancy Record",
+  "type": "object",
+  "required": [
+    "id",
+    "game_id",
+    "date",
+    "teams",
+    "incident_type",
+    "description",
+    "original_value",
+    "corrected_value",
+    "final_official_value",
+    "sources",
+    "verification_status",
+    "nba_official_record_incorrect"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique case identifier, e.g. DISC-20241023-GSW-POR-001"
+    },
+    "game_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "NBA Game ID or date+teams"
+    },
+    "date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Game date YYYY-MM-DD, or null when the game is unidentified."
+    },
+    "teams": {
+      "type": "object",
+      "properties": {
+        "home": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "away": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "home_abbr": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "away_abbr": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "season": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "period_clock": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Period and game clock when incident occurred, e.g. Q3 2:00"
+    },
+    "relevant_scoring_play": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "score_before": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "score_after_original": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "score_after_corrected": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "original_value": {
+      "type": "object",
+      "properties": {
+        "final_score": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "total_points": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "player_stat": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "corrected_value": {
+      "type": "object",
+      "properties": {
+        "final_score": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "total_points": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "player_stat": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "final_official_value": {
+      "type": "object",
+      "properties": {
+        "final_score": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "total_points": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "affected_player": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "affected_team": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sources_that_disagreed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "game_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detection_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "correction_announced": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "correction_applied": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "what_changed": {
+      "type": "string"
+    },
+    "when_changed": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cause": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Confirmed or suspected cause"
+    },
+    "cause_confidence": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "suspected",
+        "under_investigation",
+        "disputed",
+        "unknown"
+      ]
+    },
+    "incident_type": {
+      "type": "string",
+      "enum": [
+        "free_throw_not_counted",
+        "three_pointer_misclassified",
+        "scorebook_foul_miscount",
+        "illegal_substitution",
+        "buzzer_beater_disputed",
+        "throw_in_location_error",
+        "technical_foul_miscount",
+        "lane_violation_misapplication",
+        "scoreboard_data_feed_error",
+        "scorebug_timeout_error",
+        "other"
+      ]
+    },
+    "nba_official_record_incorrect": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "True if NBA's official record itself was incorrect, false if only secondary source"
+    },
+    "secondary_source_error": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "impact_on_final_total": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "impact_points": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "protest_filed": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "protest_upheld": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "resolution": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string"
+          },
+          "publisher": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "official_nba",
+              "official_team",
+              "espn",
+              "ap",
+              "news",
+              "forum",
+              "video",
+              "other"
+            ]
+          },
+          "archived_url": {
+            "type": "string"
+          },
+          "access_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "partially_verified",
+        "unverified",
+        "disputed",
+        "requires_investigation"
+      ]
+    },
+    "investigation_status": {
+      "type": "string",
+      "enum": [
+        "detected",
+        "investigating",
+        "corrected",
+        "resolved",
+        "closed"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

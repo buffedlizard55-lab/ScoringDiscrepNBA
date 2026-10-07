@@ -1,0 +1,47 @@
+name: Monitor live scores
+
+on:
+  # The five-minute current-feed workflow is pages-and-monitor.yml. Keep this
+  # older lookback/quarter-total monitor available for deliberate manual backfills.
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Date to check (YYYYMMDD), leave empty for today'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Earlier historical monitor: stdlib-only, no API keys (ESPN vs NBA liveData).
+      # It is manual/backfill only; current automatic comparisons run in pages-and-monitor.yml.
+      - name: Run discrepancy monitor (target date + 7-day backfill)
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            python3 scripts/monitor.py --date "${{ inputs.date }}" --lookback 7 || echo "monitor exit=$? (feeds may be unavailable off-season)"
+          else
+            python3 scripts/monitor.py --lookback 7 || echo "monitor exit=$? (feeds may be unavailable off-season)"
+          fi
+      - name: Rebuild site data bundle
+        run: |
+          python3 scripts/compute_stats.py
+          python3 scripts/build_site_data.py
+      - name: Commit new detections (if any)
+        run: |
+          git config user.name "scoringdiscrep-monitor"
+          git config user.email "scoringdiscrep-monitor@users.noreply.github.com"
+          git add data/investigations.json data/stats.json data/cases.json docs/data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "monitor: scheduled score-check $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NBA Scoring Discrepancies — Verified Research &amp; Live Monitor</title>
+<meta name="description" content="A verifiable database of NBA scoring discrepancies, corrections, and conflicting score data — every claim traceable to a cited source.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="hero">
+  <div class="wrap">
+    <h1>NBA Scoring Discrepancies</h1>
+    <p class="sub">A continuously updated, fully sourced database of NBA scoring errors, corrections,
+      and conflicting score data — plus an automated monitor that compares live sources and flags
+      disagreements for human investigation. <strong>Every factual claim links to its source.</strong>
+      Anything unverified is labeled unverified.</p>
+    <div class="badge-row">
+      <span class="badge solid">No hallucinations policy</span>
+      <span class="badge">Line-by-line verification</span>
+      <span class="badge">Original vs corrected vs final, side by side</span>
+      <span class="badge">Live discrepancy monitor</span>
+    </div>
+  </div>
+</header>
+<nav class="topnav"><div class="wrap">
+  <a href="#start">Start here</a>
+  <a href="#stats">Statistics</a>
+  <a href="#cases">Cases</a>
+  <a href="#monitor">Live monitor</a>
+  <a href="#method">Methodology</a>
+  <a href="#limits">Limitations &amp; roadmap</a>
+</div></nav>
+<main id="main-content" tabindex="-1">
+<section id="start"><div class="wrap">
+  <h2>Start here: what is this?</h2>
+  <p class="lead">This project began with a single incident report: <strong>one source showed a 213-point
+    final total for an NBA game while another showed 214.</strong> That report is tracked below as
+    <strong>UNVERIFIED</strong> — its game has not been identified yet, so it is treated as an open
+    investigation, not a fact. Records below include researched cases and separately labeled unverified leads; each shows its evidence state.</p>
+  <div class="alert unverified">
+    <strong>⚠ The 213-vs-214 report is UNVERIFIED.</strong>
+    Game, date, teams, and competing sources are unknown. See the record
+    <em>“UNVERIFIED: Originating report”</em> in the case list for the investigation checklist.
+    One-point total corrections like this <em>have</em> verifiably happened twice in our collection
+    (Oct 2024: 243→244, Nov 2025: 262→263) — both were missed free-throw entries corrected the next day.
+  </div>
+  <div class="alert caveat">
+    <strong>How to read a case.</strong>
+    Each record answers one question first: <em>was the NBA's own official record wrong, or only a
+    secondary source?</em> Then it shows the <strong>original value → correction → final official
+    value</strong>, the timeline, the cause (confirmed / suspected / unknown), and the sources with
+    direct links so you can re-verify each claim yourself.
+  </div>
+</div></section>
+
+<section id="stats"><div class="wrap">
+  <h2>Collection statistics</h2>
+  <p class="lead" id="stats-generated"></p>
+  <div class="grid stats">
+    <div class="stat-card"><div class="num" id="stat-verified">–</div><div class="lbl">Verified cases (full + partial)</div></div>
+    <div class="stat-card"><div class="num" id="stat-total">–</div><div class="lbl">Total records (including unverified leads)</div></div>
+    <div class="stat-card"><div class="num" id="stat-score-changed">–</div><div class="lbl">Cases where the final score changed</div></div>
+    <div class="stat-card"><div class="num" id="stat-onepoint">–</div><div class="lbl">One-point final-total corrections</div></div>
+    <div class="stat-card"><div class="num" id="stat-official-wrong">–</div><div class="lbl">Official record was wrong (share of verified)</div></div>
+    <div class="stat-card"><div class="num" id="stat-secondary-only">–</div><div class="lbl">Only secondary/display wrong (share)</div></div>
+  </div>
+  <div class="alert caveat"><strong>Scope caveat.</strong><span id="scope-caveat"></span></div>
+  <div class="two-col">
+    <div><h3>By discrepancy type</h3><div id="dist-type"></div></div>
+    <div><h3>By official-record layer</h3><div id="dist-layer"></div></div>
+  </div>
+  <h3>By outcome</h3><div id="dist-outcome"></div>
+  <h3>How long do they last? (game date → correction/ruling)</h3>
+  <ul id="duration-list"></ul>
+  <h3>How rare are these?</h3>
+  <ul id="rarity-list"></ul>
+</div></section>
+
+<section id="cases"><div class="wrap">
+  <h2>Cases &amp; investigations</h2>
+  <p class="lead">Search and filter the full collection. Click any record for the complete evidence file:
+    timeline, disputed points, open questions, reproduce-the-research steps, and every source link.</p>
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Search teams, players, dates, keywords… (e.g. Melton, protest, scoreboard)" aria-label="Search cases">
+    <select id="filter-type" aria-label="Filter by type">
+      <option value="">All types</option>
+      <option value="free-throw-entry-error">Free-throw entry error</option>
+      <option value="missed-made-basket">Missed made basket</option>
+      <option value="two-vs-three-point-ruling">2-pt vs 3-pt ruling</option>
+      <option value="scoreboard-display-error">Scoreboard display error</option>
+      <option value="official-scorer-book-error">Official scorer book error</option>
+      <option value="stat-correction-non-scoring">Stat correction (non-scoring)</option>
+      <option value="stat-correction-denied">Correction requested, denied</option>
+      <option value="timing-buzzer-dispute">Timing / buzzer dispute</option>
+      <option value="data-feed-conflict">Data-feed conflict</option>
+      <option value="unknown">Unknown</option>
+    </select>
+    <select id="filter-layer" aria-label="Filter by official-record layer">
+      <option value="">Any official-record finding</option>
+      <option value="official-record-wrong-then-corrected">Official wrong → corrected</option>
+      <option value="official-record-wrong-stands">Official disputed, stands</option>
+      <option value="official-record-correct-secondary-wrong">Official correct; secondary wrong</option>
+      <option value="unresolved">Unresolved</option>
+    </select>
+    <select id="filter-outcome" aria-label="Filter by outcome">
+      <option value="">Any outcome</option>
+      <option value="corrected-next-day">Corrected next day</option>
+      <option value="corrected-in-game">Corrected in game</option>
+      <option value="corrected-via-replay">Corrected via replay</option>
+      <option value="stands-protest-denied">Stands (protest denied)</option>
+      <option value="stands-no-review">Stands (never reviewed)</option>
+      <option value="stands-ruled-correct">Stands (ruled correct)</option>
+      <option value="pending">Pending</option>
+    </select>
+    <select id="filter-status" aria-label="Filter by verification status">
+      <option value="">Any status</option>
+      <option value="verified">Verified</option>
+      <option value="verified-partial">Verified (partial)</option>
+      <option value="under-investigation">Under investigation</option>
+      <option value="unverified">UNVERIFIED</option>
+      <option value="disputed">Disputed</option>
+      <option value="not-a-discrepancy">Not a discrepancy</option>
+    </select>
+  </div>
+  <p class="lead" id="case-count"></p>
+  <div class="case-grid" id="case-grid"></div>
+</div></section>
+
+<section id="monitor"><div class="wrap">
+  <h2>Live monitor feed</h2>
+  <p class="lead">Every game window, an automated job compares the ESPN scoreboard feed against NBA
+    liveData box scores and play-by-play (cross-source totals, quarter sums, and PBP running-score
+    consistency). Disagreements open an investigation record here; nothing becomes a case without
+    human verification. The static site shows the latest committed poll, not a streaming feed. <span id="feed-count"></span></p>
+  <div id="monitor-current" class="feed-empty" aria-live="polite"><p>No scheduled monitor snapshot has been published yet.</p></div>
+  <div id="monitor-feed"></div>
+  <p class="lead">Monitor source code: <code class="inline">scripts/monitor.py</code> ·
+    Investigation log: <code class="inline">data/investigations.json</code> ·
+    Schedule: <code class="inline">.github/workflows/monitor.yml</code></p>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <h2>Methodology: no hallucinations</h2>
+  <div class="two-col">
+    <div>
+      <h3>Verification rules</h3>
+      <ol>
+        <li><strong>Every factual claim traces to a cited source</strong> with a direct link.</li>
+        <li><strong>Unknown means null.</strong> Missing dates, scores, clocks, and causes are left blank with an open question — never guessed.</li>
+        <li><strong>Official vs secondary first.</strong> Each record rules on whether the NBA's own record was wrong.</li>
+        <li><strong>Disagreements are preserved</strong>, not papered over (see “Disputed points” in each record).</li>
+        <li><strong>“Verified” is earned:</strong> ≥2 sources incl. a strong tier, zero open questions. Everything else stays partial, disputed, or unverified.</li>
+        <li><strong>Corrections are appended</strong>, never overwritten — original, correction, and final are all kept.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Source tiers</h3>
+      <div id="tier-table"></div>
+    </div>
+  </div>
+  <h3>Authoritative references</h3>
+  <ul id="ref-list"></ul>
+  <p class="lead">Full methodology, line-by-line verification log, and contribution rules live in the repo:
+    <code class="inline">VERIFICATION.md</code>, <code class="inline">README.md</code>.</p>
+</div></section>
+
+<section id="limits"><div class="wrap">
+  <h2>Limitations &amp; roadmap</h2>
+  <div class="two-col">
+    <div class="alert unverified"><strong>Known limitations.</strong>
+      <ul>
+        <li>The collection is a sample, not a census — shares are not league-wide rates.</li>
+        <li>Primary NBA statements are still missing for several cases (see each record's open questions).</li>
+        <li>Pre-2000s coverage is thin (1982 and 2017 cases only); 4 of the 6 league-record upheld protests (incl. a Nets–76ers game) are still research gaps.</li>
+        <li>The monitor cannot see arena scoreboards or TV bugs — display-only errors need human spotters.</li>
+        <li>Live feeds lag each other by seconds; transient mismatches are expected noise, not findings.</li>
+      </ul>
+    </div>
+    <div class="alert caveat"><strong>Next up.</strong>
+      <ul>
+        <li>Identify the originating 213-vs-214 game (or reclassify as unrecoverable with a decision log).</li>
+        <li>Locate primary NBA rulings for the 2019, 2014, 2008, 1982 protests.</li>
+        <li>Add the Nets–76ers upheld protest and expand pre-2000s research.</li>
+        <li>Add box-score archive snapshots (pre/post correction) as evidence attachments.</li>
+        <li>Backfill monitor: nightly re-check of the previous 7 days to catch next-day corrections.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-label="Case evidence details"><div class="detail-inner" id="detail-body"></div></div>
+
+<footer><div class="wrap">
+  <p><strong>NBA Scoring Discrepancies</strong> — open research. Verify everything:
+  <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA">repository</a> ·
+  data: <a href="data/cases.json">cases.json</a> · <a href="data/stats.json">stats.json</a> ·
+  <a href="data/investigations.json">investigations.json</a></p>
+  <p>Project workflow: <a href="INVESTIGATION_WORKFLOW.md">investigation review and resolution guide</a> ·
+  <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/blob/main/VERIFICATION.md">verification log</a> ·
+  <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/blob/main/README.md">full project brief</a>.</p>
+  <p>Not affiliated with the NBA. All game data © its respective owners; linked reporting © its publishers.
+  Corrections welcome via pull request — with sources.</p>
+</div></footer>
+<script src="app.js"></script>
+</body>
+</html>

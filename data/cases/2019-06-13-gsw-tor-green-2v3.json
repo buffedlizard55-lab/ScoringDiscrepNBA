@@ -1,0 +1,98 @@
+{
+  "id": "2019-06-13-gsw-tor-green-2v3",
+  "title": "NBA Finals Game 6, Warriors vs Raptors — Draymond Green corner make ruled a 2, not reviewed; stands (Jun 13, 2019)",
+  "status": "verified-partial",
+  "verification_level": "multi-secondary-confirmed",
+  "game_date": "2019-06-13",
+  "season": "2018-19",
+  "away_team": "Toronto Raptors",
+  "home_team": "Golden State Warriors",
+  "venue": null,
+  "incident_summary": "Late in the first quarter of Game 6 of the 2019 NBA Finals (approximately 2:15 remaining, per NBC Sports Bay Area), Draymond Green made a corner jump shot that was ruled a 2-pointer on the floor. Replays suggested he may have been behind the arc, but the play was not reviewed. The league's position, as reported by NBC Sports Bay Area, was that even if reviewed there would not have been clear and conclusive evidence to overturn the on-floor ruling of a 2-point field goal. Golden State trailed by 3 at halftime instead of a possible 2; with 9 seconds left in the game the Warriors had the ball down 1 — a span during which the un-awarded point loomed large. The ruling was never changed.",
+  "classification": {
+    "type": "two-vs-three-point-ruling",
+    "layer": "official-record-wrong-stands",
+    "outcome": "stands-no-review"
+  },
+  "period_clock": "Q1, ~2:15 remaining (per NBC Sports Bay Area)",
+  "scoring_play": "Draymond Green (GSW) corner jumper — counted 2; appeared possibly a 3 on replay; never reviewed.",
+  "score_before": null,
+  "affected_player": "Draymond Green (GSW)",
+  "affected_team": "Golden State Warriors",
+  "originally_reported": {
+    "value": "2-pointer (Green corner make counted as 2)",
+    "total": null,
+    "basis": "On-floor ruling, Game 6 Q1 (NBC Sports Bay Area, Action Network)."
+  },
+  "corrected_value": {
+    "value": null,
+    "total": null,
+    "basis": "No correction — play was not reviewed and the ruling stands."
+  },
+  "final_official": {
+    "value": null,
+    "total": null,
+    "basis": "The 2-point ruling stands. The game's final score is INTENTIONALLY NULL here: it was not stated in the reviewed sources for this pass. Do not fill from memory — verify against the official box score first (see open questions)."
+  },
+  "sources_disagreed": [
+    "On-floor ruling + league position (2, unreviewable after the fact / no conclusive evidence to overturn) vs. broadcast-replay appearance and bettor/fan position (foot behind the line; should be 3)",
+    "Note: this record takes no position on which is correct — only that the ruling stands unreviewed."
+  ],
+  "cause": {
+    "determination": "unknown",
+    "detail": "Why the play was not held for the standard 2-vs-3 review is undocumented in the reviewed sources. Under NBA replay rules, successful 2/3-point field goals are reviewable with strict timing windows (next stoppage rules); the trigger procedure is documented in the league's replay rules, but its application to this specific play was not explained on record here. Do not speculate."
+  },
+  "official_record_was_wrong": "undetermined",
+  "timeline": [
+    {
+      "date": "2019-06-13",
+      "event": "Finals Game 6 Q1 ~2:15: Green's corner make ruled a 2 and not reviewed. Halftime deficit 3 (possibly 2). Final minute: Warriors down 1 with the ball and 9 seconds left.",
+      "source_index": 0
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/draymond-greens-jumper-controversially-ruled-as-2-pointer-in-game-6/1349466/",
+      "publisher": "NBC Sports Bay Area",
+      "tier": "team-beat",
+      "confirms": "~2:15 Q1 timing; ruled a 2 on the court; not reviewed; halftime 3 vs possible 2; league 'no clear and conclusive evidence to overturn' position.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.actionnetwork.com/nba/draymond-green-betting-nba-finals-game-6-behind-the-line-betting-controversy-bad-beat",
+      "publisher": "Action Network",
+      "tier": "secondary-digital",
+      "confirms": "Betting ramifications (1Q ML, Green over 0.5 made threes); down-1-with-9-seconds-left endgame context; play not reviewed or assessed on the officials' account.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://official.nba.com/rule-no-13-instant-replay/",
+      "publisher": "NBA Official (Rulebook)",
+      "tier": "official-nba",
+      "confirms": "Successful 2-pt/3-pt field-goal rulings are reviewable subject to strict timing windows — cited for procedure context, NOT as evidence about this play.",
+      "accessed": "2026-10-07"
+    }
+  ],
+  "disputed_points": [
+    {
+      "claim": "Whether Green's foot was behind the three-point line",
+      "positions": [
+        "Broadcast-replay appearance (per NBC/Action Network descriptions): looked like a 3.",
+        "League position (per NBC): no clear and conclusive evidence to overturn the on-floor 2."
+      ]
+    }
+  ],
+  "open_questions": [
+    "Game final score and venue name — verify against the official box score before asserting.",
+    "Why no 2-vs-3 review was triggered — undocumented; seek pool report or league comment.",
+    "Whether the Replay Center assessed the play at the next stoppage — undocumented."
+  ],
+  "betting_notes": "Per Action Network: the ruling affected Warriors first-quarter moneyline bettors (-138: loss instead of push), Green over-0.5-made-threes tickets, and the full-game spread/total settlement in a game decided in the final seconds.",
+  "reproduce_steps": [
+    "Read the NBC Sports Bay Area report for timing, the ruling, and the league position.",
+    "Read the Action Network piece for the endgame context and betting impact.",
+    "Watch Game 6 Q1 footage (~2:15) and the league's 2-vs-3 review procedure page to understand the timing windows.",
+    "Verify the final score on the official box score before adding it to this record."
+  ],
+  "last_reviewed": "2026-10-07"
+}
