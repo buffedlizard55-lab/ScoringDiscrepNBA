@@ -1,0 +1,106 @@
+name: NBA Scoring Discrepancy Monitor
+
+on:
+  schedule:
+    # Run every 15 minutes during NBA season (Oct-June)
+    # UTC times: 23:00-06:00 UTC covers US evening games (6pm-1am ET)
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Date to check (YYYY-MM-DD), leave empty for today'
+        required: false
+        type: string
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run monitoring check
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            python src/monitor.py --date ${{ inputs.date }} --data-dir data
+          else
+            python src/monitor.py --data-dir data
+          fi
+
+      - name: Check for alerts
+        id: check_alerts
+        run: |
+          if [ -f data/live_alerts.json ]; then
+            ALERT_COUNT=$(jq length data/live_alerts.json 2>/dev/null || echo 0)
+            echo "alert_count=$ALERT_COUNT" >> $GITHUB_OUTPUT
+            echo "Found $ALERT_COUNT alerts"
+          else
+            echo "alert_count=0" >> $GITHUB_OUTPUT
+          fi
+
+          if [ -f data/latest_check.json ]; then
+            cat data/latest_check.json | jq .
+          fi
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add data/
+          git add docs/data.json docs/statistics.json 2>/dev/null || true
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "auto: monitoring update $(date -u +%Y-%m-%dT%H:%M:%SZ) - alerts: ${{ steps.check_alerts.outputs.alert_count }}"
+            git push
+          fi
+
+      - name: Create issue if alerts found
+        if: steps.check_alerts.outputs.alert_count != '0'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "🚨 Scoring Discrepancy Detected - ${{ steps.check_alerts.outputs.alert_count }} alerts"
+          content-filepath: data/latest_check.json
+          labels: "discrepancy, automated, requires-investigation"
+
+  deploy-pages:
+    needs: monitor
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
