@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from monitor.runner import run_with_payloads
+from monitor.runner import _feed_material_signature, run_with_payloads
 from monitor.validation import DataValidationError
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -151,6 +151,29 @@ class RunnerTests(unittest.TestCase):
                 )
             self.assertEqual(feed_path.read_text(encoding="utf-8"), "{broken")
             self.assertFalse((Path(directory) / "data/monitor-state.json").exists())
+
+    def test_note_wording_is_part_of_the_material_signature(self) -> None:
+        """A changed explanation must be published, not frozen behind a stable game list.
+
+        The note is where the snapshot says which sources answered and what was
+        left un-compared. If it were excluded from the material signature, a
+        reader could keep seeing an explanation that no longer matches the data
+        (for example the pre-union wording "the last saved snapshot" after the
+        monitor started publishing a reachable source again).
+        """
+        base = {
+            "status": "degraded",
+            "source_health": {"nba": {"status": "unavailable"}, "espn": {"status": "ok"}},
+            "games": [],
+            "last_state_change_at": "2026-10-07T04:00:00Z",
+            "source_diagnostics": {"nba": [{"profile": "monitor", "outcome": "failed"}]},
+            "detector_status": {"cross_source_comparison_available": False},
+            "note": "Older explanation.",
+        }
+        same = dict(base)
+        changed = dict(base, note="New explanation of the same data.")
+        self.assertEqual(_feed_material_signature(same), _feed_material_signature(base))
+        self.assertNotEqual(_feed_material_signature(changed), _feed_material_signature(base))
 
     def test_unchanged_healthy_poll_keeps_published_snapshot_timestamp(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

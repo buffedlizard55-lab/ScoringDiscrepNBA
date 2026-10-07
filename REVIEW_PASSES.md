@@ -56,7 +56,7 @@ clean dashboard; open a PR and merge it.
       failure so the site still deploys.
 - [x] Dashboard: `#alerts` section (summary pill, alert cards with evidence/arithmetic/review
       steps/delivery state, detector status, coverage gaps) plus the corrected feed status pill.
-- [x] Verify: 76 Python tests, `node --check assets/app.js`, `node tests/dashboard-smoke.js`,
+- [x] Verify: 77 Python tests, `node --check assets/app.js`, `node tests/dashboard-smoke.js`,
       `python3 -m monitor --check-data`, `python3 scripts/validate.py` — all green.
 
 ### Pass 2 — adversarial defect / assumption review
@@ -84,7 +84,12 @@ Found and fixed:
 5. **`duration_ms` and per-poll timestamps** would have rewritten committed files every five
    minutes; diagnostics are published without durations and the feed/ledger are only rewritten on
    a material signature or occurrence-milestone change.
-6. **Delivery honesty**: unconfigured webhook → logged `skipped` (not silence); missing `gh` →
+6. **The snapshot's explanation was frozen behind an unchanged game list**: the material
+   signature that decides whether `data/live-feed.json` is rewritten excluded the `note` text,
+   so after this fix a stale explanation ("the last saved snapshot") could have survived even
+   while a reachable source was being published. The note is now part of the signature, with a
+   focused test (`test_note_wording_is_part_of_the_material_signature`).
+7. **Delivery honesty**: unconfigured webhook → logged `skipped` (not silence); missing `gh` →
    `dispatch.status = "skipped"`; three failed attempts → `failed`; issues always carry the
    "does not establish that any NBA record was wrong" limitation.
 
