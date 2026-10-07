@@ -168,6 +168,11 @@ def _feed_material_signature(feed: dict[str, Any]) -> str:
             "last_state_change_at": feed.get("last_state_change_at"),
             "diagnostics": feed.get("source_diagnostics"),
             "detector_status": feed.get("detector_status"),
+            # The note is the reader's explanation of what this snapshot does and
+            # does not prove (which sources answered, what was not compared), so a
+            # wording change is a material change and must be published rather than
+            # frozen behind an unchanged game list.
+            "note": feed.get("note"),
             # Only refreshes while a mismatch window is open, at 15-minute
             # granularity, so the site can show freshness without a commit per poll.
             "mismatch_refresh_bucket": _refresh_bucket(feed.get("observed_at_for_refresh")) if has_open_mismatch else None,

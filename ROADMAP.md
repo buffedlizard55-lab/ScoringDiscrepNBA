@@ -29,7 +29,7 @@ Ordered by P(Win): highest-evidence-value first.
    identically into both views of one provider is still invisible, and there is still no second
    reachable comparator while the NBA CDN feed returns HTTP 500 to the runner.
 5b. **Alert delivery is not yet proven in production.** The ledger, lifecycle, dedupe, severity,
-   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (76 tests,
+   review steps, and GitHub-issue/webhook dispatch are implemented and offline-tested (77 tests,
    stubbed `gh`, local webhook receiver), but no scheduled run has produced an alert that was
    delivered: the only scheduled poll so far had the NBA feed down and no games. Until
    `data/alert-dispatch-log.json` contains a `sent` entry with an issue URL, describe the

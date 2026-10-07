@@ -76,7 +76,7 @@
 | Piece | Location | Status |
 |---|---|---|
 | Founding brief + operating rules | this README §0/§1 | Verbatim brief retained; read at the start of every session |
-| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (76 tests); **first live dispatch has not been observed yet** — see §8 |
+| Alert detection + notification system | `monitor/alerts.py`, `monitor/dispatch.py`, `monitor/consistency.py`, `data/alerts.json`, `.github/workflows/pages-and-monitor.yml` | Implemented and offline-verified (77 tests); **first live dispatch has not been observed yet** — see §8 |
 | Alerting feasibility, limitations, verification | `ALERTING.md` | New in this session; every claim links to a source or a repository file |
 | Current live comparison monitor (NBA liveData vs ESPN + PBP context + final-game box-score arithmetic) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; the NBA CDN feed is currently **unreachable from the runner**, so the published rows come from ESPN alone and only the single-provider checks fire today (§8) |
 | Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; Melton's exact corrected player total remains disputed (11 vs 12) |
@@ -211,7 +211,7 @@ dashboard says so instead of implying a clean result.
 links, review steps, and delivery state; critical/high alerts are delivered as
 GitHub issues by `python3 -m monitor --dispatch-alerts --apply`, and an optional
 webhook (`SCORING_DISCREPANCY_WEBHOOK_URL`) can mirror them. Offline evidence:
-76 unit tests (rules, lifecycle, dedupe, arithmetic, delivery with a stubbed
+77 unit tests (rules, lifecycle, dedupe, arithmetic, delivery with a stubbed
 `gh`, webhook receipt, coverage gaps) plus a deterministic end-to-end fixture
 run that opens a critical alert and plans its notification while the primary
 feed is down. **The first live dispatch has not been observed yet**; do not
