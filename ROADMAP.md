@@ -78,8 +78,9 @@ becoming a record.
 - `validate.py`, `compute_stats.py`, `build_site_data.py`, `monitor.py --self-test` all green.
 - At least 2 open questions closed with primary evidence (or explicitly re-scoped with a dated note).
 - The 213/214 stub either identified or reclassified with a decision log (no silent drift).
-- PR #4 merged to `main` only after GitHub confirms success; post-merge CI/Pages checked; live feed
-  status described honestly; this file updated.
+- [x] PR #4 merged to `main` after GitHub confirmed success; post-merge validation, verification,
+  and Pages deployment succeeded; public site was fetched and checked. The live feed status remains
+  honestly `not_started` until a scheduled NBA/ESPN poll succeeds and publishes a timestamp.
 
 ## 5. Current architecture and retained earlier layers
 

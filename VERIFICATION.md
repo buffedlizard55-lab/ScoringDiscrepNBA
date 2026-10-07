@@ -110,11 +110,11 @@ cause beyond what sources state.
 
 ## 5. Re-verification checklist (run before any release/PR)
 
-- [ ] `python3 scripts/validate.py` passes
-- [ ] `python3 scripts/compute_stats.py && python3 scripts/build_site_data.py` reproduce committed `data/*.json` + `docs/data/*` with no diff
-- [ ] `python3 scripts/monitor.py --self-test` passes
-- [ ] Every touched case: sources open (spot-check), `last_reviewed` bumped, open questions current
-- [ ] Stats caveat still present on site + payload
+- [x] `python3 scripts/validate.py` passes
+- [x] `python3 scripts/compute_stats.py && python3 scripts/build_site_data.py` reproduce committed `data/*.json` + `docs/data/*` with no diff
+- [x] `python3 scripts/monitor.py --self-test` passes
+- [x] Every touched case: sources open (spot-check), `last_reviewed` bumped, open questions current
+- [x] Stats caveat still present on site + payload
 
 ## 6. Cross-session audit (PR #2 legacy store — 2026-10-07)
 
@@ -149,7 +149,7 @@ re-verification of load-bearing claims; NOT a full re-audit. Standing: legacy re
 7. Two 2026 scorebug errors (NBC Knicks–Hawks, Amazon Hornets–Heat) and the 2021 Porter Jr.
    stat correction: cited URLs on file in the legacy store; not yet independently checked.
 
-## 7. Arena PR #4 integration review (local date 2026-10-06; final merge check pending)
+## 7. Arena PR #4 integration review (2026-10-07 UTC; post-merge verification)
 
 This integration reconciles the earlier historical catalog/monitor work with the newer `main`
 root dashboard and monitor package. The root interface remains `index.html` + `assets/`; the
@@ -190,10 +190,24 @@ presented as a second active scheduled monitor.
   monitor. The current local suite reported **47 tests passed**; `python3 -m monitor --check-data`,
   `python3 scripts/validate.py`, `python3 scripts/monitor.py --self-test`, JavaScript syntax checks,
   Python compilation, and generated-data rebuilding passed at this integration checkpoint.
-- PR #4 merge status and post-merge Pages/live-run checks are pending until GitHub confirms the
-  current branch head, CI, and successful merge outcome. Update this section and `REVIEW_PASSES.md`
-  only after that verification. The Appendix A date note below is preserved from the earlier
-  session; the current project review date is 2026-10-06 in America/Los_Angeles.
+- **PR #4 merged:** GitHub reports merge time `2026-10-07T06:18:55Z`; main merge commit is
+  `9e0925547bbf11902220712c11ff20d0beae7deb` ([PR #4](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/pull/4)).
+  The PR-head `validate` and `verify` checks passed. Post-merge `Validate research data`
+  ([37580834050](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37580834050)),
+  `Verify research data and monitor`
+  ([37580833196](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37580833196)),
+  the Pages publisher ([37580833159](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37580833159)),
+  and Pages build/deployment ([37580833006](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37580833006)) all succeeded.
+- The public root page and `/docs/` historical catalog were fetched after deployment. The root page
+  showed both evidence-reviewed cases and both separately labeled unverified leads; the historical
+  catalog rendered its 14 records and collection-only caveats.
+- **Live polling remains unverified:** the successful push-triggered publisher skipped its
+  schedule-only source-comparison step. The published `data/live-feed.json` still reports
+  `not_started`; no successful NBA/ESPN poll is claimed. A manual workflow dispatch was attempted
+  but GitHub returned HTTP 403, `Resource not accessible by integration`. The five-minute schedule
+  is configured, but its first successful poll and published timestamp still need verification.
+- Project review date: **2026-10-07 UTC** (2026-10-06 in America/Los_Angeles). Appendix A below
+  remains the byte-preserved prior-session guide.
 
 ## Appendix A — prior session (PR #2) verification guide, preserved verbatim
 
