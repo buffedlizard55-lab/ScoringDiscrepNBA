@@ -8,6 +8,24 @@
 **GitHub Pages URL:** [`https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/`](https://buffedlizard55-lab.github.io/ScoringDiscrepNBA/).
 **Alerting scope, limitations, and verification steps:** [`ALERTING.md`](ALERTING.md).
 
+## Latest repository review — 2026-10-07
+
+**Read [the current audit and next-session plan](docs/REPOSITORY_REVIEW.md)**
+after the brief below. This review adds fail-closed game matching, Eastern-date
+normalization, provider-specific evidence context, and summary-check fixes.
+The active test suite now has **90 passing tests**; older session counts below
+are historical. GitHub reports the existing Pages deployment as built, and
+[scheduled run 37663924132](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37663924132)
+as successful. Neither fact proves live notification delivery or complete source
+coverage. NBA/news links could not be re-fetched in this restricted environment.
+No historical case was newly verified in this session.
+
+**Important preservation limitation:** the current compact investigation ledger
+keeps the first three and latest twenty observations, not every intermediate
+observation or original HTTP body. Full immutable evidence storage remains a
+requirement, not a completed feature. The brief's no-overwrite principle is the
+target; do not mistake current retention for a complete archive.
+
 ---
 
 ## 0. Founding brief (verbatim — the source of truth)
@@ -57,10 +75,12 @@
 ## 1. How we read the brief
 
 1. **A mismatch is not a correction.** Two numbers disagreeing is a *candidate*.
-   Only evidence outside the monitor (a league statement, a ruling, a documented
+   Only corroborating evidence (a league statement, a ruling, a documented
    box-score change) can move a record toward `verified`.
 2. **Preserve, never overwrite.** The first observed value, the source that
-   showed it, the poll time, and every later value stay in the ledger.
+   showed it, and the poll time must remain recoverable. Full retention of every
+   later value is the target; the compact ledger currently truncates intermediate
+   observations (see the latest audit).
 3. **No inference.** Unknown fields stay `null` with an `open_questions[]` entry;
    derived values carry their derivation and are labelled as derived.
 4. **State the blind spots.** A source outage is published as a coverage gap; an

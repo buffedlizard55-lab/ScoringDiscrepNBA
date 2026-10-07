@@ -10,9 +10,9 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -175,6 +175,25 @@ def _int_or_none(value: Any) -> int | None:
     return parsed if parsed >= 0 else None
 
 
+def _eastern_game_date(value: Any) -> str | None:
+    """Normalize a provider tipoff to NBA's Eastern calendar, not UTC date.
+
+    A date-only value is already a calendar date. Naive datetimes and malformed
+    values cannot establish a timezone and therefore do not establish a join.
+    """
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if len(value) == 10:
+            return parsed.date().isoformat()
+        if parsed.tzinfo is None:
+            return None
+        return parsed.astimezone(ZoneInfo("America/New_York")).date().isoformat()
+    except ValueError:
+        return None
+
+
 def _status_from_nba(game: dict[str, Any]) -> str:
     raw_status = game.get("gameStatus")
     if raw_status is not None:
@@ -236,12 +255,13 @@ def parse_nba_scoreboard(payload: dict[str, Any]) -> list[dict[str, Any]]:
         if not home_code or not away_code:
             raise FeedError(f"NBA scoreboard game at index {index} is missing a team abbreviation")
         game_date = str(
-            game.get("gameEt") or game.get("gameDateEst") or game.get("gameDate") or ""
+            game.get("gameEt") or game.get("gameDateEst") or game.get("gameDate")
+            or scoreboard.get("gameDate") or ""
         )
         if len(game_date) >= 10:
-            game_date = game_date[:10]
+            game_date = _eastern_game_date(game_date[:10])
         else:
-            game_date = None
+            game_date = _eastern_game_date(game.get("gameTimeUTC"))
         normalized.append(
             {
                 "game_id": str(game.get("gameId") or "").strip() or None,
@@ -316,7 +336,7 @@ def parse_espn_scoreboard(payload: dict[str, Any]) -> list[dict[str, Any]]:
         normalized.append(
             {
                 "game_id": str(event.get("id") or "").strip() or None,
-                "game_date": event_date[:10] if len(event_date) >= 10 else None,
+                "game_date": _eastern_game_date(event_date),
                 "status": _status_from_espn(event, competition),
                 "status_text": str(event_status_type.get("shortDetail") or ""),
                 "period": _int_or_none(event_status.get("period")),
@@ -354,25 +374,18 @@ def match_scoreboards(
     nba_games: list[dict[str, Any]], espn_games: list[dict[str, Any]]
 ) -> list[tuple[dict[str, Any], dict[str, Any] | None]]:
     """Join same-day feeds by home/away team pair; leave ambiguous matches unmatched."""
-    espn_by_pair: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
-    for game in espn_games:
+    def key(game):
         pair = _team_pair(game)
-        if pair:
-            espn_by_pair[pair].append(game)
+        date = game.get("game_date")
+        return (pair, date) if pair and date else None
 
-    result: list[tuple[dict[str, Any], dict[str, Any] | None]] = []
+    result = []
     for nba_game in nba_games:
-        pair = _team_pair(nba_game)
-        candidates = espn_by_pair.get(pair, []) if pair else []
-        if len(candidates) == 1:
-            result.append((nba_game, candidates[0]))
-            continue
-        if len(candidates) > 1 and nba_game.get("game_date"):
-            same_date = [g for g in candidates if g.get("game_date") == nba_game.get("game_date")]
-            if len(same_date) == 1:
-                result.append((nba_game, same_date[0]))
-                continue
-        result.append((nba_game, None))
+        identity = key(nba_game)
+        candidates = [g for g in espn_games if key(g) == identity] if identity else []
+        primary_count = sum(key(g) == identity for g in nba_games)
+        match = candidates[0] if len(candidates) == 1 and primary_count == 1 else None
+        result.append((nba_game, match))
     return result
 
 
@@ -433,22 +446,35 @@ def build_observations_from_sources(
     hashes = source_hashes or {}
     source_hash_view = {key: hashes.get(key) for key in source_games}
     observations: list[dict[str, Any]] = []
+    # A date and unique ordered team pair per source are required. Never guess
+    # which duplicate row represents a game or compare different game dates.
+    counts = {}
+    for source, games in source_games.items():
+        for game in games or []:
+            key = (source, _team_pair(game), game.get("game_date"))
+            counts[key] = counts.get(key, 0) + 1
     for source_key, games in source_games.items():
         for game in games or []:
             pair = _team_pair(game)
             if pair is None:
                 continue
+            date = game.get("game_date")
+            unique = bool(date) and counts[(source_key, pair, date)] == 1
             row = next(
                 (
                     candidate
                     for candidate in observations
-                    if candidate["_team_pair"] == pair and source_key not in candidate["scores"]
+                    if unique and candidate["_joinable"]
+                    and candidate["_team_pair"] == pair
+                    and candidate["game_date"] == date
+                    and source_key not in candidate["scores"]
                 ),
                 None,
             )
             if row is None:
                 row = {
                     "_team_pair": pair,
+                    "_joinable": unique,
                     "observed_at": observed_at,
                     "game_id": game.get("game_id"),
                     "game_date": game.get("game_date"),
@@ -470,6 +496,11 @@ def build_observations_from_sources(
                 "away": (game.get("away_team") or {}).get("score"),
                 "home": (game.get("home_team") or {}).get("score"),
                 "source_url": game.get("source_url"),
+                "game_id": game.get("game_id"),
+                "game_date": date,
+                "status": game.get("status"),
+                "period": game.get("period"),
+                "clock": game.get("clock"),
             }
     for row in observations:
         published = {
@@ -487,6 +518,7 @@ def build_observations_from_sources(
                 for value in published.values()
             )
         row.pop("_team_pair", None)
+        row.pop("_joinable", None)
     return observations
 
 

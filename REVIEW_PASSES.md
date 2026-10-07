@@ -135,3 +135,45 @@ Found and fixed:
 - [ ] **Unfinished by design:** none of the Pass-3 checks depends on the live NBA feed, but the
       production notification has still never fired. That gap is stated in README §8 and
       ROADMAP 5b rather than papered over.
+
+## 2026-10-07 — session 09ce52af: reliability and feasibility audit
+
+### Pass 1 — inspect and implement
+
+Read the founding README before working. Baseline 82 tests passed. Confirmed
+existing Pages deployment and successful scheduled-run metadata through GitHub.
+Found active matchup joins ignored dates and ambiguous duplicates. Added
+Eastern-calendar normalization, unique-date joins, per-provider game context,
+regression tests, a visible dashboard feasibility panel and repository audit.
+Added `AGENTS.md` to reinforce the session-start rule and evidence standard.
+
+### Pass 2 — bugs and edge cases
+
+Reviewed summary orchestration: failed fetches can return `None`; skip them
+without claiming consistency. Replaced summary team-pair fallback with unique
+provider-ID matching. Fixed six-hour recheck lookup for NBA-keyed joined rows
+using ESPN request IDs. Added outage and cooldown regression tests. Documented
+retention truncation, absent raw evidence, provider recovery identity splits,
+post-final queue gaps, and duplicate Pages configuration. Replaced an unsupported
+universal claim about the absence of an official corrections API with the
+narrower verified statement that this project has not integrated one.
+
+### Pass 3 — request reconciliation and final checks
+
+Found another false-correction risk: a primary final could establish a final
+baseline for a still-live secondary source. Final-revision tracking now uses
+per-source status with legacy fallback, with a regression test for both status
+orderings. Validated NBA calendar date slices rather than accepting malformed
+strings. Re-read the changes against the brief; marked incomplete research and
+operational requirements explicitly instead of asserting completion.
+
+Final local gates: **90 unit tests passed**, active data validator passed,
+14 historical records validated, historical monitor self-test passed, both JS
+syntax checks passed, dashboard DOM smoke test passed, Python compilation
+passed, regenerated historical data had no drift, `git diff --check` passed.
+No new historical cases or factual promotions. No NBA/news content could be
+re-fetched under the session network policy. No browser screenshot audit or
+real notification receipt was obtained. See `docs/REPOSITORY_REVIEW.md` for
+verified scope, direct evidence links, unresolved irregularities and prioritized
+acceptance criteria. The complete product brief remains an ongoing target, not
+a claim that all requirements are satisfied by this change.

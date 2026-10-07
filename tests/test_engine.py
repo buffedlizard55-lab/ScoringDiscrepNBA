@@ -34,6 +34,20 @@ def observation(at: str, nba_away: int, nba_home: int, espn_away: int, espn_home
 
 
 class InvestigationLifecycleTests(unittest.TestCase):
+    def test_final_baselines_require_each_providers_own_final_status(self):
+        first = observation("2026-10-07T04:00:00Z", 100, 114, 100, 113, "final")
+        first["scores"]["nba"]["status"] = "final"
+        first["scores"]["espn"]["status"] = "live"
+        state = update_state(empty_state(), [first], first["observed_at"], HEALTHY)
+        self.assertNotIn("espn:0022600001", state["final_score_baselines"])
+        second = observation("2026-10-07T04:05:00Z", 100, 114, 100, 114, "live")
+        second["scores"]["nba"]["status"] = "live"
+        second["scores"]["espn"]["status"] = "final"
+        state = update_state(state, [second], second["observed_at"], HEALTHY)
+        self.assertIn("espn:0022600001", state["final_score_baselines"])
+        self.assertFalse(any(i["detection_type"] == "final_score_feed_revision"
+                             for i in state["investigations"]))
+
     def test_mismatch_moves_detected_to_investigating_and_preserves_first_value(self) -> None:
         first = observation("2026-10-07T04:00:00Z", 50, 39, 50, 38)
         state = update_state(empty_state(), [first], first["observed_at"], HEALTHY)
