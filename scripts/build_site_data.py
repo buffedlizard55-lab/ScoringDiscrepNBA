@@ -23,6 +23,12 @@ def main():
             print(f"mirrored {name}")
         else:
             print(f"WARNING: {name} not found, skipped")
+    monitor_snapshot = ROOT / "data" / "monitor" / "current.json"
+    if monitor_snapshot.exists():
+        monitor_data = DOCS_DATA / "monitor"
+        monitor_data.mkdir(parents=True, exist_ok=True)
+        shutil.copy(monitor_snapshot, monitor_data / "current.json")
+        print("mirrored monitor/current.json")
     print(f"aggregated {len(cases)} cases")
 
 

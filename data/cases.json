@@ -1,6 +1,89 @@
 {
   "cases": [
     {
+      "id": "0000-00-00-kpj-player-stat-correction-lead",
+      "title": "UNVERIFIED: Kevin Porter Jr. player-stat correction lead (game and exact stat unknown)",
+      "status": "unverified",
+      "verification_level": "unverified-report",
+      "game_date": null,
+      "season": null,
+      "away_team": null,
+      "home_team": null,
+      "venue": null,
+      "incident_summary": "A prior legacy record and a community forum discussion raised a possible Kevin Porter Jr. player-stat correction. The legacy record labeled the game as 2021-10-22, but the date, game identity, exact play, original and corrected player statistics, NBA record change, and cause have not been independently verified in this review. The earlier specific points/assists values are therefore not repeated as facts. This is a research lead only and is excluded from confirmed-case statistics.",
+      "classification": {
+        "type": "unknown",
+        "layer": "unresolved",
+        "outcome": "pending"
+      },
+      "period_clock": null,
+      "scoring_play": null,
+      "score_before": null,
+      "affected_player": "Kevin Porter Jr. (named in the unverified report)",
+      "affected_team": null,
+      "originally_reported": {
+        "value": "Possible player-stat correction; exact original value unknown",
+        "total": null,
+        "basis": "Community/legacy research lead only. The prior exact player-stat values have not been independently established and are not asserted here."
+      },
+      "corrected_value": {
+        "value": null,
+        "total": null,
+        "basis": "No correction value is admitted without a preserved, independently verifiable source observation."
+      },
+      "final_official": {
+        "value": null,
+        "total": null,
+        "basis": "Game not independently identified; no final official value admitted."
+      },
+      "sources_disagreed": [],
+      "cause": {
+        "determination": "unknown",
+        "detail": "Unknown. The earlier legacy claim that points and assists were exchanged on a specific play is unverified; no cause is assigned."
+      },
+      "official_record_was_wrong": "undetermined",
+      "timeline": [
+        {
+          "date": "Undated lead record (legacy entry labels 2021-10-22; not verified)",
+          "event": "A community/legacy lead was retained for investigation. This record does not establish a specific game, correction, source disagreement, or changed statistic.",
+          "source_index": 0
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://community.ottoneu.com/t/basketball-stat-corrections/10451",
+          "publisher": "Ottoneu community forum",
+          "tier": "tertiary-unverified",
+          "confirms": "A community discussion is a research lead only; it does not independently establish the game, before/after values, NBA correction, or cause recorded in the prior legacy entry.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://basketball.fantasysports.yahoo.com/nba/444/statcorrections",
+          "publisher": "Yahoo Fantasy",
+          "tier": "tertiary-unverified",
+          "confirms": "Candidate dynamic correction-log URL retained for follow-up; no specific Kevin Porter Jr. correction row or historical snapshot is independently established in this record.",
+          "accessed": "2026-10-07"
+        }
+      ],
+      "disputed_points": [],
+      "open_questions": [
+        "What exact game is being reported? Verify the date, opponent, NBA game ID, and teams from independent evidence before filling them in.",
+        "What exact play and player statistic allegedly changed, with preserved original and corrected source observations?",
+        "Can an official NBA correction record or contemporaneous NBA box-score revision be recovered?",
+        "Which sources displayed each value, and what are their direct URLs, capture times, and archived snapshots?",
+        "Was the NBA record itself corrected, or did a fantasy/secondary provider alone change its display?",
+        "What cause, if any, is explicitly supported by the evidence? Do not infer a points-to-assists reclassification."
+      ],
+      "betting_notes": null,
+      "reproduce_steps": [
+        "Open the Ottoneu discussion and record only what its dated text actually says; do not copy the unverified legacy values as facts.",
+        "Inspect the Yahoo corrections page or an archived copy for a dated Kevin Porter Jr. entry, preserving the capture timestamp and exact fields.",
+        "Once a game is identified, compare the official NBA box score/play-by-play across original and revised snapshots and add a new source-traceable timeline.",
+        "Keep this lead unverified and outside confirmed statistics until independent evidence supports the specific correction."
+      ],
+      "last_reviewed": "2026-10-06"
+    },
+    {
       "id": "0000-00-00-originating-213-vs-214-report",
       "title": "UNVERIFIED: Originating report \u2014 one source showed a 213-point final total while another showed 214 (game unidentified)",
       "status": "unverified",
@@ -1067,7 +1150,7 @@
       },
       "period_clock": "Q3, 2:00 remaining",
       "scoring_play": "De'Anthony Melton (GSW) first free throw attempt of a two-shot sequence \u2014 made, but entered as missed.",
-      "score_before": "91-67 Warriors (per Bleacher Report, secondary \u2014 not confirmed by NBA.com/ESPN reports)",
+      "score_before": "91-67 Warriors (NBC Sports Bay Area; secondary report, not a preserved NBA live-feed snapshot).",
       "affected_player": "De'Anthony Melton (GSW)",
       "affected_team": "Golden State Warriors",
       "originally_reported": {
@@ -1087,7 +1170,9 @@
       },
       "sources_disagreed": [
         "In-arena stat crew game-night entry (miss-miss) vs. corrected league record (make-miss)",
-        "Secondary outlets briefly carried the 139-104 final before updating to 140-104"
+        "Secondary outlets briefly carried the 139-104 final before updating to 140-104",
+        "ESPN recap page at 2026-10-07 capture: current score table showed 140-104 while embedded AP narrative retained 139-104; provider-page inconsistency, not a second NBA correction.",
+        "CBS Sports gametracker at 2026-10-07 capture: stale 139-104 scoreboard / Melton 10 points and 0-for-2 FT conflicted with embedded AP copy saying 140-104; provider-page inconsistency, not a second NBA correction."
       ],
       "cause": {
         "determination": "confirmed",
@@ -1148,22 +1233,57 @@
           "tier": "secondary-digital",
           "confirms": "League quote on the 1-of-2 correction; reports the change raised Melton from 11 to 12 points (the opposing position in the dispute \u2014 unresolved).",
           "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/nba-error-score-change-trail-blazers/1797765/",
+          "publisher": "NBC Sports Bay Area",
+          "tier": "team-beat",
+          "confirms": "Reports the 91-67 score at the Q3 free-throw attempt and Melton at 11 points after the revision; secondary reporting, not a preserved official NBA box-score snapshot.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.espn.com/nba/boxscore/_/gameId/401704638",
+          "publisher": "ESPN",
+          "tier": "major-sports-media",
+          "confirms": "Current post-correction box-score view shows 140-104 and Melton with 11 points, 1-for-2 FT; it does not establish the original NBA feed state.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.espn.com/nba/recap/_/gameId/401704638",
+          "publisher": "ESPN / Associated Press",
+          "tier": "secondary-digital",
+          "confirms": "Captured ESPN score table showed 140-104 while embedded AP narrative said 139-104; preserve as an internal provider-page inconsistency.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.cbssports.com/nba/gametracker/boxscore/NBA_20241023_GS@POR/",
+          "publisher": "CBS Sports",
+          "tier": "secondary-digital",
+          "confirms": "Captured gametracker showed stale 139-104 and Melton at 10 points / 0-for-2 FT while embedded AP copy said 140-104; these fields are internally inconsistent and do not constitute a second NBA correction.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://official.nba.com/rule-no-5-scoring-and-timing/",
+          "publisher": "NBA Official Rule No. 5",
+          "tier": "official-nba",
+          "confirms": "A successful free throw is worth one point. This rule is used only for an explicitly labelled arithmetic-derived post-play score, not as evidence of the incident itself.",
+          "accessed": "2026-10-07"
         }
       ],
       "disputed_points": [
         {
           "claim": "De'Anthony Melton's final point total after the correction",
           "positions": [
-            "Bleacher Report and NBC Sports Bay Area (via Yahoo) report 11 points after the revision.",
-            "FanSided reports the correction raised him from 11 to 12 points.",
-            "Resolution required: check the official NBA box score / Basketball-Reference game log. NOT resolved in this pass \u2014 do not cite either total as fact."
+            "NBC Sports Bay Area reports 11 points after revision; ESPN current post-correction box-score table shows 11 points and 1-for-2 FT.",
+            "FanSided reports the correction raised Melton from 11 to 12 points.",
+            "No corrected official NBA box-score snapshot was recovered in this review. Keep the exact official player total unresolved; do not promote either secondary position to an NBA-verified fact."
           ]
         }
       ],
       "open_questions": [
-        "Direct text of the @NBAOfficial correction post (X embeds were not independently re-verified in this pass).",
-        "Melton's exact corrected box-score line (points) per the official NBA box score.",
-        "Exact time of day the correction was issued (only 'Thursday' / Oct 24 confirmed)."
+        "The direct @NBAOfficial correction post is linked, but its text was not independently re-fetched in this review; the NBA.com/AP report remains the directly inspected league-hosted correction source.",
+        "Melton's exact corrected official box-score line remains unresolved: NBC Sports Bay Area and ESPN's current table show 11, while FanSided reports 12; retrieve a historical official NBA box-score snapshot if possible.",
+        "Exact time of day the correction was issued is not preserved here; the official announcement is dated Oct. 24, 2024."
       ],
       "betting_notes": "Per ESPN: ESPN BET closed the game at over-under 223.5 with Warriors -5.5; the 139/140 change did not affect either side (both totals 243/244 sailed over).",
       "reproduce_steps": [
@@ -1172,13 +1292,14 @@
         "Pull the official NBA box score for game date 2024-10-23 GSW @ POR and confirm the 140-104 final and Melton's FT line.",
         "Compare against an archived pre-correction box score (e.g., web archive from Oct 23) to show the original 139-104 value."
       ],
-      "last_reviewed": "2026-10-07"
+      "last_reviewed": "2026-10-06",
+      "score_after_play": "92-67 Warriors (arithmetic-derived from the NBC Sports Bay Area-reported 91-67 pre-attempt score and one made free throw; no live-feed observation was preserved)."
     },
     {
       "id": "2025-11-07-cle-was-johnson-ft",
       "title": "Cavaliers @ Wizards \u2014 Tre Johnson made free throw recorded as a miss, final score corrected 148-114 to 148-115 (Nov 7-8, 2025)",
       "status": "verified-partial",
-      "verification_level": "multi-secondary-confirmed",
+      "verification_level": "official-nba-confirmed",
       "game_date": "2025-11-07",
       "season": "2025-26",
       "away_team": "Cleveland Cavaliers",
@@ -1192,7 +1313,7 @@
       },
       "period_clock": "Q2, 8:15 remaining",
       "scoring_play": "Tre Johnson (WAS) first free throw attempt of a two-shot sequence \u2014 made, but entered as missed. He made both attempts.",
-      "score_before": "Cavaliers led 50-39 at the time (per Bleacher Report, secondary \u2014 not confirmed by other outlets in this pass)",
+      "score_before": "Cavaliers led 50-39 before the attempt (reported by The Athletic; its page returned HTTP 403 to the research fetcher, and Bleacher Report also reports 50-39).",
       "affected_player": "Tre Johnson (WAS)",
       "affected_team": "Washington Wizards",
       "originally_reported": {
@@ -1212,7 +1333,8 @@
       },
       "sources_disagreed": [
         "In-arena stat crew game-night entry (first FT missed) vs. corrected league record (both made)",
-        "Secondary outlets briefly carried the 148-114 final before updating to 148-115"
+        "Secondary outlets briefly carried the 148-114 final before updating to 148-115",
+        "ESPN recap page at 2026-10-07 capture: current score table showed 148-115 while embedded AP narrative retained 148-114; provider-page inconsistency, not a separate NBA correction."
       ],
       "cause": {
         "determination": "confirmed",
@@ -1226,9 +1348,9 @@
           "source_index": 0
         },
         {
-          "date": "2025-11-08",
+          "date": "2025-11-08 16:44 UTC (minute precision; official post ID timestamp, seconds not claimed)",
           "event": "NBA issues a statement acknowledging the error and the game statistics are corrected to a 148-115 final. Johnson's line becomes 19 points, 2-of-3 FTs.",
-          "source_index": 0
+          "source_index": 3
         }
       ],
       "sources": [
@@ -1252,22 +1374,53 @@
           "tier": "secondary-digital",
           "confirms": "Same core facts; scoreboard did not move; next-morning league acknowledgment; McCollum 25 / Mitchell 24 scoring leaders.",
           "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://x.com/NBAOfficial/status/1987199646020870516",
+          "publisher": "NBA Official (@NBAOfficial on X)",
+          "tier": "official-nba",
+          "confirms": "The league's post states Tre Johnson's first free throw at 8:15 of Q2 was incorrectly entered as missed though he made both, and that game statistics were corrected. The post does not provide a preserved pre-correction box-score snapshot.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.espn.com/nba/boxscore/_/gameId/401809511",
+          "publisher": "ESPN",
+          "tier": "major-sports-media",
+          "confirms": "Current post-correction box table shows Cleveland 148, Washington 115; it is not a preserved pre-correction NBA record.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://www.espn.com/nba/recap/_/gameId/401809511",
+          "publisher": "ESPN / Associated Press",
+          "tier": "secondary-digital",
+          "confirms": "Current score table says 148-115 while embedded AP narrative retains 148-114; the page also showed an AP update time of Nov. 7, 2025, 9:43 p.m. without a printed timezone.",
+          "accessed": "2026-10-07"
+        },
+        {
+          "url": "https://official.nba.com/rule-no-5-scoring-and-timing/",
+          "publisher": "NBA Official Rule No. 5",
+          "tier": "official-nba",
+          "confirms": "A successful free throw is worth one point. This rule is used only for an explicitly labelled arithmetic-derived post-play score, not as evidence of the incident itself.",
+          "accessed": "2026-10-07"
         }
       ],
       "disputed_points": [],
       "open_questions": [
-        "A direct NBA.com / @NBAOfficial primary-source URL for this correction was not located in this pass \u2014 the league statement is quoted secondhand. Priority: find the official release.",
-        "Exact original Johnson FT line before correction (reported as updated to 2-of-3; original 1-of-3 is arithmetic, not directly quoted \u2014 treat as derived).",
-        "Betting lines/total for this game were not found in the reviewed sources \u2014 do not assert any wagering impact."
+        "The direct NBA Official correction post is now linked; preserve an independent archival capture if it becomes inaccessible.",
+        "Exact original Johnson free-throw line before correction was not preserved. The reported corrected line is 2-of-3; an original 1-of-3 value is arithmetic-derived, not a direct observation.",
+        "Verify the corrected player line against a historical official NBA box-score snapshot; current ESPN and secondary reports do not preserve the original record state.",
+        "Betting lines/total for this game were not found in the reviewed sources \u2014 do not assert any wagering impact.",
+        "The X post timestamp is retained only to the minute from the official post ID; no seconds-level timestamp is asserted."
       ],
       "betting_notes": null,
       "reproduce_steps": [
-        "Open The Athletic article and confirm the 8:15 Q2 play, the NBA statement quote, the Frank quote, and the 148-114 to 148-115 change.",
-        "Cross-check the corrected 148-115 final on the official NBA box score and Basketball-Reference game page.",
-        "Compare against an archived pre-correction box score from Nov 7 to show the original 148-114 value.",
-        "Attempt to locate the primary NBA statement (NBA.com news / @NBAOfficial, Nov 8, 2025) and record its URL here when found."
+        "Open the @NBAOfficial post and confirm the league statement about Johnson's made first free throw at 8:15 Q2 and corrected statistics.",
+        "Open The Athletic report and HoopsWire's AP-sourced article to cross-check the 148-114 to 148-115 change and the reported corrected player line; The Athletic's direct page returned HTTP 403 in the review.",
+        "Compare ESPN's current 148-115 box/table with its embedded AP narrative that still says 148-114; treat the mismatch as a provider-page inconsistency.",
+        "Retrieve a historical official NBA box-score snapshot if possible; do not infer the original Johnson free-throw line from the correction alone."
       ],
-      "last_reviewed": "2026-10-07"
+      "last_reviewed": "2026-10-06",
+      "score_after_play": "50-40 Cavaliers (arithmetic-derived from The Athletic-reported 50-39 pre-attempt score and one made free throw; no live-feed observation was preserved)."
     }
   ]
 }

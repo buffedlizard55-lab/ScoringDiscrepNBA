@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "not-run",
+  "generatedAt": null,
+  "requestedDate": null,
+  "monitorDate": null,
+  "lastSuccessfulAt": null,
+  "sourceStatus": {},
+  "games": [],
+  "activeDiscrepancies": [],
+  "counts": {
+    "gamesCompared": 0,
+    "findings": 0,
+    "feedWarnings": 0
+  },
+  "feedWarnings": [],
+  "notes": [
+    "No scheduled monitor snapshot has been committed yet.",
+    "Score values will be timestamped source observations, not a determination of which provider is correct.",
+    "No match, unavailable source, or missing score is not interpreted as zero or as resolution."
+  ]
+}

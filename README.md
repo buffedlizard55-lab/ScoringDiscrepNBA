@@ -71,25 +71,26 @@ date current feed.
 
 | Piece | Location | Status |
 |---|---|---|
-| Earlier historical collection (12 partial case records + 1 unverified stub) | `data/cases/*.json` → `data/cases.json`; also `docs/` | Preserved; not re-audited in this pass |
-| Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; intentionally a small sample |
-| Current unresolved 213/214 lead | `data/leads.json` | Unidentified; excluded from confirmed-case counts |
-| Earlier case schema, validation, and collection statistics | `data/cases-schema.json`, `scripts/validate.py`, `data/stats.json` | Retained with source caveats |
-| Earlier historical monitor (ESPN vs NBA liveData, PBP, quarter totals) | `scripts/monitor.py`, `monitor/STATE.md` | Retained for manual/backfill use; its old schedule is disabled |
-| Current live comparison monitor (NBA scoreboard vs ESPN + PBP context) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; no successful live run observed yet |
+| Earlier historical collection (12 verified-partial records + 2 unverified stubs) | `data/cases/*.json` → `data/cases.json`; also `docs/` | Preserved with source/open-question caveats; collection stats are 12 of 14, not a league-wide rate |
+| Current evidence-reviewed dashboard sample (2 confirmed corrections) | `data/reviewed-cases.json` | Source-linked; the exact corrected Melton player total remains disputed (11 vs 12) |
+| Current unresolved research leads (213/214 and 2021 Kevin Porter Jr.) | `data/leads.json` | Both explicitly unverified; excluded from confirmed-case counts and statistics |
+| Earlier case schema, validation, and collection statistics | `data/cases-schema.json`, `scripts/validate.py`, `data/stats.json` | Historical collection; 12 verified-partial records of 14 total, with explicit coverage caveats |
+| Earlier historical monitor (ESPN vs NBA liveData, PBP, quarter totals) | `scripts/monitor.py`, `monitor/STATE.md`, `data/monitor/current.json` | Manual/backfill only; checked-in snapshot is intentionally `not-run` |
+| Current live comparison monitor (NBA scoreboard vs ESPN + PBP context) | `monitor/`, `data/live-feed.json`, `data/monitor-state.json` | Test-covered; snapshot remains `not_started`; no successful live poll observed yet |
 | Current root dashboard (search, filter, source comparison) | `index.html`, `assets/` | Pages workflow succeeded after PR #5; external page content was not fetched in this sandbox |
 | Historical catalog / previous dashboard | `docs/` | Preserved and linked from the root dashboard |
-| New CI for the current monitor/dashboard | `.github/workflows/ci.yml` | 22 offline tests plus data and JavaScript checks |
+| CI for current and retained historical monitors/dashboard | `.github/workflows/ci.yml`, `.github/workflows/validate.yml` | 47 offline unit tests plus repository-data, JS, Python, and generated-data checks at the latest local run |
 | Current Pages publishing and five-minute monitor workflow | `.github/workflows/pages-and-monitor.yml` | Configured; requires successful run and Pages permissions |
 | Earlier data validation and manual monitor workflows | `.github/workflows/validate.yml`, `.github/workflows/monitor.yml` | Retained; see runbook and limitations below |
 | Verification log + methods | `VERIFICATION.md` | Retained; includes the earlier line-by-line log |
-| Limitations + roadmap | `ROADMAP.md` | Retained |
+| Limitations + roadmap + three-pass review log | `ROADMAP.md`, `REVIEW_PASSES.md` | Retained; Pass 3 is recorded only after final integration and merge checks |
 | Prior-session store + tools (PR #2, preserved as leads) | `data/discrepancies.json`, `src/`, `research/` | Preserved, audit-flagged (see §7) |
 | Prior-session site (PR #2, byte-identical archive) | `archive/session-7b4d64dc-site/` | Archived, standalone |
 
 **Originating 213-vs-214 report:** tracked as `0000-00-00-originating-213-vs-214-report`
 with status `unverified`. The game is unidentified — it must not be cited as fact until the
-checklist in that record is satisfied.
+checklist in that record is satisfied. The Kevin Porter Jr. 2021 item is likewise a lead only;
+its game, stat change, and source history remain unknown.
 
 ## 3. Quick start
 
@@ -120,19 +121,21 @@ python3 scripts/monitor.py --date 20250115 --lookback 1
 
 ```
 ├── README.md                   ← persistent brief; read first every session
-├── VERIFICATION.md / ROADMAP.md ← earlier research log, methods, limitations, and next work
+├── VERIFICATION.md / ROADMAP.md / REVIEW_PASSES.md ← methods, gaps, and three-pass log
 ├── index.html + assets/        ← current root dashboard
 ├── docs/                       ← preserved earlier historical catalog, linked from the root site
 ├── data/
 │   ├── reviewed-cases.json     ← current two-case evidence-reviewed dashboard sample
-│   ├── leads.json              ← unresolved 213/214 lead, excluded from case counts
+│   ├── leads.json              ← unverified 213/214 + KPJ leads, excluded from case counts
 │   ├── cases/*.json            ← earlier per-case historical collection; preserve nulls/open questions
 │   ├── cases.json              ← generated aggregate for the earlier docs catalog (do not hand-edit)
 │   ├── cases-schema.json       ← earlier case contract; `scripts/validate.py` checks this collection
-│   ├── live-feed.json          ← current monitor's published scoreboard snapshot
+│   ├── live-feed.json          ← current monitor snapshot (`not_started` until a live poll succeeds)
 │   ├── monitor-state.json      ← current monitor's append-only investigation ledger and baselines
+│   ├── statistics.json         ← superseded/audit-flagged manifest; use `stats.json` for the historical collection
 │   ├── investigations.json    ← earlier monitor's investigation log
-│   ├── stats.json / sources.json ← earlier collection-only statistics and source tiers
+│   ├── stats.json / sources.json ← historical collection-only statistics and source tiers
+│   ├── monitor/current.json    ← earlier manual monitor snapshot; current state is intentionally `not-run`
 │   └── ...                     ← preserved legacy datasets, see §4 and §7
 ├── monitor/                    ← current stdlib monitor package + earlier STATE.md runbook
 ├── scripts/                    ← earlier validation, data generation, and historical monitor tools
@@ -149,8 +152,9 @@ python3 scripts/monitor.py --date 20250115 --lookback 1
    and `confirms` text. Unknown fields stay `null` with an `open_questions[]` entry.
 3. Rule first on `classification.layer`: was the NBA's official record wrong, or only secondary?
 4. Run `python3 scripts/validate.py` — it fails on placeholder URLs, illegal enums, missing
-   questions, and status/source mismatches.
-5. Run `compute_stats.py` + `build_site_data.py`, review the diff, open a PR.
+   questions, and status/source mismatches. For the current root dashboard, edit
+   `data/reviewed-cases.json` only after source review and run `python3 -m monitor --check-data`.
+5. Run `compute_stats.py` + `build_site_data.py` for the historical catalog, review the diff, open a PR.
 6. Never promote `unverified` → `verified-partial` without dated evidence attached; never use
    `verified` unless ≥2 sources (incl. a strong tier) corroborate and zero questions remain.
 7. To adopt a PR #2 lead: re-verify every fact independently (the 2017 Robinson III case is the
@@ -174,17 +178,18 @@ An earlier session merged a parallel implementation (PR #2). The merge kept it i
 - **Audit-flagged (do not cite as fact):** `DISC-20241107-CLE-WAS-001` carries a wrong year
   (2024 vs demonstrated 2025); `research/` lists 12 files but ships 1; legacy stats predate
   the audit. Full findings: `VERIFICATION.md` §6.
-- **Tooling:** `src/` needs API keys for live use (per its own README); the canonical CI monitor
-  is the keyless `scripts/monitor.py`. Harmonization plan: `ROADMAP.md` §5.
+- **Tooling:** `src/` needs API keys for live use (per its own README). The current scheduled
+  keyless monitor is `monitor/`; `scripts/monitor.py` is retained for deliberate historical/backfill
+  checks only. Harmonization notes: `ROADMAP.md` §5.
 
 ## 8. Current root dashboard and monitor integration
 
-This Arena review adds the current root dashboard (`index.html` + `assets/`), a separate evidence-reviewed seed file at `data/reviewed-cases.json`, and a tested monitor package in `monitor/`. The root dashboard deliberately uses that two-case seed rather than silently importing or reclassifying the older 12-record historical collection in `data/cases.json` and `docs/`. The older collection and its published interface are preserved and linked as the **Historical catalog**; those partial records were not re-audited in this pass and must not be treated as equivalent to the current evidence-reviewed seed. The 2017 Robinson III correction remains a strong source-backed record in that preserved catalog.
+This Arena review adds the current root dashboard (`index.html` + `assets/`), a separate evidence-reviewed seed file at `data/reviewed-cases.json`, and a tested monitor package in `monitor/`. The root dashboard deliberately uses that two-case seed rather than silently importing or reclassifying the 12-record historical collection in `data/cases.json` and `docs/`. The older collection and its published interface are preserved and linked as the **Historical catalog**. This integration updated the 2024 and 2025 source trails and the two unverified stubs, but did not re-audit every historical case; their partial status and open questions must remain visible. The 2017 Robinson III correction remains a strong source-backed record in that preserved catalog.
 
-The current seed includes the 2024 Warriors–Trail Blazers and 2025 Cavaliers–Wizards postgame free-throw corrections. For Tre Johnson, the pre-correction player total is unknown in the reviewed game-night source; a later CBS page component showing 18 is retained only as a later observation with unknown update history, not asserted as his original total. The 213/214 report remains an unidentified lead and is not assigned a game or counted. See each case’s direct citations in `data/reviewed-cases.json`.
+The current seed includes the 2024 Warriors–Trail Blazers and 2025 Cavaliers–Wizards postgame free-throw corrections. The 2024 team-score change is confirmed, but Melton’s exact corrected player total remains unresolved: NBC Sports Bay Area and ESPN report/show 11, while FanSided reports 12; no corrected official NBA player-line snapshot was recovered. The 2025 NBA Official X post and NBA Gamebook are linked; The Athletic’s separate “human error” explanation remains attributed to that secondary report. For Tre Johnson, no contemporaneous pre-correction player total was verified; a later CBS component showing 18 is not presented as the game-night value. Both the unidentified 213/214 report and the 2021 Kevin Porter Jr. item remain explicitly unverified leads, with unknown facts left null and both excluded from all confirmed-case counts/statistics. See direct citations in `data/reviewed-cases.json`, `data/leads.json`, and the historical case files.
 
 The current monitor polls the NBA scoreboard and ESPN scoreboard, records source health and score comparisons, retrieves NBA play-by-play for mismatches, and stores mismatch/final-feed-revision investigation records without deciding which feed is correct. UTC observation time is the monitor poll time; it is not a provider publication time. HTTP `ETag`, `Last-Modified`, and SHA-256 response metadata are retained with discrepancy observations when available. ESPN documents that its own feed corrections can be delayed and are distinct from official NBA post-game changes ([ESPN stat-corrections guidance](https://support.espn.com/hc/en-us/articles/360056679592-Stat-corrections)), so a mismatch remains a candidate rather than proof of an NBA record error.
 
 `.github/workflows/pages-and-monitor.yml` is configured to check current feeds every five minutes and publish the root dashboard plus the preserved `docs/` catalog to GitHub Pages. The earlier `scripts/monitor.py` stays available for manual historical/backfill checks; its automated schedule is disabled to avoid two overlapping scheduled monitors. The old `pages.yml` deployment was replaced by the current combined workflow. A successful CI test run does **not** establish that a live source poll has succeeded. The post-merge Pages deployment did complete successfully, but check the Actions run, Pages environment/permissions, live-feed timestamp, and source health before describing automated monitoring as active.
 
-The current offline review passed 22 unit tests, the repository-data checks (2 reviewed current cases and 1 explicitly unverified lead), Python compilation, JavaScript syntax checks, the Node dashboard smoke test, generated-data drift checks, and local HTTP checks for the root dashboard and preserved catalog. The post-merge Pages workflow completed successfully and the Pages API reports `built` for commit `4e3360a`; the external site content itself was not fetched here. No live NBA/ESPN poll has been verified. Next: audit and reconcile the preserved historical collection into the current interface without losing its open questions, identify the 213/214 source pair, and verify the first scheduled live run end to end.
+The latest local offline review passed 47 unit tests, current and historical data validators, the monitor self-test, Python compilation, JavaScript syntax checks, the Node dashboard smoke test, and generated-data drift checks. No live NBA/ESPN poll has been verified; `data/live-feed.json` remains `not_started` and `data/monitor/current.json` remains the earlier monitor’s intentional `not-run` baseline. The Pages workflow previously completed successfully for commit `4e3360a`, but this repository state still requires PR CI, merge confirmation, and a post-merge deployment/live-monitor check. Next: identify the 213/214 source pair, continue primary-source review, and verify the first scheduled live run end to end.

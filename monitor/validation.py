@@ -151,8 +151,44 @@ def validate_repository_data(root: str | Path = ".") -> list[str]:
             lead_ids.add(lead_id)
         if lead.get("excluded_from_verified_statistics") is not True:
             errors.append(f"{where} must be excluded from verified statistics")
-        if lead.get("status") == "unidentified_unverified_lead" and lead.get("source_ids"):
-            errors.append(f"{where} has no independent source but contains source_ids")
+        if lead.get("status") in {"unidentified_unverified_lead", "unverified_lead"} and lead.get("source_ids"):
+            errors.append(f"{where} is explicitly unverified and must not imply independent source verification")
+
+    required_leads = {
+        "unidentified-213-vs-214-final-total",
+        "unverified-2021-kevin-porter-jr-stat-correction",
+    }
+    missing_leads = required_leads - lead_ids
+    if missing_leads:
+        errors.append(f"Required unverified research leads are missing: {', '.join(sorted(missing_leads))}")
+
+    for lead in leads:
+        if lead.get("id") in required_leads and lead.get("status") not in {"unidentified_unverified_lead", "unverified_lead"}:
+            errors.append(f"{lead.get('id')} must remain explicitly unverified")
+
+    melton = next(
+        (case for case in cases if case.get("id") == "nba-2024-10-23-gsw-por-free-throw-correction"),
+        None,
+    )
+    if melton is not None:
+        player_line = (melton.get("impact") or {}).get("player_points") or {}
+        reported_values = {
+            entry.get("value")
+            for entry in player_line.get("reported_values", [])
+            if isinstance(entry, dict)
+        }
+        if player_line.get("status") != "disputed_unresolved" or not {11, 12}.issubset(reported_values):
+            errors.append("Melton's exact corrected player total must remain an unresolved 11-vs-12 dispute")
+
+    johnson = next(
+        (case for case in cases if case.get("id") == "nba-2025-11-07-cle-was-free-throw-correction"),
+        None,
+    )
+    if johnson is not None and not any(
+        source.get("url") == "https://x.com/NBAOfficial/status/1987199646020870516"
+        for source in johnson.get("sources", [])
+    ):
+        errors.append("Tre Johnson case must retain the direct NBA Official correction post")
 
     return errors
 

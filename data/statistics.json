@@ -1,30 +1,13 @@
 {
-  "total_cases": 12,
-  "by_type": {
-    "free_throw_not_counted": 2,
-    "three_pointer_misclassified": 1,
-    "scorebook_foul_miscount": 1,
-    "lane_violation_misapplication": 1,
-    "technical_foul_miscount": 1,
-    "throw_in_location_error": 1,
-    "buzzer_beater_disputed": 1,
-    "illegal_substitution": 1,
-    "scorebug_timeout_error": 2,
-    "other": 1
-  },
-  "by_verification": {
-    "verified": 11,
-    "partially_verified": 1
-  },
-  "official_record_incorrect_count": 10,
-  "secondary_source_error_count": 2,
-  "impact_on_final_total_count": 8,
-  "impact_on_final_total_percent": 66.7,
-  "official_incorrect_percent": 83.3,
-  "protest_upheld_count": 6,
-  "one_point_discrepancies": 3,
-  "one_point_percent": 25.0,
-  "avg_points_impact": 7.5,
-  "max_points_impact": 38,
-  "rarity_note": "1-point total discrepancies (like 213 vs 214) represent 25.0% of all verified cases. In our dataset of 12 cases, 3 are 1-point differences."
+  "status": "superseded-audit-flagged",
+  "superseded_by": "data/stats.json",
+  "description": "The legacy PR #2 statistics summary is not a current or canonical source of counts. Its verification labels predate the cross-session audit and are not used by the active site or monitor. The prior Kevin Porter Jr. record has been downgraded to an unverified lead; both the Kevin Porter Jr. and 213/214 leads are excluded from canonical confirmed-case statistics.",
+  "unverified_leads_excluded": [
+    "DISC-20211022-PORTER-STAT-001",
+    "0000-00-00-kpj-player-stat-correction-lead",
+    "0000-00-00-originating-213-vs-214-report",
+    "unverified-2021-kevin-porter-jr-stat-correction",
+    "unidentified-213-vs-214-final-total"
+  ],
+  "historical_snapshot": "The previous legacy statistics file is preserved in archive/session-7b4d64dc-site/statistics.json for historical context only; do not cite it as a verified dataset summary."
 }

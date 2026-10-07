@@ -149,6 +149,52 @@ re-verification of load-bearing claims; NOT a full re-audit. Standing: legacy re
 7. Two 2026 scorebug errors (NBC Knicks–Hawks, Amazon Hornets–Heat) and the 2021 Porter Jr.
    stat correction: cited URLs on file in the legacy store; not yet independently checked.
 
+## 7. Arena PR #4 integration review (local date 2026-10-06; final merge check pending)
+
+This integration reconciles the earlier historical catalog/monitor work with the newer `main`
+root dashboard and monitor package. The root interface remains `index.html` + `assets/`; the
+current automated monitor remains `monitor/` + `data/live-feed.json` / `data/monitor-state.json`.
+The older `docs/` catalog and `scripts/monitor.py` are retained as historical/manual layers, not
+presented as a second active scheduled monitor.
+
+### Source and case audit
+
+- **2024 Warriors–Trail Blazers:** the NBA-reported 139–104 → 140–104 team-score correction and
+  the Q3 2:00 made-free-throw/missed-entry explanation remain supported by the NBA.com/AP and
+  official announcement links. NBC Sports Bay Area reports the 91–67 event-local score. ESPN and
+  CBS page-component inconsistencies are preserved as secondary-provider observations, not as
+  separate NBA corrections. The corrected Melton player total remains **unresolved (11 vs 12)**;
+  no official corrected player-line snapshot was recovered. The active root seed no longer chooses
+  11 as the official value.
+- **2025 Cavaliers–Wizards:** the direct NBA Official post
+  (https://x.com/NBAOfficial/status/1987199646020870516) is linked alongside the official NBA
+  Gamebook and secondary reporting. The official post establishes the league’s correction
+  statement; The Athletic’s separate “human error” and audit-process detail remains explicitly
+  attributed to that secondary report. The exact NBA record-update time and pre-correction Johnson
+  player total remain unknown. ESPN/CBS stale components are retained as later provider observations.
+- **Unverified leads:** both the 213/214 report and 2021 Kevin Porter Jr. item remain in `data/leads.json`
+  as unverified, and in the historical case collection as unverified stubs. No unsupported game,
+  matchup, changed player statistic, cause, or provider fault is treated as fact. Both are excluded
+  from confirmed-case statistics by data checks.
+- **Historical stats:** `data/stats.json` is regenerated from 14 historical case records (12
+  verified-partial, 2 unverified; **0 fully verified**). The legacy `verified_count` includes
+  `verified` + `verified-partial` and is explicitly scoped in the payload. It is collection-only. `data/statistics.json` is an audit-flagged superseded manifest; the old
+  numeric summary remains in the standalone PR #2 archive and is not current evidence.
+
+### Monitor and release state
+
+- `data/live-feed.json` still says `not_started` and `data/monitor-state.json` is the seed ledger.
+  No successful live NBA/ESPN poll is claimed. `data/monitor/current.json` is the separate earlier
+  monitor’s intentional `not-run` baseline.
+- Offline checks currently cover the active root dashboard/monitor and the retained historical
+  monitor. The current local suite reported **47 tests passed**; `python3 -m monitor --check-data`,
+  `python3 scripts/validate.py`, `python3 scripts/monitor.py --self-test`, JavaScript syntax checks,
+  Python compilation, and generated-data rebuilding passed at this integration checkpoint.
+- PR #4 merge status and post-merge Pages/live-run checks are pending until GitHub confirms the
+  current branch head, CI, and successful merge outcome. Update this section and `REVIEW_PASSES.md`
+  only after that verification. The Appendix A date note below is preserved from the earlier
+  session; the current project review date is 2026-10-06 in America/Los_Angeles.
+
 ## Appendix A — prior session (PR #2) verification guide, preserved verbatim
 
 *Everything below this line is the byte-identical content of the PR #2 session's

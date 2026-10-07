@@ -31,7 +31,9 @@
     },
     "affected_player": "De'Anthony Melton",
     "affected_team": "GSW",
-    "sources_that_disagreed": ["In-arena official scorer initial entry vs NBA post-game audit vs ESPN initial box vs NBA.com final"],
+    "sources_that_disagreed": [
+      "In-arena official scorer initial entry vs NBA post-game audit vs ESPN initial box vs NBA.com final"
+    ],
     "timestamps": {
       "game_time": "2024-10-23T19:00:00-07:00",
       "detection_time": "2024-10-24 (during NBA full game review)",
@@ -83,7 +85,14 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "This is a textbook example of NBA official record itself being incorrect, not just secondary source. Statisticians recorded Melton 0/2 FT when he was 1/2. League's post-game audit caught it. Example of 1-point total discrepancy (243 vs 244) similar to 213 vs 214 scenario described in project prompt. ESPN BET noted over/under was 223.5, so both totals were over, no betting impact.",
-    "tags": ["free_throw", "1-point", "official_error", "post_game_correction", "2024-25", "total_discrepancy_example"]
+    "tags": [
+      "free_throw",
+      "1-point",
+      "official_error",
+      "post_game_correction",
+      "2024-25",
+      "total_discrepancy_example"
+    ]
   },
   {
     "id": "DISC-20241107-CLE-WAS-001",
@@ -117,7 +126,9 @@
     },
     "affected_player": "Tre Johnson",
     "affected_team": "WAS",
-    "sources_that_disagreed": ["In-arena scoreboard vs actual made FT vs initial box score vs corrected box"],
+    "sources_that_disagreed": [
+      "In-arena scoreboard vs actual made FT vs initial box score vs corrected box"
+    ],
     "timestamps": {
       "game_time": "2024-11-07T19:00:00-05:00 (Washington DC)",
       "detection_time": "2024-11-08 during NBA full game review",
@@ -162,7 +173,14 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Second consecutive season with same error type: free throw made but entered as missed. Demonstrates pattern. Rarity: NBA's Tim Frank said 'not something that happens a lot'. 1-point total discrepancy again (262 vs 263). Important for understanding 213 vs 214 rarity - same mechanism.",
-    "tags": ["free_throw", "1-point", "official_error", "post_game_correction", "human_error", "total_discrepancy_example"]
+    "tags": [
+      "free_throw",
+      "1-point",
+      "official_error",
+      "post_game_correction",
+      "human_error",
+      "total_discrepancy_example"
+    ]
   },
   {
     "id": "DISC-20170120-IND-LAL-001",
@@ -196,7 +214,9 @@
     },
     "affected_player": "Glenn Robinson III",
     "affected_team": "IND",
-    "sources_that_disagreed": ["Initial box score vs video review vs corrected box"],
+    "sources_that_disagreed": [
+      "Initial box score vs video review vs corrected box"
+    ],
     "timestamps": {
       "game_time": "2017-01-20T19:30:00-08:00",
       "detection_time": "2017-01-20 to 2017-01-27 review period",
@@ -248,7 +268,14 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Different error type than FT misses - 2 vs 3 point classification. Still 1-point total discrepancy (204 vs 203). Video evidence linked in NBA.com release. Shows 7-day lag - longest in our verified set so far. Impact: total points change affects over/under betting - original total 204, corrected 203.",
-    "tags": ["three_pointer", "2-vs-3", "1-point", "official_error", "video_verified", "total_discrepancy_example"]
+    "tags": [
+      "three_pointer",
+      "2-vs-3",
+      "1-point",
+      "official_error",
+      "video_verified",
+      "total_discrepancy_example"
+    ]
   },
   {
     "id": "DISC-20071219-MIA-ATL-001",
@@ -282,7 +309,9 @@
     },
     "affected_player": "Shaquille O'Neal, Udonis Haslem",
     "affected_team": "MIA",
-    "sources_that_disagreed": ["Official scorer book vs referee crew vs stat crew"],
+    "sources_that_disagreed": [
+      "Official scorer book vs referee crew vs stat crew"
+    ],
     "timestamps": {
       "game_time": "2007-12-19T19:30:00-05:00",
       "detection_time": "2007-12-19 post-game",
@@ -334,7 +363,15 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "One of only 6 successful protests in NBA history. Last successful protest before 2007 was 1982. Demonstrates scoring error that directly affected competitive balance - removing Shaq with 51.9 seconds left in 1-point game. Official NBA statement quoted in sources. Shows gross negligence finding.",
-    "tags": ["foul_miscount", "protest_upheld", "Shaq", "official_error", "replay", "gross_negligence", "fine_50000"]
+    "tags": [
+      "foul_miscount",
+      "protest_upheld",
+      "Shaq",
+      "official_error",
+      "replay",
+      "gross_negligence",
+      "fine_50000"
+    ]
   },
   {
     "id": "DISC-19821130-LAL-SAS-001",
@@ -368,7 +405,9 @@
     },
     "affected_player": "Norm Nixon",
     "affected_team": "Both",
-    "sources_that_disagreed": ["Referee interpretation vs rulebook"],
+    "sources_that_disagreed": [
+      "Referee interpretation vs rulebook"
+    ],
     "timestamps": {
       "game_time": "1982-11-30",
       "detection_time": "1982-11-30 post-game protest",
@@ -413,7 +452,13 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "One of 6 successful protests. Shows scoring error that changed winner. Total points difference massive due to vacated overtimes: 269 vs 231 = 38 points. Demonstrates how official record correction can dramatically alter total.",
-    "tags": ["protest_upheld", "lane_violation", "rule_misapplication", "overtime_vacated", "winner_changed"]
+    "tags": [
+      "protest_upheld",
+      "lane_violation",
+      "rule_misapplication",
+      "overtime_vacated",
+      "winner_changed"
+    ]
   },
   {
     "id": "DISC-19781108-NJN-PHI-001",
@@ -445,7 +490,9 @@
     },
     "affected_player": "Bernard King, Kevin Loughery",
     "affected_team": "NJN",
-    "sources_that_disagreed": ["Referee Richie Powers vs rulebook"],
+    "sources_that_disagreed": [
+      "Referee Richie Powers vs rulebook"
+    ],
     "timestamps": {
       "game_time": "1978-11-08",
       "detection_time": "1978-11-08",
@@ -483,7 +530,12 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Unique case with players on both teams. Shows scoring impact of incorrect FTs from technicals.",
-    "tags": ["protest_upheld", "technical_foul", "unique_both_teams", "Eric_Money"]
+    "tags": [
+      "protest_upheld",
+      "technical_foul",
+      "unique_both_teams",
+      "Eric_Money"
+    ]
   },
   {
     "id": "DISC-19711203-CLE-BUF-001",
@@ -515,7 +567,9 @@
     },
     "affected_player": "N/A - team procedural",
     "affected_team": "CLE",
-    "sources_that_disagreed": ["Referee throw-in location vs rulebook"],
+    "sources_that_disagreed": [
+      "Referee throw-in location vs rulebook"
+    ],
     "timestamps": {
       "game_time": "1971-12-03",
       "detection_time": "1971-12-03",
@@ -553,7 +607,11 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Protest upheld but score unchanged - shows procedural error that could have affected scoring.",
-    "tags": ["protest_upheld", "throw_in", "procedural"]
+    "tags": [
+      "protest_upheld",
+      "throw_in",
+      "procedural"
+    ]
   },
   {
     "id": "DISC-19691106-ATL-CHI-001",
@@ -585,7 +643,9 @@
     },
     "affected_player": "Tom Boerwinkle",
     "affected_team": "CHI",
-    "sources_that_disagreed": ["Referee Bob Rakel heard buzzer vs timekeeper said never hit buzzer vs clock showing 1 sec left"],
+    "sources_that_disagreed": [
+      "Referee Bob Rakel heard buzzer vs timekeeper said never hit buzzer vs clock showing 1 sec left"
+    ],
     "timestamps": {
       "game_time": "1969-11-06",
       "detection_time": "1969-11-06",
@@ -623,7 +683,12 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Famous Phantom Buzzer Game. Scoring discrepancy of 2 points (122 vs 124 for CHI). Total 246 vs 248 = 2 point difference, similar to 213/214 pattern.",
-    "tags": ["protest_upheld", "phantom_buzzer", "buzzer_beater", "2-point"]
+    "tags": [
+      "protest_upheld",
+      "phantom_buzzer",
+      "buzzer_beater",
+      "2-point"
+    ]
   },
   {
     "id": "DISC-19521128-MIL-PHI-001",
@@ -655,7 +720,9 @@
     },
     "affected_player": "N/A - team eligibility",
     "affected_team": "PHI",
-    "sources_that_disagreed": ["Referee allowed substitution vs rulebook requiring 4-on-5"],
+    "sources_that_disagreed": [
+      "Referee allowed substitution vs rulebook requiring 4-on-5"
+    ],
     "timestamps": {
       "game_time": "1952-11-28",
       "detection_time": "1952-11-28",
@@ -693,7 +760,12 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "First protest in NBA history Feb 26 1952 was denied (Indianapolis Olympians). This was first successful Nov 28 1952. Total points change 155 vs 141 = 14 points.",
-    "tags": ["protest_upheld", "first_protest", "illegal_substitution", "4-on-5"]
+    "tags": [
+      "protest_upheld",
+      "first_protest",
+      "illegal_substitution",
+      "4-on-5"
+    ]
   },
   {
     "id": "DISC-20260420-NBC-SCOREBUG-001",
@@ -727,7 +799,9 @@
     },
     "affected_player": "N/A - broadcast graphics",
     "affected_team": "NYK",
-    "sources_that_disagreed": ["NBC scorebug vs official scorer timeout count vs play-by-play commentary"],
+    "sources_that_disagreed": [
+      "NBC scorebug vs official scorer timeout count vs play-by-play commentary"
+    ],
     "timestamps": {
       "game_time": "2026-04-20",
       "detection_time": "2026-04-20 during broadcast",
@@ -765,7 +839,14 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "This is critical example of secondary source error vs official record error. NBA official record was correct (0 timeouts), but NBC's secondary data feed was incorrect (1 timeout). This is exactly the type of 213/214-style discrepancy where one source shows different data than another, but official record is correct. Total 213 in this game matches prompt's 213 example. Demonstrates need for monitoring system to compare authoritative vs secondary sources.",
-    "tags": ["secondary_error", "scorebug", "timeout", "broadcast", "data_feed", "213_total_example"]
+    "tags": [
+      "secondary_error",
+      "scorebug",
+      "timeout",
+      "broadcast",
+      "data_feed",
+      "213_total_example"
+    ]
   },
   {
     "id": "DISC-20260415-AMAZON-SCOREBUG-001",
@@ -799,7 +880,9 @@
     },
     "affected_player": "N/A",
     "affected_team": "MIA",
-    "sources_that_disagreed": ["Amazon scorebug vs official timeout count"],
+    "sources_that_disagreed": [
+      "Amazon scorebug vs official timeout count"
+    ],
     "timestamps": {
       "game_time": "2026-04-15",
       "detection_time": "2026-04-15 live",
@@ -830,59 +913,65 @@
     "verification_status": "verified",
     "investigation_status": "resolved",
     "notes": "Second secondary source error in same postseason, days before NBC error. Shows pattern of data feed issues for new broadcast partners.",
-    "tags": ["secondary_error", "scorebug", "timeout", "Amazon", "hardware_failure"]
+    "tags": [
+      "secondary_error",
+      "scorebug",
+      "timeout",
+      "Amazon",
+      "hardware_failure"
+    ]
   },
   {
     "id": "DISC-20211022-PORTER-STAT-001",
-    "game_id": "0022100005",
-    "date": "2021-10-22",
-    "season": "2021-22",
+    "game_id": null,
+    "date": null,
+    "season": null,
     "teams": {
-      "home": "Houston Rockets",
-      "away": "Minnesota Timberwolves",
-      "home_abbr": "HOU",
-      "away_abbr": "MIN"
+      "home": null,
+      "away": null,
+      "home_abbr": null,
+      "away_abbr": null
     },
-    "period_clock": "Full game",
-    "relevant_scoring_play": "Kevin Porter Jr. stat line incorrectly recorded - points and assists swapped on one play",
-    "score_before": "Initial box: Porter 20 pts 9 ast",
-    "score_after_original": "Initial: 20 pts 9 ast",
-    "score_after_corrected": "Corrected: 18 pts 10 ast (one play scored incorrectly)",
+    "period_clock": null,
+    "relevant_scoring_play": "Unknown — the prior specific claim that points and assists were exchanged on one play is unverified.",
+    "score_before": null,
+    "score_after_original": null,
+    "score_after_corrected": null,
     "original_value": {
-      "final_score": "MIN 124 - HOU 106 (approx)",
-      "total_points": 230,
-      "player_stat": "Kevin Porter Jr: 20 pts, 9 ast"
+      "final_score": null,
+      "total_points": null,
+      "player_stat": null
     },
     "corrected_value": {
-      "final_score": "MIN 124 - HOU 106 (final score unchanged, but player stats changed)",
-      "total_points": 230,
-      "player_stat": "Kevin Porter Jr: 18 pts, 10 ast"
+      "final_score": null,
+      "total_points": null,
+      "player_stat": null
     },
     "final_official_value": {
-      "final_score": "MIN 124 - HOU 106",
-      "total_points": 230
+      "final_score": null,
+      "total_points": null
     },
-    "affected_player": "Kevin Porter Jr.",
-    "affected_team": "HOU",
-    "sources_that_disagreed": ["Initial live box vs Yahoo stat correction log vs NBA final"],
+    "affected_player": "Kevin Porter Jr. (named in the unverified lead)",
+    "affected_team": null,
+    "sources_that_disagreed": [],
     "timestamps": {
-      "game_time": "2021-10-22",
-      "detection_time": "2021-10-24",
-      "correction_announced": "2021-10-24",
-      "correction_applied": "2021-10-24"
+      "game_time": null,
+      "detection_time": null,
+      "correction_announced": null,
+      "correction_applied": null
     },
-    "what_changed": "One scoring play reclassified - points to assist, 2 points removed from Porter, 1 assist added",
-    "when_changed": "October 24, 2021 - 2 days after game, noted in Yahoo stat corrections log",
-    "cause": "Scoring play misattributed - official scorer initially credited Porter with points that should have been assist, or vice versa",
-    "cause_confidence": "suspected",
+    "what_changed": "Unknown. The prior assertion of an exact points/assists change is unverified and has been withdrawn from the factual fields.",
+    "when_changed": null,
+    "cause": null,
+    "cause_confidence": "unknown",
     "incident_type": "other",
-    "nba_official_record_incorrect": true,
-    "secondary_source_error": false,
-    "impact_on_final_total": false,
-    "impact_points": 0,
-    "protest_filed": false,
-    "protest_upheld": false,
-    "resolution": "NBA stat correction applied Oct 24, Ottoneu fantasy noted correction, Yahoo logged it. Demonstrates stat correction process that does not affect final total but affects player totals.",
+    "nba_official_record_incorrect": null,
+    "secondary_source_error": null,
+    "impact_on_final_total": null,
+    "impact_points": null,
+    "protest_filed": null,
+    "protest_upheld": null,
+    "resolution": "No outcome established. Retained as an investigation lead only.",
     "sources": [
       {
         "url": "https://community.ottoneu.com/t/basketball-stat-corrections/10451",
@@ -899,9 +988,15 @@
         "access_date": "2026-10-07"
       }
     ],
-    "verification_status": "partially_verified",
-    "investigation_status": "resolved",
-    "notes": "Example of stat correction that does NOT affect final total but shows NBA's correction mechanism. Important for understanding difference between scoring discrepancy that affects total vs player stats. Requires further investigation to get exact game final - currently listed as partially_verified due to limited primary sources.",
-    "tags": ["stat_correction", "player_stats", "no_total_impact", "requires_investigation"]
+    "verification_status": "unverified",
+    "investigation_status": "investigating",
+    "notes": "Unverified lead only. The prior legacy record asserted a game date, matchup, 20/9-to-18/10 player line, a points-to-assists change, and a confirmed NBA correction without adequate preserved evidence. Those claims have been cleared from factual fields. See canonical record 0000-00-00-kpj-player-stat-correction-lead; excluded from confirmed statistics.",
+    "tags": [
+      "unverified",
+      "player_stats",
+      "needs_investigation",
+      "excluded_from_confirmed_statistics"
+    ],
+    "description": "Unverified community/legacy lead of a possible Kevin Porter Jr. player-stat correction; game, play, and exact changed statistic are not independently established."
   }
 ]

@@ -9,7 +9,7 @@ games. Every stats payload carries that caveat verbatim.
 import json
 import re
 from collections import Counter
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 FULL_DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
@@ -114,12 +114,20 @@ def main():
             "Duration unknown or not applicable (stands unreviewed / transient display / single-date record): " +
             ", ".join(sorted(unknown_dur)) + ".")
 
+    status_counts = Counter(c["status"] for c in cases)
+    fully_verified_count = status_counts.get("verified", 0)
+    verified_partial_count = status_counts.get("verified-partial", 0)
     stats = {
-        "generated": date.today().isoformat(),
+        "generated": datetime.now(timezone.utc).date().isoformat(),
+        "generated_timezone": "UTC",
         "scope_caveat": CAVEAT,
         "collection_size": len(cases),
         "verified_count": len(verified),
-        "status_counts": dict(Counter(c["status"] for c in cases)),
+        "verified_count_scope": "Includes status `verified` and `verified-partial`; this is not a count of fully verified cases only. See verification_status_counts.",
+        "fully_verified_count": fully_verified_count,
+        "verified_partial_count": verified_partial_count,
+        "verification_status_counts": dict(status_counts),
+        "status_counts": dict(status_counts),
         "verified_type_counts": dict(by_type),
         "verified_layer_counts": dict(by_layer),
         "verified_outcome_counts": dict(by_outcome),
@@ -146,7 +154,7 @@ def main():
         ],
     }
     OUT.write_text(json.dumps(stats, indent=2) + "\n")
-    print(f"Wrote {OUT}: {len(verified)} verified of {len(cases)} total.")
+    print(f"Wrote {OUT}: {len(verified)} verified/partial records ({fully_verified_count} fully verified; {verified_partial_count} verified-partial) of {len(cases)} total.")
 
 
 def _share(counter, keys, denom):

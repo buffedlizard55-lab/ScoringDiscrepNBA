@@ -245,15 +245,24 @@ button, select { cursor: pointer; }
 
 .lead-section { padding-top: 71px; }
 .eyebrow-amber { color: var(--amber); }
-.lead-card { display: grid; grid-template-columns: 150px minmax(0,1fr) 30px; gap: 20px; align-items: center; padding: 22px 24px; background: #fffaf0; border: 1px solid #efdfbd; border-radius: 12px; }
-.lead-number-pair { display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 26px var(--display); color: #8c5c12; letter-spacing: -.04em; }
+.lead-list { display: grid; gap: 11px; }
+.lead-card { display: grid; grid-template-columns: 150px minmax(0,1fr) 30px; gap: 20px; align-items: start; padding: 22px 24px; background: #fffaf0; border: 1px solid #efdfbd; border-radius: 12px; }
+.lead-number-pair { display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 22px/1.2 var(--display); color: #8c5c12; letter-spacing: -.04em; text-align: center; overflow-wrap: anywhere; }
 .lead-number-pair i { font-style: normal; font: 13px var(--mono); color: #bb9a60; }
 .lead-copy p { margin: 0; color: #564c37; font-size: 12px; line-height: 1.7; }
+.lead-title { margin: 0 0 6px; color: #493b22; font: 700 15px/1.35 var(--display); }
 .lead-copy .muted-text { margin-top: 7px; color: #8b7e61; font-size: 10px; }
 .lead-mark { display: grid; place-items: center; border: 1px solid #eed9ac; width: 27px; height: 27px; border-radius: 50%; color: #a5701a; font: 500 14px var(--mono); }
 .lead-details { margin-top: 9px; }
 .lead-details span { display: inline-block; margin: 3px 4px 0 0; padding: 3px 6px; border-radius: 4px; border: 1px solid #efdfbd; color: #907e5d; background: rgba(255,255,255,.6); font: 8px var(--mono); }
 .lead-next { margin-top: 8px !important; }
+.lead-evidence { margin-top: 9px; color: #66583d; font-size: 10px; }
+.lead-evidence summary { cursor: pointer; font-weight: 600; }
+.lead-evidence ul { margin: 7px 0 0; padding-left: 18px; line-height: 1.6; }
+.impact-note { margin: 6px 0 0; color: #65736c; font-size: 9px; line-height: 1.5; }
+.player-point-positions { margin-top: 5px; }
+.player-point-positions p { margin: 3px 0; color: #65736c; font-size: 9px; line-height: 1.45; }
+.player-point-positions strong { display: inline; font-size: inherit; }
 
 .method-section { display: grid; grid-template-columns: minmax(220px, .72fr) minmax(0, 1.35fr); column-gap: 63px; row-gap: 28px; padding-top: 90px; }
 .method-intro h2 { font-size: clamp(27px, 3vw, 34px); }

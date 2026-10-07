@@ -16,7 +16,7 @@
   },
   "period_clock": "Q3, 2:00 remaining",
   "scoring_play": "De'Anthony Melton (GSW) first free throw attempt of a two-shot sequence — made, but entered as missed.",
-  "score_before": "91-67 Warriors (per Bleacher Report, secondary — not confirmed by NBA.com/ESPN reports)",
+  "score_before": "91-67 Warriors (NBC Sports Bay Area; secondary report, not a preserved NBA live-feed snapshot).",
   "affected_player": "De'Anthony Melton (GSW)",
   "affected_team": "Golden State Warriors",
   "originally_reported": {
@@ -36,7 +36,9 @@
   },
   "sources_disagreed": [
     "In-arena stat crew game-night entry (miss-miss) vs. corrected league record (make-miss)",
-    "Secondary outlets briefly carried the 139-104 final before updating to 140-104"
+    "Secondary outlets briefly carried the 139-104 final before updating to 140-104",
+    "ESPN recap page at 2026-10-07 capture: current score table showed 140-104 while embedded AP narrative retained 139-104; provider-page inconsistency, not a second NBA correction.",
+    "CBS Sports gametracker at 2026-10-07 capture: stale 139-104 scoreboard / Melton 10 points and 0-for-2 FT conflicted with embedded AP copy saying 140-104; provider-page inconsistency, not a second NBA correction."
   ],
   "cause": {
     "determination": "confirmed",
@@ -97,22 +99,57 @@
       "tier": "secondary-digital",
       "confirms": "League quote on the 1-of-2 correction; reports the change raised Melton from 11 to 12 points (the opposing position in the dispute — unresolved).",
       "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/nba-error-score-change-trail-blazers/1797765/",
+      "publisher": "NBC Sports Bay Area",
+      "tier": "team-beat",
+      "confirms": "Reports the 91-67 score at the Q3 free-throw attempt and Melton at 11 points after the revision; secondary reporting, not a preserved official NBA box-score snapshot.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/boxscore/_/gameId/401704638",
+      "publisher": "ESPN",
+      "tier": "major-sports-media",
+      "confirms": "Current post-correction box-score view shows 140-104 and Melton with 11 points, 1-for-2 FT; it does not establish the original NBA feed state.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.espn.com/nba/recap/_/gameId/401704638",
+      "publisher": "ESPN / Associated Press",
+      "tier": "secondary-digital",
+      "confirms": "Captured ESPN score table showed 140-104 while embedded AP narrative said 139-104; preserve as an internal provider-page inconsistency.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://www.cbssports.com/nba/gametracker/boxscore/NBA_20241023_GS@POR/",
+      "publisher": "CBS Sports",
+      "tier": "secondary-digital",
+      "confirms": "Captured gametracker showed stale 139-104 and Melton at 10 points / 0-for-2 FT while embedded AP copy said 140-104; these fields are internally inconsistent and do not constitute a second NBA correction.",
+      "accessed": "2026-10-07"
+    },
+    {
+      "url": "https://official.nba.com/rule-no-5-scoring-and-timing/",
+      "publisher": "NBA Official Rule No. 5",
+      "tier": "official-nba",
+      "confirms": "A successful free throw is worth one point. This rule is used only for an explicitly labelled arithmetic-derived post-play score, not as evidence of the incident itself.",
+      "accessed": "2026-10-07"
     }
   ],
   "disputed_points": [
     {
       "claim": "De'Anthony Melton's final point total after the correction",
       "positions": [
-        "Bleacher Report and NBC Sports Bay Area (via Yahoo) report 11 points after the revision.",
-        "FanSided reports the correction raised him from 11 to 12 points.",
-        "Resolution required: check the official NBA box score / Basketball-Reference game log. NOT resolved in this pass — do not cite either total as fact."
+        "NBC Sports Bay Area reports 11 points after revision; ESPN current post-correction box-score table shows 11 points and 1-for-2 FT.",
+        "FanSided reports the correction raised Melton from 11 to 12 points.",
+        "No corrected official NBA box-score snapshot was recovered in this review. Keep the exact official player total unresolved; do not promote either secondary position to an NBA-verified fact."
       ]
     }
   ],
   "open_questions": [
-    "Direct text of the @NBAOfficial correction post (X embeds were not independently re-verified in this pass).",
-    "Melton's exact corrected box-score line (points) per the official NBA box score.",
-    "Exact time of day the correction was issued (only 'Thursday' / Oct 24 confirmed)."
+    "The direct @NBAOfficial correction post is linked, but its text was not independently re-fetched in this review; the NBA.com/AP report remains the directly inspected league-hosted correction source.",
+    "Melton's exact corrected official box-score line remains unresolved: NBC Sports Bay Area and ESPN's current table show 11, while FanSided reports 12; retrieve a historical official NBA box-score snapshot if possible.",
+    "Exact time of day the correction was issued is not preserved here; the official announcement is dated Oct. 24, 2024."
   ],
   "betting_notes": "Per ESPN: ESPN BET closed the game at over-under 223.5 with Warriors -5.5; the 139/140 change did not affect either side (both totals 243/244 sailed over).",
   "reproduce_steps": [
@@ -121,5 +158,6 @@
     "Pull the official NBA box score for game date 2024-10-23 GSW @ POR and confirm the 140-104 final and Melton's FT line.",
     "Compare against an archived pre-correction box score (e.g., web archive from Oct 23) to show the original 139-104 value."
   ],
-  "last_reviewed": "2026-10-07"
+  "last_reviewed": "2026-10-06",
+  "score_after_play": "92-67 Warriors (arithmetic-derived from the NBC Sports Bay Area-reported 91-67 pre-attempt score and one made free throw; no live-feed observation was preserved)."
 }

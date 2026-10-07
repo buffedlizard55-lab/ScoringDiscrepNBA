@@ -12,7 +12,7 @@ Compares, per game:
 Results are recorded in data/investigations.json with lifecycle:
   detected -> investigating -> correction-observed | explained-no-error -> resolved
 Human review is REQUIRED before anything becomes a case in data/cases/.
-A 'feed-unavailable' record is logged (not a discrepancy) when a source is unreachable.
+Source outages are reported in the run summary (not recorded as scoring discrepancies).
 
 Endpoints:
   ESPN:  https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=YYYYMMDD
@@ -66,8 +66,35 @@ def season_year_for(datestr):
 
 # ---------------- source parsers ----------------
 
+def safe_int(value):
+    """Parse an integer observation without treating missing/invalid data as zero."""
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value >= 0 else None
+    if isinstance(value, float):
+        return int(value) if value >= 0 and value.is_integer() else None
+    raw = str(value).strip()
+    if not raw:
+        return None
+    try:
+        parsed = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if parsed < 0 or not parsed.is_integer():
+        return None
+    return int(parsed)
+
+
+def _parse_periods(team, key="periods"):
+    periods = team.get(key) or []
+    if not isinstance(periods, list):
+        return []
+    return [safe_int(row.get("score")) for row in periods if isinstance(row, dict)]
+
+
 def parse_espn(scoreboard):
-    """Return {key: {away, home, away_score, home_score, status, quarters}} keyed 'AWY@HME'."""
+    """Return normalized ESPN games keyed by 'AWY@HME'; unknown values remain None."""
     games = {}
     for ev in scoreboard.get("events", []):
         try:
@@ -76,48 +103,60 @@ def parse_espn(scoreboard):
             a, h = teams["away"], teams["home"]
             a_code = norm_team(a["team"].get("abbreviation") or a["team"].get("shortDisplayName"))
             h_code = norm_team(h["team"].get("abbreviation") or h["team"].get("shortDisplayName"))
+            if not a_code or not h_code:
+                continue
+            status = comp.get("status") or {}
+            status_type = status.get("type") or {}
+            a_lines = a.get("linescores") or []
+            h_lines = h.get("linescores") or []
             games[f"{a_code}@{h_code}"] = {
                 "away": a_code, "home": h_code,
-                "away_score": int(a.get("score", 0)), "home_score": int(h.get("score", 0)),
-                "status": comp.get("status", {}).get("type", {}).get("name", "UNKNOWN"),
-                "quarters": [int(ls.get("value", 0)) for ls in a.get("linescores", [])],
-                "home_quarters": [int(ls.get("value", 0)) for ls in h.get("linescores", [])],
+                "away_score": safe_int(a.get("score")), "home_score": safe_int(h.get("score")),
+                "status": status_type.get("name", "UNKNOWN"),
+                "quarters": [safe_int(ls.get("value")) for ls in a_lines if isinstance(ls, dict)],
+                "home_quarters": [safe_int(ls.get("value")) for ls in h_lines if isinstance(ls, dict)],
                 "source": "espn",
             }
-        except (KeyError, ValueError, TypeError):
+        except (KeyError, ValueError, TypeError, AttributeError):
             continue
     return games
 
 
 def parse_nba_scoreboard(sb):
-    """Return {gameId: meta} from NBA liveData scoreboard; meta includes tricode matchup + status."""
+    """Return {gameId: meta} from NBA liveData scoreboard; omit unidentifiable rows."""
     games = {}
     board = sb.get("scoreboard", sb)
+    if not isinstance(board, dict):
+        return games
     for g in board.get("games", []):
-        try:
-            gid = g.get("gameId")
-            a_code = norm_team(g.get("awayTeam", {}).get("teamTricode"))
-            h_code = norm_team(g.get("homeTeam", {}).get("teamTricode"))
-            games[gid] = {
-                "away": a_code, "home": h_code,
-                "status": str(g.get("gameStatusText", "")),
-                "is_final": bool(g.get("gameStatus") == 3 or "final" in str(g.get("gameStatusText", "")).lower()),
-            }
-        except (AttributeError, TypeError):
+        if not isinstance(g, dict):
             continue
+        away = g.get("awayTeam") or {}
+        home = g.get("homeTeam") or {}
+        if not isinstance(away, dict) or not isinstance(home, dict):
+            continue
+        gid = str(g.get("gameId") or "").strip()
+        a_code = norm_team(away.get("teamTricode"))
+        h_code = norm_team(home.get("teamTricode"))
+        if not gid or not a_code or not h_code:
+            continue
+        status_text = str(g.get("gameStatusText", ""))
+        games[gid] = {
+            "away": a_code, "home": h_code,
+            "status": status_text,
+            "is_final": bool(g.get("gameStatus") == 3 or "final" in status_text.lower()),
+        }
     return games
 
 
 def parse_nba_boxscore(bx):
     game = bx.get("game", bx)
-    a = game.get("awayTeam", {})
-    h = game.get("homeTeam", {})
-    aq = [int(p.get("score", 0)) for p in a.get("periods", [])]
-    hq = [int(p.get("score", 0)) for p in h.get("periods", [])]
+    a = game.get("awayTeam", {}) or {}
+    h = game.get("homeTeam", {}) or {}
     return {
         "away": norm_team(a.get("teamTricode")), "home": norm_team(h.get("teamTricode")),
-        "away_score": int(a.get("score", 0)), "home_score": int(h.get("score", 0)),
-        "quarters": aq, "home_quarters": hq, "source": "nba-cdn",
+        "away_score": safe_int(a.get("score")), "home_score": safe_int(h.get("score")),
+        "quarters": _parse_periods(a), "home_quarters": _parse_periods(h), "source": "nba-cdn",
     }
 
 
@@ -137,39 +176,85 @@ def parse_nba_pbp_final(pbp):
 
 # ---------------- checks ----------------
 
+def _complete_score_pair(side):
+    return all(isinstance(side.get(key), int) and not isinstance(side.get(key), bool)
+               for key in ("away_score", "home_score"))
+
+
 def check_cross_source(espn, nba, is_final):
+    """Compare only when both sources supplied two parseable scores."""
+    if not _complete_score_pair(espn) or not _complete_score_pair(nba):
+        return None
     if espn["away_score"] != nba["away_score"] or espn["home_score"] != nba["home_score"]:
         return {
             "check": "cross-source-total-mismatch",
+            "scope": "cross-source",
             "severity": "warn" if is_final else "info",
             "detail": (f"ESPN {espn['away']} {espn['away_score']} @ {espn['home']} {espn['home_score']} "
                        f"(total {espn['away_score'] + espn['home_score']}) vs NBA-CDN "
                        f"{nba['away_score']}-{nba['home_score']} (total {nba['away_score'] + nba['home_score']}). "
-                       + ("FINAL — possible 213-vs-214-class conflict." if is_final else "Live game — may be feed lag; recheck at final.")),
+                       + ("FINAL — possible source conflict." if is_final else "Live game — may be feed lag; recheck at final.")),
+            "observation": {
+                "espn": {key: espn.get(key) for key in ("away", "home", "away_score", "home_score", "status")},
+                "nba_cdn": {key: nba.get(key) for key in ("away", "home", "away_score", "home_score")},
+            },
         }
     return None
 
 
+def quarter_sum_observations(side, label):
+    """Return completed away/home checks; incomplete feed data is not a passing check."""
+    results = []
+    for side_name, score_key, periods_key in (
+        ("away", "away_score", "quarters"),
+        ("home", "home_score", "home_quarters"),
+    ):
+        score = side.get(score_key)
+        periods = side.get(periods_key) or []
+        if (not isinstance(score, int) or isinstance(score, bool) or not periods
+                or any(not isinstance(value, int) or isinstance(value, bool) for value in periods)):
+            continue
+        period_total = sum(periods)
+        scope = f"{side.get('source', label.lower())}-{side_name}"
+        evidence = {
+            "source": side.get("source", label.lower()),
+            "team": side.get(side_name),
+            "score": score,
+            "period_scores": periods,
+            "period_sum": period_total,
+        }
+        finding = None
+        if period_total != score:
+            finding = {
+                "check": "quarter-sum-mismatch",
+                "scope": scope,
+                "severity": "warn",
+                "detail": f"{label} {side_name} quarters {periods} sum to {period_total} != total {score}",
+                "observation": evidence,
+            }
+        results.append({"scope": scope, "evidence": evidence, "finding": finding})
+    return results
+
+
 def check_quarter_sum(side, label):
-    if side["quarters"] and sum(side["quarters"]) != side["away_score"]:
-        return {"check": "quarter-sum-mismatch",
-                "severity": "warn",
-                "detail": f"{label} away quarters {side['quarters']} sum to {sum(side['quarters'])} != total {side['away_score']}"}
-    if side["home_quarters"] and sum(side["home_quarters"]) != side["home_score"]:
-        return {"check": "quarter-sum-mismatch",
-                "severity": "warn",
-                "detail": f"{label} home quarters {side['home_quarters']} sum to {sum(side['home_quarters'])} != total {side['home_score']}"}
-    return None
+    """Compatibility helper for the offline self-test; returns the first mismatch."""
+    return next((item["finding"] for item in quarter_sum_observations(side, label)
+                 if item["finding"] is not None), None)
 
 
 def check_pbp(nba_box, pbp_final):
-    if pbp_final is None:
+    if pbp_final is None or not _complete_score_pair(nba_box):
         return None
     if pbp_final[0] != nba_box["away_score"] or pbp_final[1] != nba_box["home_score"]:
         return {"check": "pbp-recompute-mismatch",
+                "scope": "nba-pbp-vs-boxscore",
                 "severity": "warn",
                 "detail": (f"NBA PBP final running score {pbp_final[0]}-{pbp_final[1]} != "
-                           f"NBA boxscore {nba_box['away_score']}-{nba_box['home_score']}. Internal inconsistency in league data.")}
+                           f"NBA boxscore {nba_box['away_score']}-{nba_box['home_score']}. Internal inconsistency in league data."),
+                "observation": {
+                    "nba_pbp_final": list(pbp_final),
+                    "nba_boxscore": {key: nba_box.get(key) for key in ("away", "home", "away_score", "home_score")},
+                }}
     return None
 
 
@@ -185,124 +270,310 @@ def save_investigations(data):
     INV_PATH.write_text(json.dumps(data, indent=2) + "\n")
 
 
+def _observation(record, at=None):
+    return {
+        "at": at or record.get("last_seen_utc") or record.get("created_utc"),
+        "severity": record.get("severity"),
+        "evidence": record.get("evidence", {}),
+    }
+
+
 def upsert(data, new):
+    """Update the current view without discarding the initial or changed observations."""
     for rec in data["records"]:
-        if rec["id"] == new["id"]:
-            rec["last_seen_utc"] = new["last_seen_utc"]
-            rec["evidence"] = new["evidence"]
-            rec["history"].append({"at": new["last_seen_utc"], "note": "Mismatch still present on re-check."})
-            return "updated"
+        if rec["id"] != new["id"]:
+            continue
+        if not rec.get("observations"):
+            # Migrate earlier records: the old evidence value is the first known snapshot.
+            rec["observations"] = [_observation(rec, rec.get("created_utc"))]
+        rec.setdefault("history", [])
+        previous_evidence = rec.get("evidence", {})
+        previous_severity = rec.get("severity")
+        changed = previous_evidence != new.get("evidence", {}) or previous_severity != new.get("severity")
+        rec["last_seen_utc"] = new["last_seen_utc"]
+        rec["repeat_count"] = int(rec.get("repeat_count", 1)) + 1
+        rec["check_scope"] = new.get("check_scope", rec.get("check_scope"))
+        if changed:
+            rec["observations"].append(_observation(new))
+            rec["last_changed_utc"] = new["last_seen_utc"]
+            rec["history"].append({
+                "at": new["last_seen_utc"],
+                "note": "Source values or severity changed; a new observation was appended.",
+            })
+        if rec.get("status") in ("correction-observed", "explained-no-error", "resolved", "escalated-to-case"):
+            previous_status = rec["status"]
+            rec["status"] = "investigating"
+            rec["history"].append({
+                "at": new["last_seen_utc"],
+                "note": f"Mismatch reappeared after status {previous_status}; reopened for human review.",
+            })
+        rec["severity"] = new["severity"]
+        rec["evidence"] = new["evidence"]
+        return "updated"
+
+    new.setdefault("observations", [_observation(new)])
+    new.setdefault("repeat_count", 1)
+    new.setdefault("check_scope", new.get("scope", "unspecified"))
     data["records"].append(new)
     return "created"
 
 
-def resolve_if_cleared(data, ok_keys, now):
-    """Advance detected/investigating records to correction-observed when a check that
-    was actually performed in this run now agrees. Checks not performed (e.g. PBP on
-    live games, games absent from this run's date) never trigger advancement."""
+def resolve_if_cleared(data, ok_observations, now):
+    """Record source convergence only when that exact check/scope was fully performed.
+
+    Agreement is an operational observation, not proof that an earlier record was wrong
+    or that a correction occurred. The persisted resolution snapshot keeps the later
+    values available for human review.
+    """
     n = 0
     for rec in data["records"]:
         if rec["status"] not in ("detected", "investigating"):
             continue
-        key = (rec["game_date"], rec["game_key"], rec["check"])
-        if key in ok_keys:
+        scope = rec.get("check_scope")
+        if not scope:
+            # Legacy records without a scope cannot be safely closed by a narrower check.
+            continue
+        key = (rec["game_date"], rec["game_key"], rec["check"], scope)
+        evidence = ok_observations.get(key)
+        if evidence is not None:
             rec["status"] = "correction-observed"
-            rec["history"].append({"at": now, "note": "Sources agree again — possible correction or transient feed lag cleared. Needs human review before resolving."})
+            rec.setdefault("resolution_observations", []).append({"at": now, "evidence": evidence})
+            rec.setdefault("history", []).append({
+                "at": now,
+                "note": "The exact check/scope now agrees; possible correction or transient feed lag cleared. This is not a human-confirmed resolution.",
+            })
             n += 1
     return n
 
 
 # ---------------- main flow ----------------
 
-def monitor_date(datestr, live_fetch=True):
-    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+def score_block(side):
+    away_score, home_score = side.get("away_score"), side.get("home_score")
+    complete = _complete_score_pair(side)
+    return {
+        "away": away_score,
+        "home": home_score,
+        "total": away_score + home_score if complete else None,
+    }
+
+
+def monitor_date(datestr, live_fetch=True, now=None):
+    now = now or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=dt.timezone.utc)
+    now = now.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     data = load_investigations()
-    summary = {"date": datestr, "games": 0, "mismatches": 0, "created": 0, "updated": 0, "feeds_ok": {}}
+    summary = {
+        "date": datestr, "observed_at_utc": now, "games": 0, "game_rows": [],
+        "mismatches": 0, "created": 0, "updated": 0, "feeds_ok": {}, "feed_warnings": [],
+    }
     try:
-        espn_raw = fetch_json(ESPN_URL.format(datestr=datestr)) if live_fetch else json.loads((FIX_DIR / "espn_sample.json").read_text())
+        espn_url = ESPN_URL.format(datestr=datestr)
+        espn_raw = fetch_json(espn_url) if live_fetch else json.loads((FIX_DIR / "espn_sample.json").read_text())
         summary["feeds_ok"]["espn"] = True
     except Exception as exc:  # noqa: BLE001
         summary["feeds_ok"]["espn"] = f"UNAVAILABLE: {exc}"
+        summary["feeds_ok"]["nba-cdn"] = "NOT_CHECKED: ESPN scoreboard unavailable"
+        summary["feed_warnings"].append("ESPN scoreboard could not be fetched; no cross-source comparison was made.")
         save_investigations(data)
         return summary
     espn_games = parse_espn(espn_raw)
+    season = season_year_for(datestr)
+    nba_scoreboard_url = NBA_SCOREBOARD_URL.format(season=season)
     try:
-        season = season_year_for(datestr)
         if live_fetch:
-            nba_sb = parse_nba_scoreboard(fetch_json(NBA_SCOREBOARD_URL.format(season=season)))
+            nba_sb = parse_nba_scoreboard(fetch_json(nba_scoreboard_url))
         else:
             nba_sb = json.loads((FIX_DIR / "nba_scoreboard_sample.json").read_text())
         summary["feeds_ok"]["nba-cdn"] = True
     except Exception as exc:  # noqa: BLE001
         summary["feeds_ok"]["nba-cdn"] = f"UNAVAILABLE: {exc}"
+        summary["feed_warnings"].append("NBA CDN scoreboard could not be fetched; no cross-source comparison was made.")
         nba_sb = {}
 
     by_matchup = {}
     for gid, meta in nba_sb.items():
-        if gid.startswith("_") or not isinstance(meta, dict):
+        if not gid or str(gid).startswith("_") or not isinstance(meta, dict):
             continue
-        by_matchup[f"{meta['away']}@{meta['home']}"] = (gid, meta)
+        away, home = meta.get("away"), meta.get("home")
+        if away and home:
+            by_matchup[f"{away}@{home}"] = (gid, meta)
 
-    ok_keys = set()
+    ok_observations = {}
     for key, espn in espn_games.items():
         summary["games"] += 1
-        is_final = "final" in espn["status"].lower()
+        is_final = "final" in str(espn.get("status", "")).lower()
         findings = []
-        performed = set()
-        q = check_quarter_sum(espn, "ESPN")
-        performed.add("quarter-sum-mismatch")
-        if q:
-            findings.append(q)
+        row = {
+            "observed_at_utc": now,
+            "game_date": datestr,
+            "game_key": key,
+            "away_team": espn["away"],
+            "home_team": espn["home"],
+            "status": espn.get("status"),
+            "espn": {
+                "url": ESPN_URL.format(datestr=datestr),
+                "score": score_block(espn),
+                "status": espn.get("status"),
+            },
+            "nba_cdn": {
+                "scoreboard_url": nba_scoreboard_url,
+                "boxscore_url": None,
+                "game_status": None,
+                "score": None,
+            },
+            "comparison": "nba-scoreboard-unavailable" if not summary["feeds_ok"].get("nba-cdn") else "no-nba-match",
+            "score_mismatch": False,
+        }
+        if not _complete_score_pair(espn):
+            summary["feed_warnings"].append(f"ESPN {key}: one or more score values are missing; no cross-source comparison was made.")
+        for result in quarter_sum_observations(espn, "ESPN"):
+            if result["finding"] is not None:
+                findings.append(result["finding"])
+            else:
+                ok_observations[(datestr, key, "quarter-sum-mismatch", result["scope"])] = result["evidence"]
+
         nba_box = None
+        pbp_final = None
         if key in by_matchup:
             gid, meta = by_matchup[key]
             final = is_final or meta.get("is_final", False)
+            row["nba_cdn"]["boxscore_url"] = NBA_BOXSCORE_URL.format(game_id=gid)
+            row["nba_cdn"]["game_status"] = meta.get("status")
             try:
                 if live_fetch:
-                    nba_box = parse_nba_boxscore(fetch_json(NBA_BOXSCORE_URL.format(game_id=gid)))
+                    nba_box = parse_nba_boxscore(fetch_json(row["nba_cdn"]["boxscore_url"]))
                 else:
                     nba_box = json.loads((FIX_DIR / "nba_boxscore_sample.json").read_text())
-                q2 = check_quarter_sum(nba_box, "NBA-CDN")
-                if q2:
-                    findings.append(q2)
-                c = check_cross_source(espn, nba_box, final)
-                performed.add("cross-source-total-mismatch")
-                if c:
-                    findings.append(c)
+                row["nba_cdn"]["score"] = score_block(nba_box)
+                row["comparison"] = "incomplete-score-data"
+                if not _complete_score_pair(nba_box):
+                    summary["feed_warnings"].append(f"NBA boxscore {gid}: one or more score values are missing; no cross-source comparison was made.")
+
+                for result in quarter_sum_observations(nba_box, "NBA-CDN"):
+                    if result["finding"] is not None:
+                        findings.append(result["finding"])
+                    else:
+                        ok_observations[(datestr, key, "quarter-sum-mismatch", result["scope"])] = result["evidence"]
+
+                cross = check_cross_source(espn, nba_box, final)
+                if cross is not None:
+                    row["comparison"] = "different"
+                    row["score_mismatch"] = True
+                    findings.append(cross)
+                elif _complete_score_pair(espn) and _complete_score_pair(nba_box):
+                    row["comparison"] = "equal"
+                    ok_observations[(datestr, key, "cross-source-total-mismatch", "cross-source")] = {
+                        "espn": {k: espn.get(k) for k in ("away", "home", "away_score", "home_score", "status")},
+                        "nba_cdn": {k: nba_box.get(k) for k in ("away", "home", "away_score", "home_score")},
+                    }
+
                 if final:
                     try:
-                        pbp = fetch_json(NBA_PBP_URL.format(game_id=gid)) if live_fetch else json.loads((FIX_DIR / "nba_pbp_sample.json").read_text())
-                        p = check_pbp(nba_box, parse_nba_pbp_final(pbp))
-                        performed.add("pbp-recompute-mismatch")
-                        if p:
-                            findings.append(p)
+                        row["nba_cdn"]["play_by_play_url"] = NBA_PBP_URL.format(game_id=gid)
+                        pbp = fetch_json(row["nba_cdn"]["play_by_play_url"]) if live_fetch else json.loads((FIX_DIR / "nba_pbp_sample.json").read_text())
+                        pbp_final = parse_nba_pbp_final(pbp)
+                        row["nba_cdn"]["play_by_play_final_score"] = list(pbp_final) if pbp_final is not None else None
+                        pbp_check = check_pbp(nba_box, pbp_final)
+                        if pbp_check is not None:
+                            findings.append(pbp_check)
+                        elif pbp_final is not None and _complete_score_pair(nba_box):
+                            ok_observations[(datestr, key, "pbp-recompute-mismatch", "nba-pbp-vs-boxscore")] = {
+                                "nba_pbp_final": list(pbp_final),
+                                "nba_boxscore": {k: nba_box.get(k) for k in ("away", "home", "away_score", "home_score")},
+                            }
                     except Exception as exc:  # noqa: BLE001
+                        summary["feed_warnings"].append(f"NBA PBP fetch failed for {gid}: {exc}")
                         findings.append({"check": "feed-unavailable", "severity": "info",
                                          "detail": f"NBA PBP fetch failed for {gid}: {exc}"})
             except Exception as exc:  # noqa: BLE001
+                row["comparison"] = "nba-boxscore-unavailable"
+                summary["feed_warnings"].append(f"NBA boxscore fetch failed for {gid}: {exc}")
                 findings.append({"check": "feed-unavailable", "severity": "info",
                                  "detail": f"NBA boxscore fetch failed for {gid}: {exc}"})
-        for f in findings:
-            if f["check"] == "feed-unavailable":
-                continue  # feeds failing is operational noise, not a discrepancy
+        row["findings"] = [
+            {k: finding.get(k) for k in ("check", "scope", "severity", "detail")}
+            for finding in findings if finding.get("check") != "feed-unavailable"
+        ]
+        summary["game_rows"].append(row)
+
+        for finding in findings:
+            if finding["check"] == "feed-unavailable":
+                continue  # source outages are operational status, never a score discrepancy
             summary["mismatches"] += 1
-            rid = f"{datestr}-{key}-{f['check']}"
-            rec = {"id": rid, "created_utc": now, "last_seen_utc": now, "game_date": datestr,
-                   "away_team": espn["away"], "home_team": espn["home"], "game_key": key,
-                   "check": f["check"], "severity": f["severity"], "status": "detected",
-                   "evidence": {"espn": {k: espn[k] for k in ("away_score", "home_score", "status")},
-                                "nba_cdn": ({k: nba_box[k] for k in ("away_score", "home_score")} if nba_box else None),
-                                "detail": f["detail"]},
-                   "history": [{"at": now, "note": "Auto-detected by monitor.py. Human review required."}]}
+            scope = finding.get("scope", "unspecified")
+            evidence = {"check_observation": finding.get("observation"), "detail": finding["detail"]}
+            if finding["check"] == "cross-source-total-mismatch":
+                evidence["espn"] = {k: espn.get(k) for k in ("away", "home", "away_score", "home_score", "status")}
+                evidence["nba_cdn"] = ({k: nba_box.get(k) for k in ("away", "home", "away_score", "home_score")} if nba_box else None)
+            elif finding["check"] == "quarter-sum-mismatch":
+                evidence["source_snapshot"] = finding.get("observation")
+            elif finding["check"] == "pbp-recompute-mismatch":
+                evidence["nba_cdn_and_pbp"] = finding.get("observation")
+            rid = f"{datestr}-{key}-{finding['check']}-{scope}"
+            rec = {
+                "id": rid, "created_utc": now, "last_seen_utc": now, "game_date": datestr,
+                "away_team": espn["away"], "home_team": espn["home"], "game_key": key,
+                "check": finding["check"], "check_scope": scope,
+                "severity": finding["severity"], "status": "detected", "evidence": evidence,
+                "history": [{"at": now, "note": "Auto-detected by monitor.py. Source disagreement is unverified; human review required."}],
+            }
             res = upsert(data, rec)
             summary[res] += 1
-        failed = {f["check"] for f in findings if f["check"] != "feed-unavailable"}
-        for chk in performed - failed:
-            ok_keys.add((datestr, key, chk))
-    data["records"].sort(key=lambda r: r["created_utc"], reverse=True)
-    summary["auto_advanced_to_correction_observed"] = resolve_if_cleared(data, ok_keys, now)
+
+    data["records"].sort(key=lambda r: r.get("created_utc", ""), reverse=True)
+    summary["auto_advanced_to_correction_observed"] = resolve_if_cleared(data, ok_observations, now)
     save_investigations(data)
     return summary
+
+
+def write_current_snapshot(summary, requested_date=None, root=ROOT):
+    """Publish the latest scheduled comparison and feed health for the static site."""
+    path = root / "data" / "monitor" / "current.json"
+    previous = {}
+    if path.exists():
+        try:
+            previous = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            previous = {}
+    feeds = summary.get("feeds_ok", {})
+    espn_ok = feeds.get("espn") is True
+    nba_ok = feeds.get("nba-cdn") is True
+    if espn_ok and nba_ok and not summary.get("feed_warnings"):
+        status = "ok"
+    elif espn_ok or nba_ok:
+        status = "partial"
+    else:
+        status = "error"
+    observed_at = summary.get("observed_at_utc")
+    payload = {
+        "schemaVersion": 1,
+        "status": status,
+        "generatedAt": observed_at,
+        "requestedDate": requested_date or summary.get("date"),
+        "monitorDate": summary.get("date"),
+        "lastSuccessfulAt": observed_at if espn_ok and nba_ok else previous.get("lastSuccessfulAt"),
+        "sourceStatus": feeds,
+        "games": summary.get("game_rows", []),
+        "activeDiscrepancies": [row for row in summary.get("game_rows", []) if row.get("findings")],
+        "counts": {
+            "gamesCompared": summary.get("games", 0),
+            "findings": summary.get("mismatches", 0),
+            "feedWarnings": len(summary.get("feed_warnings", [])),
+        },
+        "feedWarnings": summary.get("feed_warnings", []),
+        "notes": [
+            "Score values are timestamped source observations, not a determination of which provider is correct.",
+            "No match, unavailable source, or missing score is not interpreted as zero or as resolution.",
+            "A mismatch creates an unverified investigation; human review is required before a case is confirmed.",
+        ],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = path.with_suffix(".json.tmp")
+    temp_path.write_text(json.dumps(payload, indent=2) + "\n")
+    temp_path.replace(path)
+    return payload
 
 
 def self_test():
@@ -317,7 +588,11 @@ def self_test():
     assert q is None, "ESPN fixture quarters should sum cleanly"
     pbp = json.loads((FIX_DIR / "nba_pbp_sample.json").read_text())
     assert parse_nba_pbp_final(pbp) == (110, 103), "PBP fixture final should be 110-103"
-    print("SELF-TEST PASS: 213-vs-214 fixture detected; quarter + PBP checks behave.")
+    missing = dict(espn[key], away_score=None)
+    assert check_cross_source(missing, box, True) is None, "missing score must not be treated as zero"
+    incomplete = dict(espn[key], away_score=None, home_score=None, quarters=[None], home_quarters=[None])
+    assert not quarter_sum_observations(incomplete, "ESPN"), "incomplete lines must not be treated as a passing check"
+    print("SELF-TEST PASS: source mismatch, incomplete-score guard, quarter sums, and PBP parsing behave.")
     return 0
 
 
@@ -333,11 +608,16 @@ def main(argv=None):
     dates = [(dt.datetime.strptime(base, "%Y%m%d") - dt.timedelta(days=i)).strftime("%Y%m%d")
              for i in range(args.lookback + 1)]
     all_ok = True
-    for d in dates:
+    latest_summary = None
+    for index, d in enumerate(dates):
         s = monitor_date(d)
         print(json.dumps(s, indent=2))
+        if index == 0:
+            latest_summary = s
         if "UNAVAILABLE" in json.dumps(s["feeds_ok"]):
             all_ok = False
+    if latest_summary is not None:
+        write_current_snapshot(latest_summary, requested_date=base)
     return 0 if all_ok else 2
 
 

@@ -7,7 +7,10 @@
       "status": "unidentified_unverified_lead",
       "origin": "The project brief says one source showed a 213-point final total while another showed 214.",
       "known_details": {
-        "reported_totals": [213, 214],
+        "reported_totals": [
+          213,
+          214
+        ],
         "game_date": null,
         "teams": null,
         "game_id": null,
@@ -21,6 +24,33 @@
         "Teams, if known",
         "The two source names or URLs, if known",
         "Any screenshot or timestamp preserving the 213 and 214 observations"
+      ],
+      "source_ids": [],
+      "excluded_from_verified_statistics": true
+    },
+    {
+      "id": "unverified-2021-kevin-porter-jr-stat-correction",
+      "title": "Unverified 2021 Kevin Porter Jr. scoring/stat-correction lead",
+      "status": "unverified_lead",
+      "origin": "A prior project record referred to a possible Kevin Porter Jr. statistical correction in 2021. The original game, source pair, changed statistic, and correction record have not been independently established.",
+      "known_details": {
+        "player_named_in_lead": "Kevin Porter Jr.",
+        "reported_year": 2021,
+        "game_date": null,
+        "teams": null,
+        "game_id": null,
+        "event_or_stat": null,
+        "reported_values": null,
+        "source_a": null,
+        "source_b": null,
+        "observation_timestamps": null
+      },
+      "research_note": "Retain only as an explicitly unverified research lead. Do not assert a game, matchup, exact player-stat change, NBA correction, or cause; exclude it from confirmed-case counts and all statistics.",
+      "next_evidence_needed": [
+        "A uniquely identified game date and teams",
+        "A source or archival snapshot showing the original player statistic",
+        "A separate source showing the corrected value and when it changed",
+        "Evidence distinguishing an NBA record correction from a fantasy/provider display issue"
       ],
       "source_ids": [],
       "excluded_from_verified_statistics": true

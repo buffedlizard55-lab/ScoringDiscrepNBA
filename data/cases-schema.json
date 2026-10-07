@@ -80,6 +80,7 @@
     "period_clock": { "type": ["string", "null"], "description": "Period and game clock of the scoring play, exactly as sourced, e.g. 'Q3, 2:00 remaining'." },
     "scoring_play": { "type": ["string", "null"] },
     "score_before": { "type": ["string", "null"], "description": "Score immediately before the play, with source attribution in notes when secondary-only." },
+    "score_after_play": { "type": ["string", "null"], "description": "Score immediately after the play, explicitly labelled derived when no source observation was preserved." },
     "affected_player": { "type": ["string", "null"] },
     "affected_team": { "type": ["string", "null"] },
     "originally_reported": {

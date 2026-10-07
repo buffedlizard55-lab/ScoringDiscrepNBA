@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <header class="hero">
   <div class="wrap">
     <h1>NBA Scoring Discrepancies</h1>
@@ -31,13 +32,13 @@
   <a href="#method">Methodology</a>
   <a href="#limits">Limitations &amp; roadmap</a>
 </div></nav>
-<main>
+<main id="main-content" tabindex="-1">
 <section id="start"><div class="wrap">
   <h2>Start here: what is this?</h2>
   <p class="lead">This project began with a single incident report: <strong>one source showed a 213-point
     final total for an NBA game while another showed 214.</strong> That report is tracked below as
     <strong>UNVERIFIED</strong> — its game has not been identified yet, so it is treated as an open
-    investigation, not a fact. Everything else on this page is a researched case with cited evidence.</p>
+    investigation, not a fact. Records below include researched cases and separately labeled unverified leads; each shows its evidence state.</p>
   <div class="alert unverified">
     <strong>⚠ The 213-vs-214 report is UNVERIFIED.</strong>
     Game, date, teams, and competing sources are unknown. See the record
@@ -59,7 +60,7 @@
   <p class="lead" id="stats-generated"></p>
   <div class="grid stats">
     <div class="stat-card"><div class="num" id="stat-verified">–</div><div class="lbl">Verified cases (full + partial)</div></div>
-    <div class="stat-card"><div class="num" id="stat-total">–</div><div class="lbl">Total records (incl. unverified stub)</div></div>
+    <div class="stat-card"><div class="num" id="stat-total">–</div><div class="lbl">Total records (including unverified leads)</div></div>
     <div class="stat-card"><div class="num" id="stat-score-changed">–</div><div class="lbl">Cases where the final score changed</div></div>
     <div class="stat-card"><div class="num" id="stat-onepoint">–</div><div class="lbl">One-point final-total corrections</div></div>
     <div class="stat-card"><div class="num" id="stat-official-wrong">–</div><div class="lbl">Official record was wrong (share of verified)</div></div>
@@ -132,7 +133,8 @@
   <p class="lead">Every game window, an automated job compares the ESPN scoreboard feed against NBA
     liveData box scores and play-by-play (cross-source totals, quarter sums, and PBP running-score
     consistency). Disagreements open an investigation record here; nothing becomes a case without
-    human verification. <span id="feed-count"></span></p>
+    human verification. The static site shows the latest committed poll, not a streaming feed. <span id="feed-count"></span></p>
+  <div id="monitor-current" class="feed-empty" aria-live="polite"><p>No scheduled monitor snapshot has been published yet.</p></div>
   <div id="monitor-feed"></div>
   <p class="lead">Monitor source code: <code class="inline">scripts/monitor.py</code> ·
     Investigation log: <code class="inline">data/investigations.json</code> ·
@@ -189,13 +191,16 @@
 </div></section>
 </main>
 
-<div class="detail" id="detail" role="dialog" aria-modal="true"><div class="detail-inner" id="detail-body"></div></div>
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-label="Case evidence details"><div class="detail-inner" id="detail-body"></div></div>
 
 <footer><div class="wrap">
   <p><strong>NBA Scoring Discrepancies</strong> — open research. Verify everything:
   <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA">repository</a> ·
   data: <a href="data/cases.json">cases.json</a> · <a href="data/stats.json">stats.json</a> ·
   <a href="data/investigations.json">investigations.json</a></p>
+  <p>Project workflow: <a href="INVESTIGATION_WORKFLOW.md">investigation review and resolution guide</a> ·
+  <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/blob/main/VERIFICATION.md">verification log</a> ·
+  <a href="https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/blob/main/README.md">full project brief</a>.</p>
   <p>Not affiliated with the NBA. All game data © its respective owners; linked reporting © its publishers.
   Corrections welcome via pull request — with sources.</p>
 </div></footer>

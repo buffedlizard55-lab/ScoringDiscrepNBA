@@ -48,7 +48,7 @@
         </div>
         <div class="hero-number-row"><strong id="heroVerifiedCount">—</strong><span>confirmed<br>corrections</span></div>
         <div class="hero-panel-rule"></div>
-        <p><strong id="heroOpenLeadCount">—</strong> unidentified lead held open, not counted as a case.</p>
+        <p><strong id="heroOpenLeadCount">—</strong> unverified research leads held open, excluded from confirmed-case counts.</p>
         <p class="panel-footnote">Examples found so far—not a complete history or a league-wide rate.</p>
         <a href="#method" class="text-link">How we verify <span aria-hidden="true">→</span></a>
       </aside>
@@ -154,15 +154,13 @@
     <section class="section lead-section" aria-labelledby="lead-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow eyebrow-amber">OPEN RESEARCH LEAD</p>
-          <h2 id="lead-title">213 vs 214: still unidentified</h2>
+          <p class="eyebrow eyebrow-amber">OPEN RESEARCH LEADS</p>
+          <h2 id="lead-title">Unverified leads, not confirmed cases</h2>
         </div>
-        <span class="status-pill status-warning"><span class="status-light"></span> Not verified · excluded from metrics</span>
+        <span class="status-pill status-warning"><span class="status-light"></span> Excluded from confirmed-case metrics</span>
       </div>
-      <div id="leadList" class="lead-card">
-        <div class="lead-number-pair"><span>213</span><i aria-hidden="true">↔</i><span>214</span></div>
-        <div class="lead-copy"><p>The project brief cites a game where sources showed totals of 213 and 214, but it does not identify the game, date, or providers. No unique incident is assigned without that evidence.</p><p class="muted-text">This is a prompt-supplied lead—not a confirmed incident. It is not included in any count or rate.</p><div id="leadDetails" class="lead-details"></div></div>
-        <span class="lead-mark" aria-hidden="true">?</span>
+      <div id="leadList" class="lead-list" aria-live="polite">
+        <div class="empty-state"><span class="empty-state-mark" aria-hidden="true">?</span><p>Loading explicitly unverified research leads…</p></div>
       </div>
     </section>
 
@@ -208,6 +206,6 @@
     </div>
   </footer>
 
-  <noscript><div class="noscript-notice">JavaScript is needed to load the linked research records and current monitor snapshot. The saved files remain available in the repository’s <a href="data/reviewed-cases.json">reviewed case dataset</a> and <a href="data/live-feed.json">feed snapshot</a>.</div></noscript>
+  <noscript><div class="noscript-notice">JavaScript is needed to load the linked research records and current monitor snapshot. The saved files remain available in the repository’s <a href="data/reviewed-cases.json">reviewed case dataset</a>, <a href="data/leads.json">unverified leads</a>, and <a href="data/live-feed.json">feed snapshot</a>.</div></noscript>
 </body>
 </html>

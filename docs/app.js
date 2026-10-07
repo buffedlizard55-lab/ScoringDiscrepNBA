@@ -37,6 +37,7 @@ const STATUS_LABELS = {
 };
 
 let ALL_CASES = [];
+let LAST_FOCUSED_CARD = null;
 
 function el(id) { return document.getElementById(id); }
 function esc(s) {
@@ -126,8 +127,13 @@ function applyFilters() {
   el("case-grid").innerHTML = cards.map(caseCard).join("") ||
     `<div class="feed-empty">No records match these filters. <a href="#" id="clear-filters">Clear filters</a>.</div>`;
   document.querySelectorAll(".case-card").forEach(card => {
-    card.addEventListener("click", () => openDetail(card.dataset.id));
-    card.addEventListener("keydown", e => { if (e.key === "Enter") openDetail(card.dataset.id); });
+    card.addEventListener("click", () => openDetail(card.dataset.id, card));
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        openDetail(card.dataset.id, card);
+      }
+    });
   });
   const clear = el("clear-filters");
   if (clear) clear.addEventListener("click", e => {
@@ -138,9 +144,10 @@ function applyFilters() {
   });
 }
 
-function openDetail(id) {
+function openDetail(id, trigger = null) {
   const c = ALL_CASES.find(x => x.id === id);
   if (!c) return;
+  LAST_FOCUSED_CARD = trigger || document.activeElement;
   const teams = [c.away_team, c.home_team].filter(Boolean).join(" @ ") || "Unknown (unverified report)";
   const srcItems = c.sources.map((s, i) =>
     `<li><strong>[${i}] ${esc(s.publisher)}</strong> <span class="chip">${esc(s.tier)}</span><br>` +
@@ -155,7 +162,7 @@ function openDetail(id) {
     `<li><strong>${esc(d.claim)}</strong><ul>${d.positions.map(p => `<li>${esc(p)}</li>`).join("")}</ul></li>`
   ).join("");
   el("detail-body").innerHTML = `
-    <button class="close-btn" id="detail-close">Close ✕</button>
+    <button type="button" class="close-btn" id="detail-close">Close case details</button>
     <h2>${esc(c.title)}</h2>
     <div class="meta">${esc(c.game_date || "Date unknown")} · ${esc(teams)}${c.season ? " · " + esc(c.season) : ""}${c.venue ? " · " + esc(c.venue) : ""}</div>
     <div style="margin:8px 0">${statusChip(c.status)}
@@ -174,6 +181,7 @@ function openDetail(id) {
       <li><strong>Clock:</strong> ${esc(c.period_clock || "Unknown — not inferred")}</li>
       <li><strong>Scoring play:</strong> ${esc(c.scoring_play || "Unknown")}</li>
       <li><strong>Score before:</strong> ${esc(c.score_before || "Unknown")}</li>
+      <li><strong>Score after play:</strong> ${esc(c.score_after_play || "Unknown or not independently captured")}</li>
       <li><strong>Affected:</strong> ${esc(c.affected_player || "—")} (${esc(c.affected_team || "—")})</li>
       <li><strong>Was the NBA's official record wrong?</strong> ${esc(c.official_record_was_wrong)}</li>
       <li><strong>Cause (${esc(c.cause.determination)}):</strong> ${esc(c.cause.detail)}</li>
@@ -191,11 +199,14 @@ function openDetail(id) {
     <p class="meta">Record <code class="inline">${esc(c.id)}</code> · verification: ${esc(c.verification_level)} · last reviewed ${esc(c.last_reviewed)}</p>`;
   el("detail").classList.add("open");
   document.body.style.overflow = "hidden";
-  el("detail-close").addEventListener("click", closeDetail);
+  const closeButton = el("detail-close");
+  closeButton.addEventListener("click", closeDetail);
+  closeButton.focus();
 }
 function closeDetail() {
   el("detail").classList.remove("open");
   document.body.style.overflow = "";
+  if (LAST_FOCUSED_CARD && typeof LAST_FOCUSED_CARD.focus === "function") LAST_FOCUSED_CARD.focus();
 }
 
 function renderFeed(inv) {
@@ -203,16 +214,95 @@ function renderFeed(inv) {
   const recs = (inv.records || []).filter(r => !["resolved", "escalated-to-case"].includes(r.status));
   el("feed-count").textContent = recs.length
     ? `${recs.length} open investigation${recs.length === 1 ? "" : "s"}`
-    : "No open investigations — last checks agreed across sources.";
+    : "No open investigation records are stored.";
   if (!recs.length) {
-    mount.innerHTML = `<div class="feed-empty">The monitor's latest runs found no cross-source disagreements. ` +
-      `Resolved and escalated records remain in <code class="inline">data/investigations.json</code> in the repository. ` +
-      `Note: the originating 213-vs-214 report is tracked as an <strong>unverified</strong> record above, not here, until its game is identified.</div>`;
+    mount.innerHTML = `<div class="feed-empty">No open investigation record is currently stored. ` +
+      `This does not by itself prove that the latest feeds agreed or were reachable; check the latest poll and source health above. ` +
+      `Resolved and escalated records remain in <code class="inline">data/investigations.json</code>. ` +
+      `The unidentified 213-vs-214 report and Kevin Porter Jr. lead remain separately labeled <strong>unverified</strong> in the case collection.</div>`;
     return;
   }
-  mount.innerHTML = `<table class="clean"><tr><th>Detected (UTC)</th><th>Game</th><th>Check</th><th>Status</th><th>Evidence</th></tr>` +
-    recs.map(r => `<tr><td>${esc(r.created_utc)}</td><td>${esc(r.game_date)} ${esc(r.game_key)}</td>` +
-      `<td>${esc(r.check)}</td><td>${esc(r.status)}</td><td>${esc((r.evidence || {}).detail || "")}</td></tr>`).join("") + `</table>`;
+  const rows = recs.map(r => {
+    const observations = r.observations || [];
+    const history = r.history || [];
+    const events = [
+      ...observations.map(o => {
+        const evidence = o.evidence || {};
+        const detail = evidence.detail || JSON.stringify(evidence.check_observation || evidence.source_snapshot || evidence.nba_cdn_and_pbp || evidence);
+        return { at: o.at || "", html: `<strong>${esc(o.at || "Time unavailable")}</strong> · source observation (${esc(o.severity || "severity unknown")}) — ${esc(detail)}` };
+      }),
+      ...(r.resolution_observations || []).map(o => ({
+        at: o.at || "",
+        html: `<strong>${esc(o.at || "Time unavailable")}</strong> · later source values agreed: <code class="inline">${esc(JSON.stringify(o.evidence || {}))}</code>`
+      })),
+      ...history.map(item => ({
+        at: item.at || "",
+        html: `<strong>${esc(item.at || "Time unavailable")}</strong> · status event — ${esc(item.note || "Status event")}`
+      })),
+    ].sort((a, b) => a.at.localeCompare(b.at));
+    const timeline = events.map(item => `<li>${item.html}</li>`).join("");
+    const details = events.length
+      ? `<details><summary>${observations.length} source observation${observations.length === 1 ? "" : "s"} · ${history.length} status event${history.length === 1 ? "" : "s"} · ${esc(r.repeat_count || 1)} poll${(r.repeat_count || 1) === 1 ? "" : "s"}</summary><ol>${timeline}</ol></details>`
+      : "";
+    return `<tr><td>${esc(r.created_utc || "Time unknown")}</td><td>${esc(r.game_date || "Date unknown")} ${esc(r.game_key || "Game unknown")}</td>` +
+      `<td>${esc(r.check || "Check unknown")}${r.check_scope ? ` · ${esc(r.check_scope)}` : ""}</td><td>${esc(r.status || "Status unknown")}</td>` +
+      `<td>${esc((r.evidence || {}).detail || "")} ${details}</td></tr>`;
+  }).join("");
+  mount.innerHTML = `<table class="clean"><thead><tr><th>Detected (UTC)</th><th>Game</th><th>Check / scope</th><th>Status</th><th>Evidence &amp; history</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function safeSourceLink(url, label) {
+  if (typeof url !== "string" || !url.startsWith("https://")) return "";
+  return `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+}
+
+function formatObservedScore(block) {
+  if (!block || typeof block !== "object") return "Unavailable — not assumed to be zero";
+  const away = block.away == null ? "Unknown" : String(block.away);
+  const home = block.home == null ? "Unknown" : String(block.home);
+  const total = block.total == null ? "unavailable" : String(block.total);
+  return `${away}–${home} (combined ${total})`;
+}
+
+function renderCurrentMonitor(snapshot) {
+  const mount = el("monitor-current");
+  if (!snapshot || snapshot.status === "not-run") {
+    mount.innerHTML = `<p><strong>No scheduled monitor snapshot has been published yet.</strong> This is not a statement that either feed is currently reachable.</p>`;
+    return;
+  }
+  const sourceStatus = Object.entries(snapshot.sourceStatus || {}).map(([name, value]) =>
+    `<li><strong>${esc(name)}:</strong> ${value === true ? "reachable" : esc(value || "not checked")}</li>`
+  ).join("");
+  const warnings = (snapshot.feedWarnings || []).map(item => `<li>${esc(item)}</li>`).join("");
+  const rows = (snapshot.games || []).map(row => {
+    const espn = row.espn || {}, nba = row.nba_cdn || {};
+    const findings = (row.findings || []).map(item => `<li><strong>${esc(item.check || "check")}</strong>: ${esc(item.detail || "")}</li>`).join("");
+    const comparisonLabels = {
+      equal: "Feeds agree on displayed score",
+      different: "Feeds differ — unverified source divergence",
+      "no-nba-match": "No NBA matchup match; not treated as a score difference",
+      "nba-scoreboard-unavailable": "NBA scoreboard unavailable; no comparison",
+      "nba-boxscore-unavailable": "NBA box score unavailable; no comparison",
+      "incomplete-score-data": "One or more score values missing; no comparison",
+    };
+    return `<tr><td>${esc(row.game_date || "Date unknown")} · ${esc(row.away_team || "Away team unknown")} @ ${esc(row.home_team || "Home team unknown")}<br><span class="meta">${esc(row.status || "Status unknown")} · observed ${esc(row.observed_at_utc || "time unknown")}</span></td>` +
+      `<td>${esc(formatObservedScore(espn.score))}<br>${safeSourceLink(espn.url, "ESPN source")}</td>` +
+      `<td>${esc(formatObservedScore(nba.score))}<br>${safeSourceLink(nba.boxscore_url || nba.scoreboard_url, "NBA CDN source")}` +
+      `${nba.play_by_play_url ? `<br>${safeSourceLink(nba.play_by_play_url, "NBA play-by-play")}` : ""}</td>` +
+      `<td>${esc(comparisonLabels[row.comparison] || row.comparison || "Not compared")}</td>` +
+      `<td>${findings ? `<ul>${findings}</ul>` : "No finding recorded for this row."}</td></tr>`;
+  }).join("");
+  const currentRows = rows
+    ? `<div class="table-scroll"><table class="clean"><thead><tr><th>Game / observed time (UTC)</th><th>ESPN observation</th><th>NBA CDN observation</th><th>Comparison</th><th>Checks</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    : `<p>No game rows were returned for this poll date. This may be an off-day or a source/coverage limitation.</p>`;
+  mount.innerHTML = `<p><strong>Latest committed poll:</strong> ${esc(snapshot.generatedAt || "time unavailable")} · status <strong>${esc(snapshot.status || "unknown")}</strong> · requested date ${esc(snapshot.requestedDate || "unknown")}. ` +
+    `Last poll with both score feeds available: ${esc(snapshot.lastSuccessfulAt || "none recorded")}.</p>` +
+    `<p>Games compared: ${esc(snapshot.counts && snapshot.counts.gamesCompared != null ? snapshot.counts.gamesCompared : 0)} · ` +
+    `findings: ${esc(snapshot.counts && snapshot.counts.findings != null ? snapshot.counts.findings : 0)} · ` +
+    `feed warnings: ${esc(snapshot.counts && snapshot.counts.feedWarnings != null ? snapshot.counts.feedWarnings : 0)}.</p>` +
+    `<h3>Source health</h3><ul>${sourceStatus || "<li>No source-health data recorded.</li>"}</ul>` +
+    `${warnings ? `<h3>Feed warnings (not scoring findings)</h3><ul>${warnings}</ul>` : ""}` +
+    `${currentRows}<ul>${(snapshot.notes || []).map(note => `<li>${esc(note)}</li>`).join("")}</ul>`;
 }
 
 function renderMethodology(src) {
@@ -224,9 +314,10 @@ function renderMethodology(src) {
 
 async function init() {
   try {
-    const [cases, stats, inv, src] = await Promise.all([
+    const [cases, stats, inv, src, monitorSnapshot] = await Promise.all([
       loadJSON("data/cases.json"), loadJSON("data/stats.json"),
-      loadJSON("data/investigations.json"), loadJSON("data/sources.json")
+      loadJSON("data/investigations.json"), loadJSON("data/sources.json"),
+      loadJSON("data/monitor/current.json")
     ]);
     ALL_CASES = cases.cases || [];
     renderStats(stats);
@@ -234,9 +325,32 @@ async function init() {
       .forEach(id => el(id).addEventListener("input", applyFilters));
     applyFilters();
     renderFeed(inv);
+    renderCurrentMonitor(monitorSnapshot);
     renderMethodology(src);
     el("detail").addEventListener("click", e => { if (e.target.id === "detail") closeDetail(); });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+    document.addEventListener("keydown", e => {
+      const dialog = el("detail");
+      if (!dialog.classList.contains("open")) return;
+      if (e.key === "Escape") {
+        closeDetail();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = [...dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+        .filter(node => node.offsetParent !== null);
+      if (!focusable.length) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   } catch (err) {
     document.querySelector("main").innerHTML =
       `<div class="wrap"><div class="alert unverified"><strong>Data failed to load.</strong>` +

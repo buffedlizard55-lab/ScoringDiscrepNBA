@@ -134,11 +134,26 @@
     const corrected = scores.corrected_final || {};
     const official = scores.final_official || {};
     const playerImpact = item.impact?.player_points;
-    const playerPointsLine = playerImpact
-      ? `${playerImpact.originally_reported ?? "Unknown"} → ${playerImpact.corrected ?? "Unknown"}`
-      : item.impact?.player_points_after_correction != null
-        ? `${item.impact.player_points_before_correction ?? "Unknown"} → ${item.impact.player_points_after_correction}`
-        : "Not established";
+    const disputedPlayerValues = playerImpact?.status === "disputed_unresolved"
+      && Array.isArray(playerImpact.reported_values)
+      ? playerImpact.reported_values
+      : [];
+    const playerPointsLine = disputedPlayerValues.length
+      ? `${disputedPlayerValues.map((entry) => entry.value).join(" vs ")} · unresolved`
+      : playerImpact
+        ? `${playerImpact.originally_reported ?? "Unknown"} → ${playerImpact.corrected ?? "Unknown"}`
+        : item.impact?.player_points_after_correction != null
+          ? `${item.impact.player_points_before_correction ?? "Unknown"} → ${item.impact.player_points_after_correction}`
+          : "Not established";
+    const playerPointsLabel = disputedPlayerValues.length
+      ? "Conflicting player-point reports"
+      : "Player points · reported → corrected";
+    const playerPointsNote = playerImpact?.note
+      ? `<p class="impact-note">${escapeHtml(playerImpact.note)}</p>`
+      : "";
+    const playerPointsEvidence = disputedPlayerValues.length
+      ? `<div class="player-point-positions">${disputedPlayerValues.map((entry) => `<p><strong>${escapeHtml(entry.value)} reported by:</strong> ${sourceLinks(entry.source_ids, sourceMap)}</p>`).join("")}</div>`
+      : "";
     const teamPointsDelta = item.impact?.team_points_delta ?? item.impact?.final_total_delta;
     const filterText = JSON.stringify(item).toLowerCase();
     const statusLabel = item.official_record_status === "nba_record_corrected" ? "NBA record corrected" : "Verified case";
@@ -171,7 +186,7 @@
             <div class="case-impact">
               <div class="impact-item"><span>Affected player</span><strong>${escapeHtml(item.impact?.affected_player || event.player || "Not stated")}</strong></div>
               <div class="impact-item"><span>Affected team</span><strong>${escapeHtml(item.impact?.affected_team || item.impact?.team || event.team || "Not stated")}</strong></div>
-              <div class="impact-item"><span>Player points · reported → corrected</span><strong>${escapeHtml(playerPointsLine)}</strong></div>
+              <div class="impact-item"><span>${escapeHtml(playerPointsLabel)}</span><strong>${escapeHtml(playerPointsLine)}</strong>${playerPointsNote}${playerPointsEvidence}</div>
               <div class="impact-item"><span>Team-score change</span><strong>${teamPointsDelta == null ? "Not established" : `+${escapeHtml(teamPointsDelta)} point`}</strong></div>
             </div>
             ${sourceLinks(item.cause?.source_ids, sourceMap)}
@@ -432,18 +447,43 @@
   };
 
   const renderLeads = (leads) => {
-    const container = $("#leadDetails");
+    const container = $("#leadList");
     if (!Array.isArray(leads) || !leads.length) {
-      container.innerHTML = `<span>No additional lead records</span>`;
+      container.innerHTML = `<div class="empty-state"><span class="empty-state-mark" aria-hidden="true">∅</span><p>No unverified lead records are published.</p></div>`;
       return;
     }
     container.innerHTML = leads.map((lead) => {
-      const details = [
-        lead.known_details?.game_date ? `Date ${lead.known_details.game_date}` : "Game date not supplied",
-        lead.known_details?.teams ? lead.known_details.teams.join(" / ") : "Teams not supplied",
-        lead.known_details?.source_a || lead.known_details?.source_b ? "Source details supplied" : "Sources not supplied",
-      ];
-      return `${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join("")}<p class="lead-next">${escapeHtml(lead.research_note || "No research note supplied.")}</p>`;
+      const details = lead.known_details || {};
+      const totals = Array.isArray(details.reported_totals) ? details.reported_totals : [];
+      const year = details.reported_year;
+      const player = details.player_named_in_lead;
+      const marker = totals.length
+        ? totals.map((value) => `<span>${escapeHtml(value)}</span>`).join('<i aria-hidden="true">↔</i>')
+        : `<span>${escapeHtml([year ? `${year} ·` : "", player || "?"].filter(Boolean).join(" "))}</span>`;
+      const detailChips = [];
+      if (player) detailChips.push(`Player named in lead: ${player}`);
+      if (year) detailChips.push(`Year stated in lead: ${year} (unverified)`);
+      if (totals.length) detailChips.push(`Reported totals: ${totals.join(" and ")} (unverified)`);
+      if (details.game_date) detailChips.push(`Game date: ${details.game_date}`);
+      else detailChips.push("Game date not established");
+      const teams = Array.isArray(details.teams) ? details.teams : null;
+      if (teams?.length) detailChips.push(`Teams: ${teams.join(" / ")}`);
+      else detailChips.push("Teams not established");
+      const hasSources = Array.isArray(lead.source_ids) && lead.source_ids.length > 0;
+      detailChips.push(hasSources ? "Source references supplied; not verified" : "No independently verified source pair supplied");
+      const nextEvidence = Array.isArray(lead.next_evidence_needed) ? lead.next_evidence_needed : [];
+      return `<article class="lead-card" data-lead="${escapeHtml(lead.id || "")}">
+        <div class="lead-number-pair" aria-label="Unverified lead details">${marker}</div>
+        <div class="lead-copy">
+          <h3 class="lead-title">${escapeHtml(lead.title || "Unverified research lead")}</h3>
+          <p>${escapeHtml(lead.origin || "Origin of this lead was not recorded.")}</p>
+          <p class="muted-text">${escapeHtml((lead.status || "unverified_lead").replaceAll("_", " "))} · excluded from confirmed-case statistics.</p>
+          <div class="lead-details">${detailChips.map((detail) => `<span>${escapeHtml(detail)}</span>`).join("")}</div>
+          <p class="lead-next">${escapeHtml(lead.research_note || "No research note supplied.")}</p>
+          ${nextEvidence.length ? `<details class="lead-evidence"><summary>Evidence needed to investigate</summary><ul>${nextEvidence.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></details>` : ""}
+        </div>
+        <span class="lead-mark" aria-hidden="true">?</span>
+      </article>`;
     }).join("");
   };
 

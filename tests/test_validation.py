@@ -21,6 +21,27 @@ class RepositoryDataTests(unittest.TestCase):
         self.assertIn("scores", schema["properties"])
         self.assertIn("sources", schema["properties"])
 
+    def test_unverified_research_leads_are_explicit_and_excluded(self) -> None:
+        leads = json.loads((ROOT / "data" / "leads.json").read_text(encoding="utf-8"))["leads"]
+        by_id = {lead["id"]: lead for lead in leads}
+        expected = {
+            "unidentified-213-vs-214-final-total": "unidentified_unverified_lead",
+            "unverified-2021-kevin-porter-jr-stat-correction": "unverified_lead",
+        }
+        self.assertTrue(set(expected).issubset(by_id))
+        for lead_id, status in expected.items():
+            self.assertEqual(by_id[lead_id]["status"], status)
+            self.assertTrue(by_id[lead_id]["excluded_from_verified_statistics"])
+            self.assertEqual(by_id[lead_id]["source_ids"], [])
+
+    def test_melton_player_total_conflict_is_not_resolved_by_the_dashboard(self) -> None:
+        cases = json.loads((ROOT / "data" / "reviewed-cases.json").read_text(encoding="utf-8"))["cases"]
+        melton = next(case for case in cases if case["id"] == "nba-2024-10-23-gsw-por-free-throw-correction")
+        impact = melton["impact"]["player_points"]
+        self.assertEqual(impact["status"], "disputed_unresolved")
+        self.assertEqual({entry["value"] for entry in impact["reported_values"]}, {11, 12})
+        self.assertIn("NBA-verified value", impact["note"])
+
     def test_missing_data_file_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(DataValidationError):

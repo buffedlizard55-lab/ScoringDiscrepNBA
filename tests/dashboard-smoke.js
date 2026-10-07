@@ -60,21 +60,31 @@ async function main() {
   await new Promise((resolve) => setImmediate(resolve));
 
   assert.equal(elements.get("heroVerifiedCount").textContent, "2");
+  assert.equal(elements.get("heroOpenLeadCount").textContent, "2");
   assert.equal(elements.get("statFinalScore").textContent, "2 / 2");
   assert.match(elements.get("caseList").innerHTML, /Tre Johnson/);
   assert.match(elements.get("caseList").innerHTML, /After corrected entry/);
-  assert.match(elements.get("caseList").innerHTML, /Player points · reported → corrected/);
+  assert.match(elements.get("caseList").innerHTML, /Conflicting player-point reports/);
+  assert.match(elements.get("caseList").innerHTML, /11 vs 12 · unresolved/);
+  assert.match(elements.get("caseList").innerHTML, /No corrected official NBA player-line snapshot was recovered/);
+  assert.match(elements.get("caseList").innerHTML, /FanSided/);
+  assert.match(elements.get("caseList").innerHTML, /NBA Official post on the Cavaliers–Wizards score correction/);
   assert.match(elements.get("caseList").innerHTML, /official NBA Gamebook/);
   assert.match(elements.get("caseList").innerHTML, /boxscore\/NBA_20251107_CLE@WAS/);
   assert.match(elements.get("typeBreakdown").innerHTML, /made free throw recorded as miss/);
   assert.equal(elements.get("typeFilter").children.length, 1);
   assert.match(html, /href="docs\/index\.html"/, "root dashboard must link to the preserved historical catalog");
-  assert.match(elements.get("leadDetails").innerHTML, /not counted/);
+  assert.equal((elements.get("leadList").innerHTML.match(/class="lead-card"/g) || []).length, 2);
+  assert.match(elements.get("leadList").innerHTML, /213/);
+  assert.match(elements.get("leadList").innerHTML, /214/);
+  assert.match(elements.get("leadList").innerHTML, /Kevin Porter Jr\./);
+  assert.match(elements.get("leadList").innerHTML, /Year stated in lead: 2021 \(unverified\)/);
+  assert.match(elements.get("leadList").innerHTML, /excluded from confirmed-case statistics/);
   assert.match(elements.get("monitorStatus").innerHTML, /Not yet active/);
   assert.equal(elements.get("investigationsPanel").hidden, true);
   assert.doesNotMatch(elements.get("caseList").innerHTML, /\[object Object\]/);
 
-  console.log(`Dashboard smoke test passed (${new Set(selectors).size} DOM selectors, linked seed records, filters, lead, and not-started monitor state).`);
+  console.log(`Dashboard smoke test passed (${new Set(selectors).size} DOM selectors, linked seed records, unresolved player-line conflict, two excluded leads, filters, and not-started monitor state).`);
 }
 
 main().catch((error) => {

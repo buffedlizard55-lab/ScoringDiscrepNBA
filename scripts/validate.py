@@ -179,6 +179,37 @@ def main():
     inv = json.loads((ROOT / "data" / "investigations.json").read_text()) if (ROOT / "data" / "investigations.json").exists() else {}
     if isinstance(inv, dict) and "records" in inv and not isinstance(inv["records"], list):
         errors.append("investigations.json: 'records' must be a list")
+    snapshot_path = ROOT / "data" / "monitor" / "current.json"
+    if snapshot_path.exists():
+        try:
+            snapshot = json.loads(snapshot_path.read_text())
+            if snapshot.get("status") not in {"not-run", "ok", "partial", "error"}:
+                errors.append("data/monitor/current.json: invalid status")
+            if not isinstance(snapshot.get("games"), list):
+                errors.append("data/monitor/current.json: 'games' must be a list")
+            for i, row in enumerate(snapshot.get("games", [])):
+                if not isinstance(row, dict):
+                    errors.append(f"data/monitor/current.json: games[{i}] must be an object")
+                    continue
+                for source in ("espn", "nba_cdn"):
+                    block = row.get(source, {})
+                    score = block.get("score") if isinstance(block, dict) else None
+                    if score is None:
+                        continue
+                    if not isinstance(score, dict):
+                        errors.append(f"data/monitor/current.json: games[{i}].{source}.score must be an object or null")
+                        continue
+                    away, home, total = score.get("away"), score.get("home"), score.get("total")
+                    for side, value in (("away", away), ("home", home), ("total", total)):
+                        if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
+                            errors.append(f"data/monitor/current.json: games[{i}].{source}.score.{side} must be a non-negative integer or null")
+                    if away is None or home is None:
+                        if total is not None:
+                            errors.append(f"data/monitor/current.json: games[{i}].{source} infers a total from incomplete scores")
+                    elif total != away + home:
+                        errors.append(f"data/monitor/current.json: games[{i}].{source}.score total does not equal away + home")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"data/monitor/current.json invalid: {exc}")
     if errors:
         print(f"VALIDATION FAILED ({len(errors)} issue(s)):")
         for err in errors:

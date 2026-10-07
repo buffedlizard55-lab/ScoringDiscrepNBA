@@ -1,10 +1,18 @@
 {
   "generated": "2026-10-07",
+  "generated_timezone": "UTC",
   "scope_caveat": "Within-collection statistics only. This repository is a growing research collection, not a census of all NBA games, so these shares describe the collection \u2014 not league-wide incidence rates. Do not cite them as 'X% of NBA games'.",
-  "collection_size": 13,
+  "collection_size": 14,
   "verified_count": 12,
+  "verified_count_scope": "Includes status `verified` and `verified-partial`; this is not a count of fully verified cases only. See verification_status_counts.",
+  "fully_verified_count": 0,
+  "verified_partial_count": 12,
+  "verification_status_counts": {
+    "unverified": 2,
+    "verified-partial": 12
+  },
   "status_counts": {
-    "unverified": 1,
+    "unverified": 2,
     "verified-partial": 12
   },
   "verified_type_counts": {
@@ -36,8 +44,8 @@
     "yes-stands": 1
   },
   "verified_level_counts": {
-    "multi-secondary-confirmed": 8,
-    "official-nba-confirmed": 2,
+    "multi-secondary-confirmed": 7,
+    "official-nba-confirmed": 3,
     "single-secondary": 2
   },
   "final_score_changed_ids": [
@@ -75,18 +83,17 @@
     "2019-12-03-hou-san-harden-dunk": 6,
     "2022-01-24-uta-phx-paul-assist": 1,
     "2022-01-27-min-gsw-edwards-steal": 1,
-    "2024-10-23-gsw-por-melton-ft": 1,
-    "2025-11-07-cle-was-johnson-ft": 1
+    "2024-10-23-gsw-por-melton-ft": 1
   },
   "duration_notes": [
-    "Next-day corrections (1 day, game to corrected record): 4 cases \u2014 2022-01-24-uta-phx-paul-assist, 2022-01-27-min-gsw-edwards-steal, 2024-10-23-gsw-por-melton-ft, 2025-11-07-cle-was-johnson-ft.",
+    "Next-day corrections (1 day, game to corrected record): 3 cases \u2014 2022-01-24-uta-phx-paul-assist, 2022-01-27-min-gsw-edwards-steal, 2024-10-23-gsw-por-melton-ft.",
     "Resolution lag 6 days (game to final ruling/replay): 2019-12-03-hou-san-harden-dunk.",
     "Resolution lag 7 days (game to final ruling/replay): 2017-01-20-ind-lal-robinson-2v3.",
     "Resolution lag 15 days (game to final ruling/replay): 2014-11-13-sac-mem-lee-buzzer.",
     "Resolution lag 80 days (game to final ruling/replay): 2007-12-19-mia-atl-shaq-foul.",
     "1982-11-30-lal-san-nixon-ft: Approximate: protest upheld December 1982 and the finish was replayed in April 1983 \u2014 roughly 4-5 months from game to replayed finish (month granularity only; LA Times, China Daily).",
     "2018-12-31-min-nop-scoreboard: Transient display error observed during the final minute of play; total duration undocumented (Action Network). No post-game correction was needed.",
-    "Duration unknown or not applicable (stands unreviewed / transient display / single-date record): 2019-06-13-gsw-tor-green-2v3, 2022-02-09-chi-cha-lavine-assist."
+    "Duration unknown or not applicable (stands unreviewed / transient display / single-date record): 2019-06-13-gsw-tor-green-2v3, 2022-02-09-chi-cha-lavine-assist, 2025-11-07-cle-was-johnson-ft."
   ],
   "headline": {
     "official_record_wrong_share": 0.667,
