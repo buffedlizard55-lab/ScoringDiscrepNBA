@@ -218,6 +218,26 @@ class FinalGameConsistencyTests(unittest.TestCase):
         game["homeTeam"]["score"] = 115
         return payload
 
+    def test_failed_summary_fetch_is_not_treated_as_a_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state, _ = run_with_payloads(
+                self.final_nba_scoreboard(), self.final_espn_scoreboard(),
+                root=directory, observed_at="2026-10-07T04:00:00Z",
+                summary_payloads={"espn:401809511": None})
+            self.assertEqual(state["final_game_checks"], {})
+
+    def test_summary_recheck_uses_provider_id_for_joined_record(self):
+        from monitor.runner import _due_for_summary_check
+        with tempfile.TemporaryDirectory() as directory:
+            state, _ = run_with_payloads(
+                self.final_nba_scoreboard(), self.final_espn_scoreboard(),
+                root=directory, observed_at="2026-10-07T04:00:00Z",
+                summary_payloads={"espn:401809511": read_fixture("espn-summary-401809511.json")})
+            self.assertFalse(_due_for_summary_check(
+                state, "espn", "401809511", {"away": 148, "home": 115}, "2026-10-07T04:05:00Z"))
+            self.assertTrue(_due_for_summary_check(
+                state, "espn", "401809511", {"away": 148, "home": 116}, "2026-10-07T04:05:00Z"))
+
     def test_consistent_final_is_recorded_without_creating_an_investigation(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             state, _ = run_with_payloads(

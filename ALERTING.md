@@ -26,7 +26,7 @@ about any specific game unless a link is attached.
 | Can we detect that a source changed a score it had already published as final? | **Yes** | [`monitor/engine.py`](monitor/engine.py) keeps a per-source baseline of the first final score it saw |
 | Can we detect that one provider's final score contradicts the box score that same provider publishes? | **Yes** | [`monitor/consistency.py`](monitor/consistency.py) recomputes `2 × (FGM − 3PM) + 3 × 3PM + FTM` from the provider's own cells. This detector works while the primary feed is down, because rows are now built from every source that answered |
 | Can we notify someone automatically? | **Yes**, as GitHub issues with the repository's `GITHUB_TOKEN`, and optionally to a webhook | [`monitor/dispatch.py`](monitor/dispatch.py) + the scheduled workflow |
-| Can the system confirm that the NBA's *official* record was wrong? | **No** | There is no machine-readable official correction feed; see §3.1 |
+| Can the system confirm that the NBA's *official* record was wrong? | **No** | No dedicated official correction feed has been verified or integrated here; see §3.1 |
 | Can it see arena scoreboard / TV graphics errors? | **No** | Those are not published through the feeds we can read; see §3.5 |
 | Can it find historical cases before this monitor existed? | **No, not automatically** | We only observe feeds forward in time; historical cases come from archive research; see §3.4 |
 | Does "no alerts" mean "no discrepancies"? | **No** | Outages, poll delay, and consistent errors all produce silence; see §3.6 |
@@ -78,11 +78,12 @@ observations, the lifecycle entries, and the delivery record.
 
 ## 3. Limitations that are real today
 
-### 3.1 There is no machine-readable official correction feed
+### 3.1 No dedicated official correction feed has been verified here
 
 The NBA announces scoring corrections as prose: game recaps, league statements,
-and posts from the official account. There is no public endpoint that says
-"game 0022400072 was corrected from 139-104 to 140-104". Consequently the
+and posts from the official account in the linked seed cases. This project has
+not verified or integrated a dedicated correction endpoint; that does not prove
+no such product exists. With the currently integrated feeds, the
 system can produce a *candidate* and attach evidence, but a human (or an agent
 under review) must confirm whether the league's record changed. The two
 confirmed examples in this project both required reading a published statement:

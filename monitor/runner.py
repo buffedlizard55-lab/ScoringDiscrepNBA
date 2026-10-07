@@ -380,31 +380,16 @@ def run_with_payloads(
     # from the same provider's scoreboard value and box-score components, so
     # they still work when only one source is reachable.
     consistency_checks: list[dict[str, Any]] = []
-    # An observation's game_id comes from the primary feed when the two feeds
-    # are joined, so the ESPN game is matched by its own id first and then by
-    # the team pair it belongs to.
-    observations_by_pair = {
-        (
-            (item.get("away_team") or {}).get("abbreviation"),
-            (item.get("home_team") or {}).get("abbreviation"),
-        ): item
-        for item in observations
-    }
-    espn_games_by_id = {str(game.get("game_id")): game for game in espn_games}
+    # Join summaries by the provider's own ID, never by team pair alone.
     for key, payload in sorted((summary_payloads or {}).items()):
         source_key, _, game_id = key.partition(":")
-        if source_key != "espn" or not game_id:
+        if source_key != "espn" or not game_id or payload is None:
             continue
-        espn_game = espn_games_by_id.get(game_id)
-        pair = (
-            (espn_game.get("away_team") or {}).get("abbreviation"),
-            (espn_game.get("home_team") or {}).get("abbreviation"),
-        ) if espn_game else (None, None)
-        observation = next(
-            (item for item in observations if str(item.get("game_id")) == game_id), None
-        ) or observations_by_pair.get(pair)
-        if observation is None:
+        matches = [item for item in observations
+                   if str((item.get("scores", {}).get("espn") or {}).get("game_id")) == game_id]
+        if len(matches) != 1:
             continue
+        observation = matches[0]
         provider_scores = {
             "away": (observation.get("scores", {}).get("espn") or {}).get("away"),
             "home": (observation.get("scores", {}).get("espn") or {}).get("home"),
@@ -456,7 +441,13 @@ def _due_for_summary_check(
 ) -> bool:
     record = ((state.get("final_game_checks") or {}).get(f"{source_key}:{game_key}")) or {}
     if not record:
-        return True
+        # Joined rows use the NBA row identity, while requests use ESPN IDs.
+        matches = [entry for entry in (state.get("final_game_checks") or {}).values()
+                   if entry.get("source_key") == source_key
+                   and str(entry.get("game_id")) == game_key]
+        if len(matches) != 1:
+            return True
+        record = matches[0]
     if record.get("provider_reported") != {"away": score.get("away"), "home": score.get("home")}:
         return True
     checked_at = _parse_iso(record.get("checked_at"))
