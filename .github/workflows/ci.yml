@@ -24,12 +24,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Check active and historical dashboard JavaScript syntax
+      - name: Check active, historical, and alert JavaScript syntax
         run: |
           node --check assets/app.js
           node --check docs/app.js
+          node --check scripts/github_alerts.js
+          node --check tests/github-alerts-smoke.js
       - name: Smoke-test dashboard data rendering
         run: node tests/dashboard-smoke.js
+      - name: Smoke-test idempotent GitHub issue alerting
+        run: node tests/github-alerts-smoke.js
       - name: Compile active and retained Python tools/tests
         run: python3 -m compileall -q monitor scripts src tests
       - name: Validate data contracts and source links

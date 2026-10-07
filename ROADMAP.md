@@ -20,18 +20,29 @@ Ordered by P(Win): highest-evidence-value first.
    have ever been upheld (NBA.com) — this collection documents 2 (1982-83, 2007-08). The other
    4 (reportedly incl. a 1978 Nets–76ers game plus 1952/1969/1971 games per the PR #2 session's
    leads) are known gaps requiring independent per-case verification.
-5. **Monitor blind spots:** arena scoreboards / TV bugs are invisible to feed comparison;
-   transient live-feed lag is expected noise; ESPN/NBA endpoints can change without notice.
-6. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
-   some corrected values, but pre-correction game-night box-score snapshots and the exact record-update
+5. **Monitor blind spots and current health:** arena scoreboards / TV bugs are invisible to
+   feed comparison; transient live-feed lag is expected noise; ESPN/NBA endpoints can change
+   without notice. The last reviewed scheduled snapshot (`2026-10-07T11:50:09Z`) was degraded:
+   ESPN was `ok`, NBA returned an opaque `HTTPError`, and no games were listed. Do not claim a
+   healthy dual-feed monitor until both source statuses and a recent paired-poll timestamp confirm it.
+6. **Alert delivery is limited.** The first channel is deduplicated GitHub issues for persistent
+   mismatches and final-feed revisions. A workflow warning/retry is best-effort; personal email,
+   SMS, Discord/Slack, and closed-tab browser push are not configured. GitHub notifications depend
+   on watch/subscription settings.
+7. **Workflow cadence is not a real-time guarantee.** GitHub Actions schedules can be delayed or
+   skipped and upstream APIs can fail. The five-minute cadence can miss short-lived differences.
+   Publishing each scheduled snapshot improves freshness but increases Pages deployment/Actions
+   activity; monitor workflow delay and platform limits during a live-game soak test.
+8. **Original-state snapshots are incomplete.** Current NBA pages and an NBA Gamebook corroborate
+   some corrected values, but pre-correction game-night box-score snapshots and exact record-update
    times are not preserved for the 2024/2025 examples.
-7. **Duration analysis is day-granularity.** Game→correction/ruling lags are computed where
+9. **Duration analysis is day-granularity.** Game→correction/ruling lags are computed where
    timelines allow (see `resolution_lag_days`); intraday detection→correction timestamps and
    transient display-error durations still need work.
-8. **Schema v1 approximations:** the 1982 rules-misapplication replay is typed
-   `official-scorer-book-error` for lack of a better enum; the 7-day-later 2017 correction
-   reuses `corrected-next-day`. Schema v2 should add `rules-misapplication-replay` and
-   `corrected-later`.
+10. **Schema v1 approximations:** the 1982 rules-misapplication replay is typed
+    `official-scorer-book-error` for lack of a better enum; the 7-day-later 2017 correction
+    reuses `corrected-next-day`. Schema v2 should add `rules-misapplication-replay` and
+    `corrected-later`.
 
 ## 2. Suggested next session (concrete, ordered)
 
@@ -55,9 +66,11 @@ Ordered by P(Win): highest-evidence-value first.
       or independently corroborated evidence identifies the game and the exact change.
 - [ ] **F. Evidence snapshots.** Add `evidence/` with archived pre/post-correction box scores
       for the 2017 + 2024 + 2025 correction cases; link from records.
-- [ ] **G. Monitor hardening.** Real-world soak test during a live game window; tune
-      live-vs-final handling; add quarter-line drift detection; alert on
-      `feed-unavailable` streaks. Decide whether to adopt PR #2's auto-issue idea (spam-safe?).
+- [ ] **G. Monitor hardening.** Run a real-world soak test during a live game window; confirm
+      both feeds respond and the issue-alert permission works; measure false positives and cron-to-
+      Pages delay. Add quarter-line drift detection and a deduplicated/persistent alert for repeated
+      `feed-unavailable` streaks. Consider a Slack/Discord/email channel only after a maintainer
+      configures secrets and an explicit delivery policy; do not enable a noisy default.
 - [ ] **H. Schema v2.** Add `rules-misapplication-replay` type and `corrected-later` outcome;
       migrate the 1982 and 2017 cases; keep validator green.
 
@@ -78,21 +91,24 @@ becoming a record.
 - `validate.py`, `compute_stats.py`, `build_site_data.py`, `monitor.py --self-test` all green.
 - At least 2 open questions closed with primary evidence (or explicitly re-scoped with a dated note).
 - The 213/214 stub either identified or reclassified with a decision log (no silent drift).
-- [x] PR #4 merged to `main` after GitHub confirmed success; post-merge validation, verification,
-  and Pages deployment succeeded; public site was fetched and checked. The live feed status remains
-  honestly `not_started` until a scheduled NBA/ESPN poll succeeds and publishes a timestamp.
+- [x] Previous Pages/monitor implementation was merged and deployed; scheduled workflow runs are
+  now visible in Actions.
+- [ ] After the current alert/freshness review merges, verify a scheduled run publishes both a
+  recent attempt timestamp and a successful paired comparison (`source_health.nba` and `.espn`
+  both `ok`). The last reviewed snapshot was `degraded`; workflow success alone is insufficient.
 
 ## 5. Current architecture and retained earlier layers
 
-The root dashboard/monitor (PR #5/#6) is the active published interface. The older historical
-catalog and monitor remain available for their distinct purposes; they must not be conflated.
+The root dashboard and `monitor/` package are the active interface and live monitor. The older
+historical catalog and `scripts/monitor.py` backfill monitor remain available for their distinct
+purposes; do not conflate their data, state, schedules, or verification statuses.
 
 | Concern | Active root dashboard / monitor | Historical or retained layer |
 |---|---|---|
 | Root case sample | `data/reviewed-cases.json` (2 evidence-reviewed cases) | `data/cases/*.json` → `data/cases.json` and the linked `docs/` catalog (12 partial cases + 2 unverified stubs) |
 | Open leads | `data/leads.json` (213/214 and KPJ; excluded from counts) | `data/discrepancies.json` — legacy leads, audit-flagged |
-| Current monitor | `monitor/` package; `data/live-feed.json` + `data/monitor-state.json` | `scripts/monitor.py` and `data/monitor/current.json` for manual/backfill; current snapshot is `not-run` |
-| Site | Root `index.html` + `assets/`; `.github/workflows/pages-and-monitor.yml` | `docs/` historical catalog, included in Pages artifact |
+| Current monitor | `monitor/` package; `data/live-feed.json` + `data/monitor-state.json`; GitHub issue alerts for persistent mismatch/final-feed revision | `scripts/monitor.py` and `data/monitor/current.json` for manual/backfill; current snapshot is `not-run` |
+| Site | Root `index.html` + `assets/`; every scheduled poll stages a fresh Pages artifact | `docs/` historical catalog and monitor/alert runbooks, included in Pages artifact |
 | Validation | `python3 -m monitor --check-data`; `.github/workflows/ci.yml` | `scripts/validate.py`, `compute_stats.py`, `build_site_data.py`; manual `monitor.yml` |
 | Statistics | Root seed counts are descriptive only; no NBA-wide rates | `data/stats.json` is collection-only; `data/statistics.json` is a superseded/audit-flagged manifest; old numeric archive remains historical |
 | Legacy tooling | — | `src/` may require API keys; do not treat as the scheduled monitor |

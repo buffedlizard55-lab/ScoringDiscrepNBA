@@ -8,6 +8,8 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const script = fs.readFileSync(path.join(root, "assets", "app.js"), "utf8");
+const savedFeed = JSON.parse(fs.readFileSync(path.join(root, "data", "live-feed.json"), "utf8"));
+const savedState = JSON.parse(fs.readFileSync(path.join(root, "data", "monitor-state.json"), "utf8"));
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
 const elements = new Map();
 
@@ -80,11 +82,48 @@ async function main() {
   assert.match(elements.get("leadList").innerHTML, /Kevin Porter Jr\./);
   assert.match(elements.get("leadList").innerHTML, /Year stated in lead: 2021 \(unverified\)/);
   assert.match(elements.get("leadList").innerHTML, /excluded from confirmed-case statistics/);
-  assert.match(elements.get("monitorStatus").innerHTML, /Not yet active/);
-  assert.equal(elements.get("investigationsPanel").hidden, true);
+  const attemptTime = Date.parse(savedFeed.last_poll_attempt_at || "");
+  const hasPollHeartbeat = Number.isFinite(attemptTime);
+  const pollIsStale = hasPollHeartbeat && Date.now() - attemptTime > 15 * 60 * 1000;
+  const pollTimeIsFuture = hasPollHeartbeat && attemptTime - Date.now() > 60 * 1000;
+  const expectedStatusLabel = pollIsStale
+    ? savedFeed.status === "degraded" ? "Feed degraded · stale" : "Snapshot stale"
+    : pollTimeIsFuture
+      ? "Poll time anomaly"
+      : savedFeed.status === "healthy" && !hasPollHeartbeat
+        ? "Freshness unknown"
+        : {
+            healthy: savedFeed.games?.some((game) => game.score_mismatch === true)
+              || Number(savedFeed.active_investigation_count || 0) > 0 ? "Review candidate" : "Feeds available",
+            degraded: "Feed degraded",
+            not_started: "Not yet active",
+          }[savedFeed.status] || "Not yet active";
+  assert.match(elements.get("monitorStatus").innerHTML, new RegExp(expectedStatusLabel));
+  if (pollIsStale) {
+    assert.match(elements.get("feedNotice").textContent, /more than 15 minutes old/);
+  } else if (!hasPollHeartbeat && savedFeed.status !== "not_started") {
+    assert.match(elements.get("feedNotice").textContent, /freshness cannot be verified/);
+  }
+  assert.match(elements.get("sourceHealth").innerHTML, /NBA primary/);
+  assert.match(elements.get("sourceHealth").innerHTML, /ESPN secondary/);
+  if (savedFeed.last_poll_attempt_at) {
+    assert.match(elements.get("feedTimestamp").textContent, /Latest poll attempt/);
+  } else {
+    assert.match(elements.get("feedTimestamp").textContent, /Heartbeat not recorded|No poll-attempt timestamp/);
+  }
+  if (savedFeed.last_successful_comparison_at) {
+    assert.match(elements.get("feedTimestamp").textContent, /Last poll with both feeds parsed/);
+  } else {
+    assert.match(elements.get("feedTimestamp").textContent, /No both-feed successful-poll time/);
+  }
+  assert.equal(
+    elements.get("investigationsPanel").hidden,
+    !Array.isArray(savedState.investigations) || savedState.investigations.length === 0,
+    "the monitor investigation panel must reflect the checked-in investigation ledger",
+  );
   assert.doesNotMatch(elements.get("caseList").innerHTML, /\[object Object\]/);
 
-  console.log(`Dashboard smoke test passed (${new Set(selectors).size} DOM selectors, linked seed records, unresolved player-line conflict, two excluded leads, filters, and not-started monitor state).`);
+  console.log(`Dashboard smoke test passed (${new Set(selectors).size} DOM selectors, linked seed records, unresolved player-line conflict, two excluded leads, filters, and published monitor status: ${savedFeed.status}).`);
 }
 
 main().catch((error) => {

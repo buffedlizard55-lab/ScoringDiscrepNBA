@@ -209,6 +209,15 @@ presented as a second active scheduled monitor.
 - Project review date: **2026-10-07 UTC** (2026-10-06 in America/Los_Angeles). Appendix A below
   remains the byte-preserved prior-session guide.
 
+## 8. Current alert/freshness implementation review (2026-10-07)
+
+- GitHub issue alerts remain operational candidate notices only. A cross-feed alert requires two consecutive comparable observations; source outage/invalidity, missing game, or incomplete score is explicitly recorded as a streak-breaking comparison. Final NBA-feed score revisions are alerted as feed revisions, not confirmed official-record corrections.
+- Alert text retains first/latest observation context and safe source links. Stable issue tags, saved issue numbers/body hashes/status, unchanged-run suppression, marker verification before editing, human-closure preservation, non-causal resolution comments, and warning-only notification failure are covered by the Node smoke test. No destination-specific email/mobile/closed-browser delivery is promised.
+- The Pages workflow publishes each scheduled snapshot, while material state changes (including notification metadata and investigation history) are committed without heartbeat-only commits. The dashboard distinguishes poll-attempt time from the last successful two-feed comparison and warns on stale/unknown freshness.
+- Verification performed: **53 Python tests passed**; dashboard and alert smoke tests passed; Python compilation, current and historical data validators, historical monitor self-test, JavaScript syntax checks, updated Pages/CI YAML parsing, deterministic generated-data checks, material-diff check, and `git diff --check` passed.
+- No live poll or external historical-source review was performed in this implementation turn. The committed feed snapshot last reviewed at `2026-10-07T11:50:09Z` was degraded (ESPN `ok`, NBA request unavailable with the prior generic `HTTPError`); do not infer current endpoint health or a successful comparison from the code tests.
+- No new case facts were admitted. The 213/214 report and 2021 Kevin Porter Jr. item remain explicitly unverified; no NBA record error, provider fault, score correction, or cause is inferred from the monitor.
+
 ## Appendix A — prior session (PR #2) verification guide, preserved verbatim
 
 *Everything below this line is the byte-identical content of the PR #2 session's
@@ -332,3 +341,13 @@ python src/discrepancy_detector.py  # Should generate statistics.json
 # Verify all URLs are reachable (manual)
 # Use fetch_page tool to verify each URL returns expected content
 ```
+
+---
+
+## 7. Operations review — 2026-10-07 (no new NBA case facts admitted)
+
+This pass reviewed monitor freshness, notification behavior, workflow permissions, and stale runbooks; it did not promote or add any NBA incident facts. The saved feed snapshot at `2026-10-07T11:50:09Z` reported `degraded`, with ESPN `ok`, NBA unavailable (`HTTPError`), and an empty game list. The associated scheduled workflow run [37616762038](https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/actions/runs/37616762038) completed successfully; the result does not establish that both sources were healthy. This recorded observation is not a claim about the status of later polls.
+
+The code review adds separate poll-attempt and successful-pair timestamps, a fresh Pages artifact per scheduled attempt, material-only Git commits, HTTP status-code diagnostics, and deduplicated GitHub issue alerts for persistent source mismatches and final NBA-feed revisions. Alert contents remain explicitly unverified. Offline tests exercise the persistence threshold, no-fault wording, issue deduplication, resolution comments, heartbeat freshness, and Git-commit filtering. See `docs/ALERTING.md`, `docs/INVESTIGATION_WORKFLOW.md`, and `monitor/STATE.md` for behavior and limitations.
+
+**Still unverified:** no conclusion is made here about whether the NBA feed is healthy after the recorded poll, whether the NBA official record was wrong, whether any public issue notification reached a particular person, or whether the schedule will meet a real-time service guarantee. Confirm the next live poll and issue API permissions in GitHub Actions after deployment.

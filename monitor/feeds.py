@@ -72,7 +72,11 @@ def fetch_json(url: str, timeout: int = 15) -> tuple[dict[str, Any], dict[str, s
                 "last_modified": response.headers.get("Last-Modified"),
             }
             return payload, metadata
-    except (HTTPError, URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+    except HTTPError as exc:
+        # Preserve the useful status code so an operator can distinguish a
+        # denied/retired endpoint from a transient network or parse failure.
+        raise FeedError(f"Upstream returned HTTP {exc.code}") from exc
+    except (URLError, TimeoutError, OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise FeedError(f"Could not fetch or decode upstream JSON: {type(exc).__name__}") from exc
 
 

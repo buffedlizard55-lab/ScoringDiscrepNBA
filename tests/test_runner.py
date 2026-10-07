@@ -53,6 +53,9 @@ class RunnerTests(unittest.TestCase):
             saved_feed = json.loads((Path(directory) / "data/live-feed.json").read_text())
             self.assertEqual(saved_state["investigations"][0]["observation_count"], 1)
             self.assertEqual(saved_feed["last_updated_at"], "2026-10-07T04:00:00Z")
+            self.assertEqual(saved_feed["last_poll_attempt_at"], "2026-10-07T04:00:00Z")
+            self.assertEqual(saved_feed["last_successful_comparison_at"], "2026-10-07T04:00:00Z")
+            self.assertEqual(saved_feed["games"][0]["observed_at"], "2026-10-07T04:00:00Z")
 
     def test_repeated_poll_updates_mismatch_then_closes_after_two_agreements(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -65,6 +68,71 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(state["investigations"][0]["status"], "resolved")
             self.assertEqual(feed["active_investigation_count"], 0)
             self.assertIn("does not establish", state["investigations"][0]["resolution"]["note"])
+
+    def test_incomplete_poll_breaks_consecutive_mismatch_window(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            nba = read_fixture("nba-scoreboard.json")
+            espn = read_fixture("espn-scoreboard.json")
+            state, _ = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:00:00Z"
+            )
+            state, _ = run_with_payloads(
+                None,
+                espn,
+                root=directory,
+                observed_at="2026-10-07T04:05:00Z",
+                source_errors={"nba": "HTTP 403"},
+            )
+            investigation = state["investigations"][0]
+            self.assertEqual(investigation["comparison_checks"][-1]["result"], "incomplete")
+            self.assertEqual(investigation["comparison_checks"][-1]["reason"], "source_unavailable_or_invalid")
+            self.assertEqual(
+                investigation["comparison_checks"][-1]["source_health"]["nba"]["status"],
+                "unavailable",
+            )
+            self.assertEqual(investigation["consecutive_disagreements"], 0)
+
+            state, _ = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:10:00Z"
+            )
+            investigation = state["investigations"][0]
+            self.assertEqual(investigation["status"], "detected")
+            self.assertEqual(investigation["consecutive_disagreements"], 1)
+            self.assertEqual(
+                [check["result"] for check in investigation["comparison_checks"][-2:]],
+                ["incomplete", "mismatch"],
+            )
+
+            state, _ = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:15:00Z"
+            )
+            investigation = state["investigations"][0]
+            self.assertEqual(investigation["status"], "investigating")
+            self.assertEqual(investigation["consecutive_disagreements"], 2)
+
+    def test_unmatched_poll_breaks_consecutive_mismatch_window(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            nba = read_fixture("nba-scoreboard.json")
+            espn = read_fixture("espn-scoreboard.json")
+            state, _ = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:00:00Z"
+            )
+            state, feed = run_with_payloads(
+                {"scoreboard": {"games": []}},
+                {"events": []},
+                root=directory,
+                observed_at="2026-10-07T04:05:00Z",
+            )
+            self.assertEqual(feed["status"], "healthy")
+            self.assertEqual(state["investigations"][0]["comparison_checks"][-1]["result"], "incomplete")
+            self.assertEqual(
+                state["investigations"][0]["comparison_checks"][-1]["reason"],
+                "game_or_score_not_comparable",
+            )
+            state, _ = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:10:00Z"
+            )
+            self.assertEqual(state["investigations"][0]["consecutive_disagreements"], 1)
 
     def test_failed_feed_keeps_empty_result_explicitly_degraded(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -79,6 +147,8 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(feed["games"], [])
             self.assertEqual(feed["source_health"]["nba"]["status"], "unavailable")
             self.assertEqual(state["investigations"], [])
+            self.assertEqual(feed["last_poll_attempt_at"], "2026-10-07T04:00:00Z")
+            self.assertIsNone(feed["last_successful_comparison_at"])
             self.assertIn("not evidence", feed["note"])
 
     def test_malformed_existing_feed_snapshot_is_not_overwritten(self) -> None:
@@ -96,14 +166,46 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(feed_path.read_text(encoding="utf-8"), "{broken")
             self.assertFalse((Path(directory) / "data/monitor-state.json").exists())
 
-    def test_unchanged_healthy_poll_keeps_published_snapshot_timestamp(self) -> None:
+    def test_unchanged_healthy_poll_refreshes_heartbeat_and_game_clock_without_material_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            nba_first = read_fixture("nba-scoreboard.json")
+            nba_second = json.loads(json.dumps(nba_first))
+            nba_second["scoreboard"]["games"][0]["gameClock"] = "PT08M10.00S"
+            espn = espn_with_home_score("39")
+            _, first_feed = run_with_payloads(
+                nba_first, espn, root=directory, observed_at="2026-10-07T04:00:00Z"
+            )
+            _, second_feed = run_with_payloads(
+                nba_second, espn, root=directory, observed_at="2026-10-07T04:05:00Z"
+            )
+            self.assertEqual(first_feed["last_updated_at"], second_feed["last_updated_at"])
+            self.assertEqual(second_feed["last_poll_attempt_at"], "2026-10-07T04:05:00Z")
+            self.assertEqual(second_feed["last_successful_comparison_at"], "2026-10-07T04:05:00Z")
+            self.assertEqual(second_feed["games"][0]["observed_at"], "2026-10-07T04:05:00Z")
+            self.assertEqual(second_feed["games"][0]["clock"], "PT08M10.00S")
+
+    def test_failed_poll_keeps_previous_success_time_and_marks_saved_games_stale(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             nba = read_fixture("nba-scoreboard.json")
             espn = espn_with_home_score("39")
-            _, first_feed = run_with_payloads(nba, espn, root=directory, observed_at="2026-10-07T04:00:00Z")
-            _, second_feed = run_with_payloads(nba, espn, root=directory, observed_at="2026-10-07T04:05:00Z")
-            self.assertEqual(first_feed["last_updated_at"], second_feed["last_updated_at"])
-            self.assertEqual(first_feed["games"][0]["observed_at"], second_feed["games"][0]["observed_at"])
+            _, healthy_feed = run_with_payloads(
+                nba, espn, root=directory, observed_at="2026-10-07T04:00:00Z"
+            )
+            _, degraded_feed = run_with_payloads(
+                None,
+                espn,
+                root=directory,
+                observed_at="2026-10-07T04:05:00Z",
+                source_errors={"nba": "HTTP 403"},
+            )
+            self.assertEqual(degraded_feed["status"], "degraded")
+            self.assertEqual(degraded_feed["last_poll_attempt_at"], "2026-10-07T04:05:00Z")
+            self.assertEqual(
+                degraded_feed["last_successful_comparison_at"],
+                healthy_feed["last_successful_comparison_at"],
+            )
+            self.assertTrue(degraded_feed["games"][0]["stale"])
+            self.assertEqual(degraded_feed["games"][0]["observed_at"], "2026-10-07T04:00:00Z")
 
 
 if __name__ == "__main__":

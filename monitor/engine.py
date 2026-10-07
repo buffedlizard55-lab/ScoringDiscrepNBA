@@ -97,6 +97,11 @@ def _create_investigation(
         "consecutive_disagreements": 1 if detection_type == "cross_source_score_mismatch" else 0,
         "consecutive_agreements": 0,
         "observation_count": 1,
+        "comparison_checks": (
+            [{"observed_at": detected_at, "result": "mismatch"}]
+            if detection_type == "cross_source_score_mismatch"
+            else []
+        ),
         "first_observation": compact,
         "latest_observation": compact,
         "observations": [compact],
@@ -116,9 +121,41 @@ def _append_observation(item: dict[str, Any], observation: dict[str, Any]) -> No
     item.setdefault("observations", []).append(compact)
 
 
-def _process_feed_mismatches(
-    state: dict[str, Any], observations: list[dict[str, Any]]
+def _record_comparison_check(
+    item: dict[str, Any],
+    observed_at: str,
+    result: str,
+    reason: str | None = None,
+    source_health: dict[str, Any] | None = None,
 ) -> None:
+    checks = item.get("comparison_checks")
+    if not isinstance(checks, list):
+        checks = []
+        item["comparison_checks"] = checks
+    # One marker breaks a mismatch streak; repeated unavailable polls do not
+    # need to create a repository commit every five minutes.
+    if (
+        result == "incomplete"
+        and checks
+        and isinstance(checks[-1], dict)
+        and checks[-1].get("result") == "incomplete"
+    ):
+        return
+    check = {"observed_at": observed_at, "result": result}
+    if reason:
+        check["reason"] = reason
+    if result == "incomplete":
+        check["source_health"] = deepcopy(source_health or {})
+    checks.append(check)
+
+
+def _process_feed_mismatches(
+    state: dict[str, Any],
+    observations: list[dict[str, Any]],
+    observed_at: str,
+    source_health: dict[str, Any],
+) -> None:
+    comparable_game_keys: set[str] = set()
     for observation in observations:
         game_key = _game_identity(observation)
         mismatch = observation.get("score_mismatch")
@@ -129,6 +166,8 @@ def _process_feed_mismatches(
             for score in (nba_score, espn_score)
             for side in ("away", "home")
         )
+        if mismatch in (True, False) and both_scores:
+            comparable_game_keys.add(game_key)
         if mismatch is True and both_scores:
             item = _open_investigation(
                 state["investigations"], game_key, "cross_source_score_mismatch"
@@ -142,15 +181,17 @@ def _process_feed_mismatches(
                 },
             }
             if item is None:
-                _create_investigation(
+                created = _create_investigation(
                     state["investigations"],
                     observation,
                     "cross_source_score_mismatch",
                     "detected",
                     details,
                 )
+                _record_comparison_check(created, observed_at, "mismatch")
             else:
                 _append_observation(item, observation)
+                _record_comparison_check(item, observed_at, "mismatch")
                 item["consecutive_disagreements"] = int(item.get("consecutive_disagreements", 0)) + 1
                 item["consecutive_agreements"] = 0
                 item["current_details"] = details
@@ -163,6 +204,7 @@ def _process_feed_mismatches(
             )
             if item is not None:
                 _append_observation(item, observation)
+                _record_comparison_check(item, observed_at, "agreement")
                 item["consecutive_agreements"] = int(item.get("consecutive_agreements", 0)) + 1
                 item["consecutive_disagreements"] = 0
                 if item["consecutive_agreements"] == 1:
@@ -175,6 +217,32 @@ def _process_feed_mismatches(
                         "at": observation.get("observed_at"),
                         "note": "The two observed feed values converged for two consecutive polls. This closes the observed mismatch window only; it does not establish which prior value was correct or why the feeds differed.",
                     }
+
+    both_sources_ok = all(
+        (source_health.get(name) or {}).get("status") == "ok"
+        for name in ("nba", "espn")
+    )
+    incomplete_reason = "game_or_score_not_comparable" if both_sources_ok else "source_unavailable_or_invalid"
+    for item in state["investigations"]:
+        if (
+            item.get("detection_type") != "cross_source_score_mismatch"
+            or item.get("status") in RESOLVED_STATUSES
+        ):
+            continue
+        game_key = str(item.get("game_key") or _game_identity(item))
+        if game_key in comparable_game_keys:
+            continue
+        _record_comparison_check(
+            item,
+            observed_at,
+            "incomplete",
+            incomplete_reason,
+            source_health,
+        )
+        item["consecutive_disagreements"] = 0
+        item["consecutive_agreements"] = 0
+        if item.get("status") == "monitoring_for_convergence":
+            item["status"] = "investigating"
 
 
 def _process_final_score_revisions(
@@ -266,7 +334,7 @@ def update_state(
     before = deepcopy(state)
     state["source_health"] = deepcopy(source_health)
 
-    _process_feed_mismatches(state, observations)
+    _process_feed_mismatches(state, observations, observed_at, source_health)
     _process_final_score_revisions(state, observations)
     state["note"] = (
         "Automated detections are unverified leads, not confirmed NBA scoring errors. "

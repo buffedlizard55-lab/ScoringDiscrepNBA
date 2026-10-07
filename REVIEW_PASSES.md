@@ -32,3 +32,37 @@ This log enforces the requested Pass 1 → Pass 2 → Pass 3 sequence. Evidence 
 - [ ] Verify the first successful scheduled NBA/ESPN poll and published timestamp. Manual `workflow_dispatch` from this session was denied by GitHub with HTTP 403 (`Resource not accessible by integration`); no live poll is claimed.
 
 **Pass 3 implementation/review is complete.** Production deployment is confirmed, but live monitoring is **not yet proven operational** until the scheduled poll publishes a successful snapshot. Keep that distinction explicit in future updates.
+
+---
+
+## Current Arena session — notification and freshness hardening (2026-10-07)
+
+### Pass 1 — implement and verify
+
+- [x] Read the carried-forward README brief before continuing; preserve Arena's “Maximize P(Win)” and “Own the Outcome” operating values.
+- [x] Add idempotent GitHub issue notifications with durable issue number/body-hash/status metadata; refresh material changes, skip unchanged issues, leave human-closed issues untouched, and keep convergence non-causal/non-auto-closing.
+- [x] Order workflow notification before material-diff detection so notifier metadata is committed with monitor state; keep issue API failures warning-only so feed publication continues.
+- [x] Add poll-attempt and paired-feed timestamps, material-only commit comparison, stale/unknown dashboard freshness messaging, and better HTTP status diagnostics.
+- [x] Preserve investigation originals and add incomplete-comparison markers; outages, missing games, and incomplete scores break the two-comparable-poll alert/convergence streak.
+- [x] Run all active/historical validators, Python/JavaScript syntax checks, monitor self-test, dashboard and alert smoke tests, workflow YAML parsing, deterministic generators, and diff hygiene.
+
+**Pass 1 results:** 53 Python unit tests passed; both Node smoke tests passed; active data checks passed (2 reviewed cases, 2 explicitly unverified leads); 14 historical case files validated; monitor self-test and compilation passed; updated Pages/CI YAML parsed; stats/site generation made no unexpected changes; material monitor diff returned `false` for the unchanged checked-in snapshot.
+
+### Pass 2 — adversarial defect and gap review
+
+- [x] Verify alert filtering and payload labels do not assign fault or upgrade a source observation into an NBA-record correction.
+- [x] Test deduplication, material score refresh, API-free unchanged runs, persisted notification metadata, closed issues, resolution notices, feed-text HTML/mention escaping, and stale issue references.
+- [x] Find and fix a subtle false-positive path: a failed or missing-game poll had no game-row observation, so two mismatches separated by an unobserved poll could appear adjacent. Persist an `incomplete` comparison marker and reset both streaks; repeated incomplete polls do not create heartbeat-only commits.
+- [x] Check stale/missing/future poll timestamps and distinguish attempt heartbeat from a successful paired-feed comparison in the dashboard.
+- [x] Reorder alerting before material-diff detection and explicitly pass the workspace monitor-state path to the action.
+
+**Pass 2 findings/fixes:** the alert smoke test initially exposed raw-HTML risk in feed-provided play-by-play text; angle brackets are now HTML-encoded. Review also found that a stale saved issue number could otherwise edit an unrelated issue; the notifier now verifies the stable issue marker before mutation and searches/creates safely if the reference is mismatched. Incomplete comparisons now break mismatch and convergence streaks. All findings were regression-tested.
+
+### Pass 3 — full-request recheck
+
+- [x] Recheck the founding scope, source-role distinction, no-overwrite/no-hallucination rules, accessible dashboard status, and notification limitations.
+- [x] Keep the originating 213/214 report and 2021 Kevin Porter Jr. lead unverified and excluded from confirmed-case statistics; add no new historical-case claims in this implementation pass.
+- [x] Confirm alert behavior does not prove which feed is right, does not auto-create a verified case, does not auto-close GitHub issues, and does not promise personal email/mobile/closed-tab push.
+- [x] Run the complete test/check matrix recorded above after final changes.
+- [ ] Push the fixed Arena branch, open the requested PR, and merge if GitHub permits; record CI and deployment outcomes below.
+- [ ] Verify a later scheduled feed snapshot only after it occurs. No live poll was run during this review; the checked-in snapshot is the previously observed degraded snapshot, not evidence of current source availability.

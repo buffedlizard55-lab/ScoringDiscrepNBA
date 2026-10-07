@@ -1,32 +1,12 @@
-# Research Cases - Individual Investigations
+# Legacy research index — not a verified case list
 
-Each case has its own markdown file with full verification.
+This file was inherited from an earlier implementation and is **not a source of truth**. Its old list references research files that are not present in this checkout and includes verification claims that conflict with the audited records. Do not rely on its case titles, counts, or statements such as “all sources are real, reachable, and confirm facts.” Those claims have not been independently validated here.
 
-## Cases
+Use these canonical locations instead:
 
-- DISC-20241023-GSW-POR-001 - Warriors vs Blazers FT error (verified, 1-pt)
-- DISC-20241107-CLE-WAS-001 - Cavs vs Wizards FT error (verified, 1-pt)
-- DISC-20170120-IND-LAL-001 - Pacers vs Lakers 2 vs 3 (verified, 1-pt)
-- DISC-20071219-MIA-ATL-001 - Heat vs Hawks Shaq foul (verified, protest upheld)
-- DISC-19821130-LAL-SAS-001 - Lakers vs Spurs lane violation (verified, protest upheld)
-- DISC-19781108-NJN-PHI-001 - Nets vs 76ers technicals (verified, protest upheld)
-- DISC-19711203-CLE-BUF-001 - Cavs vs Braves throw-in (verified, protest upheld)
-- DISC-19691106-ATL-CHI-001 - Hawks vs Bulls phantom buzzer (verified, protest upheld)
-- DISC-19521128-MIL-PHI-001 - Hawks vs Warriors illegal sub (verified, protest upheld)
-- DISC-20260420-NBC-SCOREBUG-001 - Knicks vs Hawks NBC timeout bug (verified, secondary only, 213 total example!)
-- DISC-20260415-AMAZON-SCOREBUG-001 - Hornets vs Heat Amazon bug (verified, secondary only)
-- DISC-20211022-PORTER-STAT-001 - Porter Jr stat correction (partially_verified)
+- [`data/cases/`](../data/cases/) — retained historical records, many explicitly `verified-partial` with open questions.
+- [`data/reviewed-cases.json`](../data/reviewed-cases.json) — current evidence-reviewed dashboard examples.
+- [`data/leads.json`](../data/leads.json) — unverified research leads, excluded from confirmed-case statistics.
+- [`VERIFICATION.md`](../VERIFICATION.md) — source tiers, verification method, known conflicts, and audit log.
 
-## Verification Status
-
-- 11 verified
-- 1 partially_verified
-- 0 unverified
-
-## How to Verify
-
-See ../VERIFICATION.md for line-by-line verification steps for each case.
-
-All sources are real, reachable, and confirm facts.
-
-No hallucinations.
+Only promote a lead after identifying its game and preserving direct evidence for the original report, correction, final official value, timing, and cause (when a source states one). The project’s 213-vs-214 report remains unidentified and unverified; this index does not resolve it.

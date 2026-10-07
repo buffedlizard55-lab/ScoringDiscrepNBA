@@ -386,22 +386,54 @@
     const pill = $("#monitorStatus");
     const potentialDifference = (Array.isArray(feed?.games) && feed.games.some((game) => game.score_mismatch === true))
       || Number(feed?.active_investigation_count || 0) > 0;
+    const attemptMs = Date.parse(feed?.last_poll_attempt_at || "");
+    const hasPollHeartbeat = Number.isFinite(attemptMs);
+    const pollIsStale = hasPollHeartbeat && Date.now() - attemptMs > 15 * 60 * 1000;
+    const pollTimeIsFuture = hasPollHeartbeat && attemptMs - Date.now() > 60 * 1000;
+    const freshnessUnknown = !hasPollHeartbeat && status !== "not_started";
     const labels = {
       healthy: potentialDifference ? ["status-warning", "Review candidate"] : ["status-good", "Feeds available"],
       degraded: ["status-warning", "Feed degraded"],
       not_started: ["status-neutral", "Not yet active"],
     };
-    const [className, label] = labels[status] || labels.not_started;
+    let [className, label] = labels[status] || labels.not_started;
+    if (pollIsStale) {
+      className = "status-warning";
+      label = status === "degraded" ? "Feed degraded · stale" : "Snapshot stale";
+    } else if (pollTimeIsFuture) {
+      className = "status-warning";
+      label = "Poll time anomaly";
+    } else if (freshnessUnknown && status === "healthy") {
+      className = "status-warning";
+      label = "Freshness unknown";
+    }
     pill.className = `status-pill ${className}`;
     pill.innerHTML = `<span class="status-light"></span>${escapeHtml(label)}`;
-    $("#feedTimestamp").textContent = feed?.last_updated_at
-      ? `Latest published observation · ${formatTimestamp(feed.last_updated_at)}`
-      : "No successful poll has been published.";
+    const pollTimes = [];
+    if (hasPollHeartbeat) {
+      pollTimes.push(`Latest poll attempt · ${formatTimestamp(feed.last_poll_attempt_at)}`);
+    } else if (feed?.last_updated_at) {
+      pollTimes.push(`Heartbeat not recorded · last saved state change ${formatTimestamp(feed.last_updated_at)}`);
+    } else {
+      pollTimes.push("No poll-attempt timestamp is recorded in this snapshot");
+    }
+    pollTimes.push(feed?.last_successful_comparison_at
+      ? `Last poll with both feeds parsed · ${formatTimestamp(feed.last_successful_comparison_at)}`
+      : "No both-feed successful-poll time is recorded in this snapshot");
+    $("#feedTimestamp").textContent = pollTimes.join(" · ");
     const notice = $("#feedNotice");
-    notice.textContent = feed?.note || "No live-feed status is available.";
+    const freshnessNote = pollIsStale
+      ? "The latest poll attempt is more than 15 minutes old; the published feed may be stale."
+      : pollTimeIsFuture
+        ? "The poll-attempt timestamp is more than one minute in the future; review clock and snapshot integrity."
+        : freshnessUnknown
+          ? "No poll-attempt heartbeat is recorded; freshness cannot be verified from this snapshot."
+          : null;
+    notice.textContent = [feed?.note || "No live-feed status is available.", freshnessNote].filter(Boolean).join(" ");
     notice.className = "feed-notice";
-    if (status === "degraded") notice.classList.add("notice-degraded");
-    else if (potentialDifference) notice.classList.add("notice-mismatch");
+    if (status === "degraded" || pollIsStale || pollTimeIsFuture || (freshnessUnknown && status === "healthy")) {
+      notice.classList.add("notice-degraded");
+    } else if (potentialDifference) notice.classList.add("notice-mismatch");
 
     const health = feed?.source_health || {};
     $("#sourceHealth").innerHTML = ["nba", "espn"].map((key) => {

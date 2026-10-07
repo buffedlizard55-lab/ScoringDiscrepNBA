@@ -41,7 +41,7 @@ def _source_status(url: str, status: str, **extra: Any) -> dict[str, Any]:
     return result
 
 
-def _published_game(observation: dict[str, Any], prior_game: dict[str, Any] | None, now: str) -> dict[str, Any]:
+def _published_game(observation: dict[str, Any], now: str) -> dict[str, Any]:
     game = {
         "game_id": observation.get("game_id"),
         "game_date": observation.get("game_date"),
@@ -56,38 +56,10 @@ def _published_game(observation: dict[str, Any], prior_game: dict[str, Any] | No
         "latest_official_scoring_play": deepcopy(observation.get("latest_official_scoring_play")),
         "play_by_play_source_url": observation.get("play_by_play_source_url"),
     }
-    material = (
-        game.get("status"),
-        game.get("period"),
-        (game.get("scores", {}).get("nba") or {}).get("away"),
-        (game.get("scores", {}).get("nba") or {}).get("home"),
-        (game.get("scores", {}).get("espn") or {}).get("away"),
-        (game.get("scores", {}).get("espn") or {}).get("home"),
-        game.get("score_mismatch"),
-    )
-    prior_material = None
-    if prior_game:
-        prior_material = (
-            prior_game.get("status"),
-            prior_game.get("period"),
-            (prior_game.get("scores", {}).get("nba") or {}).get("away"),
-            (prior_game.get("scores", {}).get("nba") or {}).get("home"),
-            (prior_game.get("scores", {}).get("espn") or {}).get("away"),
-            (prior_game.get("scores", {}).get("espn") or {}).get("home"),
-            prior_game.get("score_mismatch"),
-        )
-    if prior_game and material == prior_material:
-        # The snapshot's timestamp applies to every displayed field. Do not
-        # silently replace only the clock while keeping an older timestamp.
-        game["observed_at"] = prior_game.get("observed_at")
-        game["clock"] = prior_game.get("clock")
-        game["status_text"] = prior_game.get("status_text")
-        game["latest_official_scoring_play"] = deepcopy(
-            prior_game.get("latest_official_scoring_play")
-        )
-        game["play_by_play_source_url"] = prior_game.get("play_by_play_source_url")
-    else:
-        game["observed_at"] = now
+    # Each scheduled artifact is a fresh poll, even when the score is
+    # unchanged. The workflow filters these volatile fields from Git commits
+    # but publishes the current clock and observation time to Pages.
+    game["observed_at"] = now
     return game
 
 
@@ -127,34 +99,8 @@ def _build_feed(
     now: str,
     nba_ok: bool,
 ) -> dict[str, Any]:
-    prior_games = {
-        str(game.get("game_id")): game
-        for game in previous_feed.get("games", [])
-        if game.get("game_id") is not None
-    }
     if nba_ok:
-        games = [
-            _published_game(observation, prior_games.get(str(observation.get("game_id"))), now)
-            for observation in observations
-        ]
-        # Keep in-progress mismatch samples visibly fresh even if the point
-        # totals have not changed since the last poll.
-        open_mismatch_ids = {
-            item.get("game_id")
-            for item in active_investigations(state)
-            if item.get("detection_type") == "cross_source_score_mismatch"
-        }
-        observation_by_id = {str(item.get("game_id")): item for item in observations}
-        for game in games:
-            if game.get("game_id") in open_mismatch_ids:
-                current = observation_by_id.get(str(game.get("game_id")), {})
-                game["observed_at"] = now
-                game["clock"] = current.get("clock")
-                game["status_text"] = current.get("status_text")
-                game["latest_official_scoring_play"] = deepcopy(
-                    current.get("latest_official_scoring_play")
-                )
-                game["play_by_play_source_url"] = current.get("play_by_play_source_url")
+        games = [_published_game(observation, now) for observation in observations]
     else:
         games = deepcopy(previous_feed.get("games", []))
         for game in games:
@@ -181,6 +127,10 @@ def _build_feed(
         "active_investigation_count": len(active_investigations(state)),
         "last_state_change_at": state.get("last_state_change_at"),
         "last_updated_at": previous_feed.get("last_updated_at"),
+        "last_poll_attempt_at": now,
+        "last_successful_comparison_at": (
+            now if both_ok else previous_feed.get("last_successful_comparison_at")
+        ),
         "last_material_signature": previous_feed.get("last_material_signature"),
         "note": (
             "NBA and ESPN feed values are observations, not a determination of which source is correct. "
