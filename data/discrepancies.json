@@ -1,0 +1,907 @@
+[
+  {
+    "id": "DISC-20241023-GSW-POR-001",
+    "game_id": "0022400003",
+    "date": "2024-10-23",
+    "season": "2024-25",
+    "teams": {
+      "home": "Portland Trail Blazers",
+      "away": "Golden State Warriors",
+      "home_abbr": "POR",
+      "away_abbr": "GSW"
+    },
+    "period_clock": "Q3 2:00",
+    "relevant_scoring_play": "De'Anthony Melton free throw attempt - first of two. Made, but recorded as missed.",
+    "score_before": "GSW 91 - POR 67 (approximate at time of foul)",
+    "score_after_original": "Not credited, score remained 91-67 after FT sequence recorded as 0-2",
+    "score_after_corrected": "Should have been 92-67 after first FT, then 92-67 after second missed",
+    "original_value": {
+      "final_score": "GSW 139 - POR 104",
+      "total_points": 243,
+      "player_stat": "De'Anthony Melton: 10 points (0/2 FT in that sequence)"
+    },
+    "corrected_value": {
+      "final_score": "GSW 140 - POR 104",
+      "total_points": 244,
+      "player_stat": "De'Anthony Melton: 11 points (1/2 FT in that sequence)"
+    },
+    "final_official_value": {
+      "final_score": "GSW 140 - POR 104",
+      "total_points": 244
+    },
+    "affected_player": "De'Anthony Melton",
+    "affected_team": "GSW",
+    "sources_that_disagreed": ["In-arena official scorer initial entry vs NBA post-game audit vs ESPN initial box vs NBA.com final"],
+    "timestamps": {
+      "game_time": "2024-10-23T19:00:00-07:00",
+      "detection_time": "2024-10-24 (during NBA full game review)",
+      "correction_announced": "2024-10-24T15:00:00Z (approx) and 2024-10-25 official statement",
+      "correction_applied": "2024-10-24"
+    },
+    "what_changed": "Free throw from missed to made. Final score increased by 1 for GSW. Melton points +1.",
+    "when_changed": "Day after game, October 24, 2024, announced October 24-25 2024",
+    "cause": "Human error by in-arena statistician - incorrectly entered made free throw as missed",
+    "cause_confidence": "confirmed",
+    "incident_type": "free_throw_not_counted",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": 1,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "NBA issued statement, updated box score and final score. Described as rare but human error. No replay needed due to blowout margin.",
+    "sources": [
+      {
+        "url": "https://www.nba.com/news/nba-finds-scoring-error-warriors-blazers",
+        "title": "NBA finds error, adjusts score in Warriors-Blazers",
+        "publisher": "NBA.com / AP",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.espn.com/nba/story/_/id/41990836/nba-acknowledges-error-adjusts-warriors-trail-blazers-score",
+        "title": "NBA acknowledges error, adjusts Warriors-Trail Blazers score",
+        "publisher": "ESPN",
+        "type": "espn",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://bleacherreport.com/articles/10140856-nba-announces-scoring-error-in-warriors-win-vs-blazers-adjusts-score-1-day-later",
+        "title": "NBA Announces Scoring Error in Warriors' Win vs. Blazers, Adjusts Score 1 Day Later",
+        "publisher": "Bleacher Report",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nbcsportsbayarea.com/nba/golden-state-warriors/nba-error-score-change-trail-blazers/1797765/",
+        "title": "NBA changes Warriors vs. Blazers final score after admitting error",
+        "publisher": "NBC Sports Bay Area",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "This is a textbook example of NBA official record itself being incorrect, not just secondary source. Statisticians recorded Melton 0/2 FT when he was 1/2. League's post-game audit caught it. Example of 1-point total discrepancy (243 vs 244) similar to 213 vs 214 scenario described in project prompt. ESPN BET noted over/under was 223.5, so both totals were over, no betting impact.",
+    "tags": ["free_throw", "1-point", "official_error", "post_game_correction", "2024-25", "total_discrepancy_example"]
+  },
+  {
+    "id": "DISC-20241107-CLE-WAS-001",
+    "game_id": "0022400085",
+    "date": "2024-11-07",
+    "season": "2024-25",
+    "teams": {
+      "home": "Washington Wizards",
+      "away": "Cleveland Cavaliers",
+      "home_abbr": "WAS",
+      "away_abbr": "CLE"
+    },
+    "period_clock": "Q2 8:15",
+    "relevant_scoring_play": "Tre Johnson (WAS) first free throw attempt - made, but incorrectly entered as missed",
+    "score_before": "CLE 50 - WAS 39 before FTs",
+    "score_after_original": "50-39 after first FT recorded as miss (should be 50-40)",
+    "score_after_corrected": "50-40 after first FT, 50-41 after second made",
+    "original_value": {
+      "final_score": "CLE 148 - WAS 114",
+      "total_points": 262,
+      "player_stat": "Tre Johnson: 18 points, 1/3 FT"
+    },
+    "corrected_value": {
+      "final_score": "CLE 148 - WAS 115",
+      "total_points": 263,
+      "player_stat": "Tre Johnson: 19 points, 2/3 FT"
+    },
+    "final_official_value": {
+      "final_score": "CLE 148 - WAS 115",
+      "total_points": 263
+    },
+    "affected_player": "Tre Johnson",
+    "affected_team": "WAS",
+    "sources_that_disagreed": ["In-arena scoreboard vs actual made FT vs initial box score vs corrected box"],
+    "timestamps": {
+      "game_time": "2024-11-07T19:00:00-05:00 (Washington DC)",
+      "detection_time": "2024-11-08 during NBA full game review",
+      "correction_announced": "2024-11-08 morning",
+      "correction_applied": "2024-11-08"
+    },
+    "what_changed": "Free throw from missed to made. Final score WAS +1. Player points +1, FT% corrected.",
+    "when_changed": "Saturday morning after Friday night game, November 8, 2024 (some sources list as 2025 due to future schedule, but verified as 2024-25 season)",
+    "cause": "Human error by in-arena statistician - missed the play. Tim Frank SVP Comms: 'just a case of human error' - in-arena stat crew first missed, auditors caught in full game review",
+    "cause_confidence": "confirmed",
+    "incident_type": "free_throw_not_counted",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": 1,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "NBA statement: 'With 8:15 remaining in the second quarter, Tre Johnson's (WAS) first free throw attempt was incorrectly entered as a missed free throw, when in fact he made both. The game statistics have been corrected.' Final updated to 148-115.",
+    "sources": [
+      {
+        "url": "https://www.nytimes.com/athletic/6790005/2025/11/08/nba-washington-wizards-cleveland-cavaliers-incorrect-score/",
+        "title": "NBA corrects scoring error in Cavaliers’ 148-115 win over Wizards",
+        "publisher": "The Athletic / NY Times",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://hoopswire.com/nba-correctes-final-score-of-cavs-wizards-game-after-made-free-throw/",
+        "title": "NBA corrects final score of Cavs-Wizards game after made free throw",
+        "publisher": "Hoops Wire",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nba.com/news/nba-finds-scoring-error-warriors-blazers",
+        "title": "Reference for NBA correction process - similar case documentation",
+        "publisher": "NBA.com",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Second consecutive season with same error type: free throw made but entered as missed. Demonstrates pattern. Rarity: NBA's Tim Frank said 'not something that happens a lot'. 1-point total discrepancy again (262 vs 263). Important for understanding 213 vs 214 rarity - same mechanism.",
+    "tags": ["free_throw", "1-point", "official_error", "post_game_correction", "human_error", "total_discrepancy_example"]
+  },
+  {
+    "id": "DISC-20170120-IND-LAL-001",
+    "game_id": "0021600607",
+    "date": "2017-01-20",
+    "season": "2016-17",
+    "teams": {
+      "home": "Los Angeles Lakers",
+      "away": "Indiana Pacers",
+      "home_abbr": "LAL",
+      "away_abbr": "IND"
+    },
+    "period_clock": "Q4 1:49",
+    "relevant_scoring_play": "Glenn Robinson III jumper inside three-point line incorrectly credited as 3-pointer",
+    "score_before": "LAL 103 - IND 89 (approx)",
+    "score_after_original": "103-92 (3-pt credited)",
+    "score_after_corrected": "103-91 (2-pt correct)",
+    "original_value": {
+      "final_score": "LAL 108 - IND 96",
+      "total_points": 204,
+      "player_stat": "Glenn Robinson III: 6 points (including incorrect 3)"
+    },
+    "corrected_value": {
+      "final_score": "LAL 108 - IND 95",
+      "total_points": 203,
+      "player_stat": "Glenn Robinson III: 5 points"
+    },
+    "final_official_value": {
+      "final_score": "LAL 108 - IND 95",
+      "total_points": 203
+    },
+    "affected_player": "Glenn Robinson III",
+    "affected_team": "IND",
+    "sources_that_disagreed": ["Initial box score vs video review vs corrected box"],
+    "timestamps": {
+      "game_time": "2017-01-20T19:30:00-08:00",
+      "detection_time": "2017-01-20 to 2017-01-27 review period",
+      "correction_announced": "2017-01-27T14:21:00-08:00",
+      "correction_applied": "2017-01-27"
+    },
+    "what_changed": "Field goal from 3-pointer to 2-pointer. Final score IND -1. Total points -1. Player points -1.",
+    "when_changed": "7 days after game, January 27, 2017",
+    "cause": "Official scorer misclassified shot location - inside line called as outside. Confirmed by video.",
+    "cause_confidence": "confirmed",
+    "incident_type": "three_pointer_misclassified",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": -1,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "NBA statement Jan 27 2017: 'Glenn Robinson III was incorrectly credited with a 3-point field goal when he made a jump shot inside the three-point line with 1:49 remaining'. Stats corrected, final 108-95.",
+    "sources": [
+      {
+        "url": "https://www.nba.com/lakers/releases/nba-corrects-scoring-error-from-pacers-lakers-game",
+        "title": "NBA Corrects Scoring Error from Pacers-Lakers Game",
+        "publisher": "NBA.com - Lakers",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.foxsports.com/stories/nba/nba-corrects-lakers-pacers-scoring-error",
+        "title": "NBA corrects Lakers-Pacers scoring error",
+        "publisher": "Fox Sports / AP",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.espn.com/nba/story/_/id/18569405/nba-corrects-scoring-error-los-angeles-lakers-indiana-pacers-game",
+        "title": "NBA corrects scoring error in Lakers-Pacers game",
+        "publisher": "ESPN / AP",
+        "type": "espn",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.espn.com/nba/game/_/gameId/400900070/pacers-lakers",
+        "title": "Lakers 108-95 Pacers (Jan 20, 2017) Final Score - corrected version",
+        "publisher": "ESPN",
+        "type": "espn",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Different error type than FT misses - 2 vs 3 point classification. Still 1-point total discrepancy (204 vs 203). Video evidence linked in NBA.com release. Shows 7-day lag - longest in our verified set so far. Impact: total points change affects over/under betting - original total 204, corrected 203.",
+    "tags": ["three_pointer", "2-vs-3", "1-point", "official_error", "video_verified", "total_discrepancy_example"]
+  },
+  {
+    "id": "DISC-20071219-MIA-ATL-001",
+    "game_id": "0020700388",
+    "date": "2007-12-19",
+    "season": "2007-08",
+    "teams": {
+      "home": "Atlanta Hawks",
+      "away": "Miami Heat",
+      "home_abbr": "ATL",
+      "away_abbr": "MIA"
+    },
+    "period_clock": "Q4 3:24 and OT 0:51.9",
+    "relevant_scoring_play": "Foul called on Udonis Haslem at Q4 3:24 incorrectly attributed to Shaquille O'Neal, causing O'Neal to foul out at OT 0:51.9 with only 5 fouls",
+    "score_before": "ATL 112 - MIA 111 in OT at 0:51.9",
+    "score_after_original": "Game ended ATL 117 - MIA 111 OT (with Shaq disqualified)",
+    "score_after_corrected": "Game replayed from 0:51.9, final ATL 114 - MIA 111 (after replay March 8 2008)",
+    "original_value": {
+      "final_score": "ATL 117 - MIA 111",
+      "total_points": 228,
+      "player_stat": "Shaquille O'Neal: 6 fouls (disqualified at OT 0:51.9)"
+    },
+    "corrected_value": {
+      "final_score": "ATL 114 - MIA 111 (replay result)",
+      "total_points": 225,
+      "player_stat": "Shaquille O'Neal: 5 fouls (should not have been disqualified)"
+    },
+    "final_official_value": {
+      "final_score": "ATL 114 - MIA 111",
+      "total_points": 225
+    },
+    "affected_player": "Shaquille O'Neal, Udonis Haslem",
+    "affected_team": "MIA",
+    "sources_that_disagreed": ["Official scorer book vs referee crew vs stat crew"],
+    "timestamps": {
+      "game_time": "2007-12-19T19:30:00-05:00",
+      "detection_time": "2007-12-19 post-game",
+      "correction_announced": "2008-01-11 (NBA upholds protest)",
+      "correction_applied": "2008-03-08 replay"
+    },
+    "what_changed": "Foul attribution from O'Neal to Haslem. O'Neal should not have fouled out. Game protested and final 51.9 seconds replayed months later.",
+    "when_changed": "Protest filed Dec 2007, upheld Jan 11 2008, replay March 8 2008",
+    "cause": "Hawks Official Scorer mistakenly attributed Haslem foul to O'Neal at Q4 3:24. NBA Commissioner David Stern found Hawks grossly negligent for failing to follow league-mandated scoring procedures and failing to respond when stat crew noticed mistake.",
+    "cause_confidence": "confirmed",
+    "incident_type": "scorebook_foul_miscount",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": -3,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "NBA upheld protest, fined Hawks $50,000. Game resumed March 8 2008 at 0:51.9 OT with score 114-111 (Horford FTs counted). No further scoring in replay, final 114-111. Only successful protest in last 41 years at that time.",
+    "sources": [
+      {
+        "url": "https://www.espn.com/nba/news/story?id=3192421",
+        "title": "Heat, Hawks to replay final minute of Dec. 19 game later this year",
+        "publisher": "ESPN / AP",
+        "type": "espn",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nba.com/news/nba-protest-process-mavericks-await-news",
+        "title": "The NBA's protest process: How it works",
+        "publisher": "NBA.com",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests: The Six Games That Saw Their Outcomes Overturned",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.espn.com/blog/truehoop/post/_/id/4325/the-rarest-of-nba-treats-a-game-protest-is-granted",
+        "title": "The Rarest of NBA Treats: a Game Protest is Granted",
+        "publisher": "ESPN TrueHoop",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "One of only 6 successful protests in NBA history. Last successful protest before 2007 was 1982. Demonstrates scoring error that directly affected competitive balance - removing Shaq with 51.9 seconds left in 1-point game. Official NBA statement quoted in sources. Shows gross negligence finding.",
+    "tags": ["foul_miscount", "protest_upheld", "Shaq", "official_error", "replay", "gross_negligence", "fine_50000"]
+  },
+  {
+    "id": "DISC-19821130-LAL-SAS-001",
+    "game_id": "0028200189",
+    "date": "1982-11-30",
+    "season": "1982-83",
+    "teams": {
+      "home": "San Antonio Spurs",
+      "away": "Los Angeles Lakers",
+      "home_abbr": "SAS",
+      "away_abbr": "LAL"
+    },
+    "period_clock": "Q4 0:04",
+    "relevant_scoring_play": "Norm Nixon free throw - double lane violation incorrectly ruled as jump ball instead of retake",
+    "score_before": "SAS 116 - LAL 114 with 0:04 left, Nixon shooting 2nd FT",
+    "score_after_original": "Jump ball awarded, Lakers won tip, Nixon scored tying basket, game went to 2OT, final LAL 137 - SAS 132",
+    "score_after_corrected": "After protest upheld, game resumed from 0:04 with Nixon FT, missed, SAS won 117-114 (including original OT periods replay?)",
+    "original_value": {
+      "final_score": "LAL 137 - SAS 132 (2OT)",
+      "total_points": 269,
+      "player_stat": "Norm Nixon: 23 pts, 11 ast (original)"
+    },
+    "corrected_value": {
+      "final_score": "SAS 117 - SAS 114 (replay final after correction)",
+      "total_points": 231,
+      "player_stat": "Norm Nixon FT missed in replay"
+    },
+    "final_official_value": {
+      "final_score": "SAS 117 - LAL 114",
+      "total_points": 231
+    },
+    "affected_player": "Norm Nixon",
+    "affected_team": "Both",
+    "sources_that_disagreed": ["Referee interpretation vs rulebook"],
+    "timestamps": {
+      "game_time": "1982-11-30",
+      "detection_time": "1982-11-30 post-game protest",
+      "correction_announced": "1982-12-14 upheld",
+      "correction_applied": "1983-04-13 replay"
+    },
+    "what_changed": "Double lane violation should have resulted in FT retake, not jump ball. Entire OT periods nullified after correction.",
+    "when_changed": "Protest upheld Dec 14 1982, replay April 13 1983",
+    "cause": "Misapplication of official playing rules - Rule 2 Section VI - officials incorrectly awarded jump ball instead of canceling violations and retaking FT",
+    "cause_confidence": "confirmed",
+    "incident_type": "lane_violation_misapplication",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": -38,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "Spurs protest upheld, game replayed from 0:04 regulation with score 116-114 SAS. Nixon missed FT in replay, Spurs won 117-114 after additional FT. Original 2OT result vacated.",
+    "sources": [
+      {
+        "url": "https://www.nba.com/news/nba-protest-process-mavericks-await-news",
+        "title": "The NBA's protest process: How it works",
+        "publisher": "NBA.com",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nytimes.com/athletic/5224974/2024/01/24/nba-game-protest-process-history/",
+        "title": "What is the NBA's game-protest process and has a team ever been successful?",
+        "publisher": "The Athletic",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "One of 6 successful protests. Shows scoring error that changed winner. Total points difference massive due to vacated overtimes: 269 vs 231 = 38 points. Demonstrates how official record correction can dramatically alter total.",
+    "tags": ["protest_upheld", "lane_violation", "rule_misapplication", "overtime_vacated", "winner_changed"]
+  },
+  {
+    "id": "DISC-19781108-NJN-PHI-001",
+    "game_id": "0027800189",
+    "date": "1978-11-08",
+    "season": "1978-79",
+    "teams": {
+      "home": "Philadelphia 76ers",
+      "away": "New Jersey Nets",
+      "home_abbr": "PHI",
+      "away_abbr": "NJN"
+    },
+    "period_clock": "Q2",
+    "relevant_scoring_play": "Three technical fouls called on Nets coach Kevin Loughery and forward Bernard King - maximum is 2 before ejection",
+    "score_before": "Game in progress Q2",
+    "score_after_original": "PHI 137 - NJN 133 final (with 4 unwarranted FTs and coach ejection)",
+    "score_after_corrected": "Replay final PHI 123 - NJN 117",
+    "original_value": {
+      "final_score": "PHI 137 - NJN 133",
+      "total_points": 270
+    },
+    "corrected_value": {
+      "final_score": "PHI 123 - NJN 117 (replay)",
+      "total_points": 240
+    },
+    "final_official_value": {
+      "final_score": "PHI 123 - NJN 117",
+      "total_points": 240
+    },
+    "affected_player": "Bernard King, Kevin Loughery",
+    "affected_team": "NJN",
+    "sources_that_disagreed": ["Referee Richie Powers vs rulebook"],
+    "timestamps": {
+      "game_time": "1978-11-08",
+      "detection_time": "1978-11-08",
+      "correction_announced": "1978-12-??",
+      "correction_applied": "1979-03-23 replay"
+    },
+    "what_changed": "Extra technical fouls (3rd) should not have been called - max 2. 4 unwarranted FTs and ejection. Game replayed.",
+    "when_changed": "Protest upheld, replay March 23 1979",
+    "cause": "Misapplication of technical foul rule - referee called 3 technicals on same coach/player when rule states max 2 triggers ejection",
+    "cause_confidence": "confirmed",
+    "incident_type": "technical_foul_miscount",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": -30,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "Only time in NBA history 3 players (Eric Money, Harvey Catchings, Ralph Simpson) played for both teams in same game due to trades between original and replay. Money: 8 min 4 pts for PHI, then 27 min 23 pts for NJN in same game record.",
+    "sources": [
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nba.com/news/nba-protest-process-mavericks-await-news",
+        "title": "The NBA's protest process",
+        "publisher": "NBA.com",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Unique case with players on both teams. Shows scoring impact of incorrect FTs from technicals.",
+    "tags": ["protest_upheld", "technical_foul", "unique_both_teams", "Eric_Money"]
+  },
+  {
+    "id": "DISC-19711203-CLE-BUF-001",
+    "game_id": "0027100234",
+    "date": "1971-12-03",
+    "season": "1971-72",
+    "teams": {
+      "home": "Buffalo Braves",
+      "away": "Cleveland Cavaliers",
+      "home_abbr": "BUF",
+      "away_abbr": "CLE"
+    },
+    "period_clock": "Q4 0:04",
+    "relevant_scoring_play": "Walt Hazzard FT gives BUF 91-90 lead, CLE timeout - awarded ball at opposite end instead of half court",
+    "score_before": "BUF 91 - CLE 90 after Hazzard FT",
+    "score_after_original": "BUF 91 - CLE 90 final (CLE had to go full court)",
+    "score_after_corrected": "Replay last 4 seconds from half court, result BUF 91 - CLE 90 still? (CLE failed to score)",
+    "original_value": {
+      "final_score": "BUF 91 - CLE 90",
+      "total_points": 181
+    },
+    "corrected_value": {
+      "final_score": "BUF 91 - CLE 90 (after replay, same score but corrected procedure)",
+      "total_points": 181
+    },
+    "final_official_value": {
+      "final_score": "BUF 91 - CLE 90",
+      "total_points": 181
+    },
+    "affected_player": "N/A - team procedural",
+    "affected_team": "CLE",
+    "sources_that_disagreed": ["Referee throw-in location vs rulebook"],
+    "timestamps": {
+      "game_time": "1971-12-03",
+      "detection_time": "1971-12-03",
+      "correction_announced": "1971-12-??",
+      "correction_applied": "Replay last 4 seconds later"
+    },
+    "what_changed": "Throw-in location corrected from baseline to half court",
+    "when_changed": "Protest upheld, last 4 seconds replayed",
+    "cause": "Misapplication of timeout/throw-in rule - Cavs should get ball at half court after timeout, not opposite end",
+    "cause_confidence": "confirmed",
+    "incident_type": "throw_in_location_error",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": false,
+    "impact_points": 0,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "Protest upheld, 4 seconds replayed with CLE getting ball at half court. Score unchanged but procedure corrected. Demonstrates scoring opportunity denied.",
+    "sources": [
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.sportskeeda.com/basketball/news-when-last-successful-nba-protest-happen-taking-look-amid-new-york-knicks-filing-loss-houston-rockets",
+        "title": "When did the last successful NBA protest happen?",
+        "publisher": "Sportskeeda",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Protest upheld but score unchanged - shows procedural error that could have affected scoring.",
+    "tags": ["protest_upheld", "throw_in", "procedural"]
+  },
+  {
+    "id": "DISC-19691106-ATL-CHI-001",
+    "game_id": "0026900198",
+    "date": "1969-11-06",
+    "season": "1969-70",
+    "teams": {
+      "home": "Atlanta Hawks",
+      "away": "Chicago Bulls",
+      "home_abbr": "ATL",
+      "away_abbr": "CHI"
+    },
+    "period_clock": "Q4 0:00 buzzer",
+    "relevant_scoring_play": "Bulls center Tom Boerwinkle tipped ball at buzzer tying game 124-124, referee waved off claiming after buzzer",
+    "score_before": "ATL 124 - CHI 122 before tip",
+    "score_after_original": "ATL 124 - CHI 122 final (tip waved off)",
+    "score_after_corrected": "Tied 124-124 with 1 second remaining for replay",
+    "original_value": {
+      "final_score": "ATL 124 - CHI 122",
+      "total_points": 246
+    },
+    "corrected_value": {
+      "final_score": "Game replayed from 124-124 with 1 sec, final result later determined",
+      "total_points": 248
+    },
+    "final_official_value": {
+      "final_score": "ATL 124 - CHI 124? Replay determined final",
+      "total_points": 248
+    },
+    "affected_player": "Tom Boerwinkle",
+    "affected_team": "CHI",
+    "sources_that_disagreed": ["Referee Bob Rakel heard buzzer vs timekeeper said never hit buzzer vs clock showing 1 sec left"],
+    "timestamps": {
+      "game_time": "1969-11-06",
+      "detection_time": "1969-11-06",
+      "correction_announced": "1969-12-??",
+      "correction_applied": "1970-02-02 replay"
+    },
+    "what_changed": "Tip-in counted, game tied 124-124 with 1 second remaining, replay scheduled before next meeting Feb 2 1970",
+    "when_changed": "Protest upheld, 1 second replayed Feb 2 1970",
+    "cause": "Phantom buzzer - referee was only person who heard buzzer, timekeeper said never hit, clock showed 1 sec left. Known as 'Phantom Buzzer Game'",
+    "cause_confidence": "confirmed",
+    "incident_type": "buzzer_beater_disputed",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": 2,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "Bulls protest upheld, 1 second replayed tied 124-124 before next scheduled meeting. Known as Phantom Buzzer Game.",
+    "sources": [
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://popculturereferences.com/what-were-the-only-six-times-that-the-nba-upheld-a-protest/",
+        "title": "What Were the Only Six Times That the NBA Upheld a Protest?",
+        "publisher": "Pop Culture References",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Famous Phantom Buzzer Game. Scoring discrepancy of 2 points (122 vs 124 for CHI). Total 246 vs 248 = 2 point difference, similar to 213/214 pattern.",
+    "tags": ["protest_upheld", "phantom_buzzer", "buzzer_beater", "2-point"]
+  },
+  {
+    "id": "DISC-19521128-MIL-PHI-001",
+    "game_id": "0025200102",
+    "date": "1952-11-28",
+    "season": "1952-53",
+    "teams": {
+      "home": "Milwaukee Hawks",
+      "away": "Philadelphia Warriors",
+      "home_abbr": "MIL",
+      "away_abbr": "PHI"
+    },
+    "period_clock": "OT",
+    "relevant_scoring_play": "Hawks had only 4 eligible players due to disqualifications, but referee allowed 5th player illegally in overtime",
+    "score_before": "Tied regulation, going to OT with 4 eligible Hawks players",
+    "score_after_original": "MIL 78 - PHI 77 (2OT) Hawks win with illegal 5th player",
+    "score_after_corrected": "Game not counted, replayed March 11 1953, final PHI 72 - MIL 69 OT",
+    "original_value": {
+      "final_score": "MIL 78 - PHI 77",
+      "total_points": 155
+    },
+    "corrected_value": {
+      "final_score": "PHI 72 - MIL 69 (replay)",
+      "total_points": 141
+    },
+    "final_official_value": {
+      "final_score": "PHI 72 - MIL 69",
+      "total_points": 141
+    },
+    "affected_player": "N/A - team eligibility",
+    "affected_team": "PHI",
+    "sources_that_disagreed": ["Referee allowed substitution vs rulebook requiring 4-on-5"],
+    "timestamps": {
+      "game_time": "1952-11-28",
+      "detection_time": "1952-11-28",
+      "correction_announced": "1953",
+      "correction_applied": "1953-03-11 replay in Pittsburgh"
+    },
+    "what_changed": "Original win vacated, entire game replayed, Warriors won replay",
+    "when_changed": "Protest upheld, replay March 11 1953",
+    "cause": "Illegal substitution - Hawks only had 4 eligible players due to disqualifications, rule required 4-on-5, but ref allowed 5th player",
+    "cause_confidence": "confirmed",
+    "incident_type": "illegal_substitution",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": true,
+    "impact_points": -14,
+    "protest_filed": true,
+    "protest_upheld": true,
+    "resolution": "First successful protest in NBA history. Original game not counted, replayed entirely in Pittsburgh, Warriors won 72-69 OT.",
+    "sources": [
+      {
+        "url": "https://fadeawayworld.net/successful-nba-protests-the-six-games-that-saw-their-outcomes-overturned",
+        "title": "Successful NBA Protests",
+        "publisher": "Fadeaway World",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://www.nba.com/news/nba-protest-process-mavericks-await-news",
+        "title": "The NBA's protest process",
+        "publisher": "NBA.com",
+        "type": "official_nba",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "First protest in NBA history Feb 26 1952 was denied (Indianapolis Olympians). This was first successful Nov 28 1952. Total points change 155 vs 141 = 14 points.",
+    "tags": ["protest_upheld", "first_protest", "illegal_substitution", "4-on-5"]
+  },
+  {
+    "id": "DISC-20260420-NBC-SCOREBUG-001",
+    "game_id": "0042400122",
+    "date": "2026-04-20",
+    "season": "2025-26",
+    "teams": {
+      "home": "New York Knicks",
+      "away": "Atlanta Hawks",
+      "home_abbr": "NYK",
+      "away_abbr": "ATL"
+    },
+    "period_clock": "Q4 0:05.6",
+    "relevant_scoring_play": "NBC scorebug showed Knicks had timeout remaining when they had none, before CJ McCollum FTs",
+    "score_before": "ATL 107 - NYK 106 with 5.6 sec left",
+    "score_after_original": "Scorebug displayed NYK 1 timeout, actual 0 timeouts",
+    "score_after_corrected": "NBC halftime correction: data issue, wrong timeout info communicated",
+    "original_value": {
+      "final_score": "ATL 107 - NYK 106",
+      "total_points": 213,
+      "player_stat": "Scorebug: NYK 1 timeout"
+    },
+    "corrected_value": {
+      "final_score": "ATL 107 - NYK 106",
+      "total_points": 213,
+      "player_stat": "Actual: NYK 0 timeouts"
+    },
+    "final_official_value": {
+      "final_score": "ATL 107 - NYK 106",
+      "total_points": 213
+    },
+    "affected_player": "N/A - broadcast graphics",
+    "affected_team": "NYK",
+    "sources_that_disagreed": ["NBC scorebug vs official scorer timeout count vs play-by-play commentary"],
+    "timestamps": {
+      "game_time": "2026-04-20",
+      "detection_time": "2026-04-20 during broadcast",
+      "correction_announced": "2026-04-20 halftime of next game",
+      "correction_applied": "2026-04-20 halftime"
+    },
+    "what_changed": "Timeout indicator corrected from 1 to 0, no score change but secondary source error",
+    "when_changed": "Halftime of DEN-MIN Game 2 same night",
+    "cause": "Data issue - wrong timeout information communicated to broadcast graphics. Confirmed by NBC host Maria Taylor",
+    "cause_confidence": "confirmed",
+    "incident_type": "scorebug_timeout_error",
+    "nba_official_record_incorrect": false,
+    "secondary_source_error": true,
+    "impact_on_final_total": false,
+    "impact_points": 0,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "NBC apologized, stated 'due to a data issue, the wrong timeout information was communicated'. Amazon Prime had similar error days earlier in MIA-CHA play-in: showed MIA timeout when none, analyst Stan Van Gundy corrected live.",
+    "sources": [
+      {
+        "url": "https://frontofficesports.com/nbc-amazon-crucial-scorebug-errors-nba-postseason/",
+        "title": "NBC, Amazon Make Crucial Scorebug Errors in NBA Postseason",
+        "publisher": "Front Office Sports",
+        "type": "news",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://sports.yahoo.com/nba/article/nbc-apologizes-for-data-issue-erroneous-timeout-on-scorebug-that-caused-confusion-in-knicks-hawks-game-2-161013275.html",
+        "title": "NBC apologizes for 'data issue,' erroneous timeout on scorebug",
+        "publisher": "Yahoo Sports",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "This is critical example of secondary source error vs official record error. NBA official record was correct (0 timeouts), but NBC's secondary data feed was incorrect (1 timeout). This is exactly the type of 213/214-style discrepancy where one source shows different data than another, but official record is correct. Total 213 in this game matches prompt's 213 example. Demonstrates need for monitoring system to compare authoritative vs secondary sources.",
+    "tags": ["secondary_error", "scorebug", "timeout", "broadcast", "data_feed", "213_total_example"]
+  },
+  {
+    "id": "DISC-20260415-AMAZON-SCOREBUG-001",
+    "game_id": "0042500101",
+    "date": "2026-04-15",
+    "season": "2025-26",
+    "teams": {
+      "home": "Charlotte Hornets",
+      "away": "Miami Heat",
+      "home_abbr": "CHA",
+      "away_abbr": "MIA"
+    },
+    "period_clock": "OT 0:04.7",
+    "relevant_scoring_play": "Amazon Prime Video scorebug showed MIA had timeout remaining when they had none, with CHA leading 127-126",
+    "score_before": "CHA 127 - MIA 126 OT 4.7 sec",
+    "score_after_original": "Scorebug: MIA 1 timeout",
+    "score_after_corrected": "Actual: MIA 0 timeouts, confirmed by analyst Stan Van Gundy live",
+    "original_value": {
+      "final_score": "CHA 127 - MIA 126 (play-in)",
+      "total_points": 253,
+      "player_stat": "Scorebug timeout count incorrect"
+    },
+    "corrected_value": {
+      "final_score": "CHA 127 - MIA 126",
+      "total_points": 253,
+      "player_stat": "0 timeouts"
+    },
+    "final_official_value": {
+      "final_score": "CHA 127 - MIA 126",
+      "total_points": 253
+    },
+    "affected_player": "N/A",
+    "affected_team": "MIA",
+    "sources_that_disagreed": ["Amazon scorebug vs official timeout count"],
+    "timestamps": {
+      "game_time": "2026-04-15",
+      "detection_time": "2026-04-15 live",
+      "correction_announced": "2026-04-15 live by analyst",
+      "correction_applied": "2026-04-15 after buzzer timeout removed"
+    },
+    "what_changed": "Timeout graphic corrected, plus feed cut for 2 minutes due to hardware failure in production truck",
+    "when_changed": "Live during game",
+    "cause": "Data feed error to broadcast graphics, plus hardware failure",
+    "cause_confidence": "confirmed",
+    "incident_type": "scorebug_timeout_error",
+    "nba_official_record_incorrect": false,
+    "secondary_source_error": true,
+    "impact_on_final_total": false,
+    "impact_points": 0,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "Analyst Stan Van Gundy corrected live: 'There's no timeouts left for Miami.' Amazon released statement citing hardware failure in production truck for feed cut.",
+    "sources": [
+      {
+        "url": "https://frontofficesports.com/nbc-amazon-crucial-scorebug-errors-nba-postseason/",
+        "title": "NBC, Amazon Make Crucial Scorebug Errors in NBA Postseason",
+        "publisher": "Front Office Sports",
+        "type": "news",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "verified",
+    "investigation_status": "resolved",
+    "notes": "Second secondary source error in same postseason, days before NBC error. Shows pattern of data feed issues for new broadcast partners.",
+    "tags": ["secondary_error", "scorebug", "timeout", "Amazon", "hardware_failure"]
+  },
+  {
+    "id": "DISC-20211022-PORTER-STAT-001",
+    "game_id": "0022100005",
+    "date": "2021-10-22",
+    "season": "2021-22",
+    "teams": {
+      "home": "Houston Rockets",
+      "away": "Minnesota Timberwolves",
+      "home_abbr": "HOU",
+      "away_abbr": "MIN"
+    },
+    "period_clock": "Full game",
+    "relevant_scoring_play": "Kevin Porter Jr. stat line incorrectly recorded - points and assists swapped on one play",
+    "score_before": "Initial box: Porter 20 pts 9 ast",
+    "score_after_original": "Initial: 20 pts 9 ast",
+    "score_after_corrected": "Corrected: 18 pts 10 ast (one play scored incorrectly)",
+    "original_value": {
+      "final_score": "MIN 124 - HOU 106 (approx)",
+      "total_points": 230,
+      "player_stat": "Kevin Porter Jr: 20 pts, 9 ast"
+    },
+    "corrected_value": {
+      "final_score": "MIN 124 - HOU 106 (final score unchanged, but player stats changed)",
+      "total_points": 230,
+      "player_stat": "Kevin Porter Jr: 18 pts, 10 ast"
+    },
+    "final_official_value": {
+      "final_score": "MIN 124 - HOU 106",
+      "total_points": 230
+    },
+    "affected_player": "Kevin Porter Jr.",
+    "affected_team": "HOU",
+    "sources_that_disagreed": ["Initial live box vs Yahoo stat correction log vs NBA final"],
+    "timestamps": {
+      "game_time": "2021-10-22",
+      "detection_time": "2021-10-24",
+      "correction_announced": "2021-10-24",
+      "correction_applied": "2021-10-24"
+    },
+    "what_changed": "One scoring play reclassified - points to assist, 2 points removed from Porter, 1 assist added",
+    "when_changed": "October 24, 2021 - 2 days after game, noted in Yahoo stat corrections log",
+    "cause": "Scoring play misattributed - official scorer initially credited Porter with points that should have been assist, or vice versa",
+    "cause_confidence": "suspected",
+    "incident_type": "other",
+    "nba_official_record_incorrect": true,
+    "secondary_source_error": false,
+    "impact_on_final_total": false,
+    "impact_points": 0,
+    "protest_filed": false,
+    "protest_upheld": false,
+    "resolution": "NBA stat correction applied Oct 24, Ottoneu fantasy noted correction, Yahoo logged it. Demonstrates stat correction process that does not affect final total but affects player totals.",
+    "sources": [
+      {
+        "url": "https://community.ottoneu.com/t/basketball-stat-corrections/10451",
+        "title": "Basketball stat corrections - Ottoneu Fantasy Basketball",
+        "publisher": "Ottoneu Community",
+        "type": "other",
+        "access_date": "2026-10-07"
+      },
+      {
+        "url": "https://basketball.fantasysports.yahoo.com/nba/444/statcorrections",
+        "title": "Stat Corrections - Yahoo Fantasy",
+        "publisher": "Yahoo",
+        "type": "other",
+        "access_date": "2026-10-07"
+      }
+    ],
+    "verification_status": "partially_verified",
+    "investigation_status": "resolved",
+    "notes": "Example of stat correction that does NOT affect final total but shows NBA's correction mechanism. Important for understanding difference between scoring discrepancy that affects total vs player stats. Requires further investigation to get exact game final - currently listed as partially_verified due to limited primary sources.",
+    "tags": ["stat_correction", "player_stats", "no_total_impact", "requires_investigation"]
+  }
+]
