@@ -26,6 +26,9 @@ This log enforces the requested Pass 1 → Pass 2 → Pass 3 sequence. Evidence 
 - [x] Recheck source roles and disagreements: NBA correction vs ESPN/CBS page inconsistency; preserve Melton's exact corrected player total as unresolved (11 vs 12); add the direct NBA Official post for the 2025 correction while attributing the separate human-error explanation.
 - [x] Run active + historical validators, both dashboard JavaScript syntax checks, monitor self-test, Python compilation, 47 offline tests, deterministic stats/site generation, and Pages artifact smoke checks.
 - [x] Confirm honest live-monitor baselines: current monitor `not_started`, historical monitor `not-run`; no unverified poll is described as successful.
-- [ ] Integrate latest `origin/main` ancestry, push the fixed Arena branch, recheck PR CI/mergeability, and verify the successful merge and post-merge Pages/monitor workflow.
+- [x] Integrate latest `origin/main` ancestry on the fixed Arena branch, push it, confirm PR CI/mergeability, and merge PR #4 after GitHub reported it ready.
+- [x] Verify post-merge validation, verification, Pages publishing, Pages deployment, and the public root + historical catalog.
+- [x] Preserve honest operational baselines: the push event skipped live source comparison; `data/live-feed.json` remains `not_started` and the historical monitor remains `not-run`.
+- [ ] Verify the first successful scheduled NBA/ESPN poll and published timestamp. Manual `workflow_dispatch` from this session was denied by GitHub with HTTP 403 (`Resource not accessible by integration`); no live poll is claimed.
 
-Pass 3 remains **pending only on GitHub integration and post-merge confirmation**; do not mark it complete until those outcomes are confirmed.
+**Pass 3 implementation/review is complete.** Production deployment is confirmed, but live monitoring is **not yet proven operational** until the scheduled poll publishes a successful snapshot. Keep that distinction explicit in future updates.
