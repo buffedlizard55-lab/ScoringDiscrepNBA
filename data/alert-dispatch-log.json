@@ -17,9 +17,25 @@
       "channel": "webhook",
       "detail": "SCORING_DISCREPANCY_WEBHOOK_URL is not configured; GitHub issues remain the only delivery channel",
       "result": "skipped"
+    },
+    {
+      "action": "refresh_issue",
+      "alert_id": "ALR-source_unavailable-nba",
+      "at": "2026-10-08T02:40:08Z",
+      "channel": "github_issue",
+      "detail": "material alert content refreshed",
+      "result": "sent"
+    },
+    {
+      "action": "comment_issue",
+      "alert_id": "ALR-source_unavailable-nba",
+      "at": "2026-10-08T02:40:08Z",
+      "channel": "github_issue",
+      "detail": "non-causal monitor update comment",
+      "result": "sent"
     }
   ],
   "note": "Append-only delivery log. A failed or skipped entry means the alert was not delivered through that channel; it does not mean the alert did not happen.",
   "schema_version": 1,
-  "updated_at": "2026-10-07T23:02:13Z"
+  "updated_at": "2026-10-08T02:40:08Z"
 }
