@@ -42,7 +42,7 @@
       "first_seen_at": "2026-10-07T23:02:09Z",
       "game": null,
       "id": "ALR-source_unavailable-nba",
-      "last_seen_at": "2026-10-08T16:52:03Z",
+      "last_seen_at": "2026-10-08T21:42:54Z",
       "lifecycle": [
         {
           "at": "2026-10-07T23:02:09Z",
@@ -50,7 +50,7 @@
           "event": "opened"
         }
       ],
-      "occurrences": 4,
+      "occurrences": 5,
       "occurrences_bucket": 12,
       "resolution": null,
       "resolved_at": null,
@@ -107,9 +107,8 @@
     }
   },
   "dispatch_policy": "Alerts are written to data/alerts.json on every material change. Critical and high-severity alerts are additionally queued for notification as a GitHub issue by 'python3 -m monitor --dispatch-alerts --apply', which the scheduled workflow runs. Medium-severity alerts stay on the site until they escalate. An optional webhook (SCORING_DISCREPANCY_WEBHOOK_URL) can mirror dispatched alerts to Slack, Discord, or a similar endpoint; when it is not configured, notifications are GitHub-issue only and that is recorded, not assumed.",
-  "generated_at": "2026-10-08T16:52:03Z",
-  "last_dispatch_at": "2026-10-08T16:52:08Z",
-  "last_material_signature": "{\"alerts\":[{\"condition_id\":\"nba:2026-10-07T18:04:06Z\",\"content\":{\"arithmetic\":null,\"evidence\":[{\"label\":\"NBA endpoint\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\",\"value\":\"authoritative\"},{\"label\":\"Last recorded error\",\"url\":null,\"value\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\"}],\"resolution\":null,\"status\":\"open\",\"summary\":\"The NBA feed's first consecutive failure was recorded at 2026-10-07T18:04:06Z. The configured 15-minute alert threshold has been reached according to monitor poll times; the exact provider recovery time is unknown until a later successful poll. While it is unavailable, no comparison against it can run, so an absence of detections is not evidence that no discrepancy exists.\",\"title\":\"NBA source unavailable (authoritative)\"},\"dispatch\":{\"human_closed\":false,\"issue_number\":13,\"issue_url\":\"https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/issues/13\",\"last_body_sha256\":\"6a1fe61aa48329858e1fb5da22740bc3e53556ed1c7628ed325ba0c8dce1c9d7\",\"last_status\":\"open\",\"resolution_comment_pending\":false,\"status\":\"sent\",\"webhook_status\":\"skipped\"},\"id\":\"ALR-source_unavailable-nba\",\"occurrences_bucket\":12,\"severity\":\"high\",\"status\":\"open\"}],\"coverage_gaps\":0,\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison\":{\"available\":false,\"blocked_reason\":\"fewer than two sources returned data, so cross-source comparison could not run\",\"sources_ok\":[\"espn\"]},\"final_score_revision_tracking\":{\"baselines\":5,\"sources_tracked\":[\"espn\"]},\"single_provider_arithmetic_checks\":{\"by_status\":{\"consistent\":5},\"games_checked\":5,\"method\":\"2 * (FGM - 3PM) + 3 * 3PM + FTM from the provider's own box-score components\"}}}",
+  "generated_at": "2026-10-08T21:42:54Z",
+  "last_material_signature": "{\"alerts\":[{\"condition_id\":\"nba:2026-10-07T18:04:06Z\",\"content\":{\"arithmetic\":null,\"evidence\":[{\"label\":\"NBA endpoint\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\",\"value\":\"authoritative\"},{\"label\":\"Last recorded error\",\"url\":null,\"value\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\"}],\"resolution\":null,\"status\":\"open\",\"summary\":\"The NBA feed's first consecutive failure was recorded at 2026-10-07T18:04:06Z. The configured 15-minute alert threshold has been reached according to monitor poll times; the exact provider recovery time is unknown until a later successful poll. While it is unavailable, no comparison against it can run, so an absence of detections is not evidence that no discrepancy exists.\",\"title\":\"NBA source unavailable (authoritative)\"},\"dispatch\":{\"human_closed\":false,\"issue_number\":13,\"issue_url\":\"https://github.com/buffedlizard55-lab/ScoringDiscrepNBA/issues/13\",\"last_body_sha256\":\"4d070b729a77f92dfe18d10655f51bbd9d47d29ea7f08018e524f6c842f528c2\",\"last_status\":\"open\",\"resolution_comment_pending\":false,\"status\":\"sent\",\"webhook_status\":\"skipped\"},\"id\":\"ALR-source_unavailable-nba\",\"occurrences_bucket\":12,\"severity\":\"high\",\"status\":\"open\"}],\"coverage_gaps\":0,\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison\":{\"available\":false,\"blocked_reason\":\"fewer than two sources returned data, so cross-source comparison could not run\",\"sources_ok\":[\"espn\"]},\"final_score_revision_tracking\":{\"baselines\":5,\"sources_tracked\":[\"espn\"]},\"single_provider_arithmetic_checks\":{\"by_status\":{\"consistent\":5},\"games_checked\":5,\"method\":\"2 * (FGM - 3PM) + 3 * 3PM + FTM from the provider's own box-score components\"}}}",
   "note": "This file is the alert ledger for the automated monitor. It advances only when the set of alerts materially changes (new alert, severity change, lifecycle change, dispatch result, or an occurrence milestone), so the scheduled runner does not rewrite it on every poll. Times are monitor poll times in UTC, not provider publication times.",
   "schema_version": 1,
   "unverified_reminder": "Automated candidate detection only. This alert records what two published observations showed and when. It does not establish that any NBA record was wrong, which source was correct, or what caused the difference."
