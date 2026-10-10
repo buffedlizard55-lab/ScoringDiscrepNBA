@@ -261,6 +261,32 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401908939",
       "status": "consistent"
     },
+    "espn:401908940": {
+      "checked_at": "2026-10-10T05:42:57Z",
+      "derived": [
+        {
+          "derived_points": 104,
+          "provider_reported_final": 104,
+          "side": "away"
+        },
+        {
+          "derived_points": 100,
+          "provider_reported_final": 100,
+          "side": "home"
+        }
+      ],
+      "game_id": "401908940",
+      "game_key": "401908940",
+      "method": "2 * (FGM - 3PM) + 3 * 3PM + FTM, using the provider's own box-score components",
+      "note": "The provider's reported final matches the arithmetic of the box-score components it publishes for the same game. This check cannot detect an error the provider propagated consistently across both views.",
+      "provider_reported": {
+        "away": 104,
+        "home": 100
+      },
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401908940",
+      "status": "consistent"
+    },
     "espn:401914123": {
       "checked_at": "2026-10-08T09:29:37Z",
       "derived": [
@@ -465,6 +491,21 @@
         "home": "CHI"
       }
     },
+    "espn:401908940": {
+      "current_score": {
+        "away": 104,
+        "home": 100
+      },
+      "first_final_seen_at": "2026-10-10T05:42:57Z",
+      "game_date": "2026-10-09",
+      "game_id": "401908940",
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+      "team_codes": {
+        "away": "MEM",
+        "home": "CHI"
+      }
+    },
     "espn:401914123": {
       "current_score": {
         "away": 112,
@@ -497,7 +538,7 @@
     }
   },
   "investigations": [],
-  "last_state_change_at": "2026-10-09T15:12:59Z",
+  "last_state_change_at": "2026-10-10T05:42:57Z",
   "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause. Source outages are recorded as coverage gaps because no comparison can run while a source is unavailable.",
   "schema_version": 1,
   "source_health": {
