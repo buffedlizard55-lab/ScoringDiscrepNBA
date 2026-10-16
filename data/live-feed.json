@@ -13,19 +13,19 @@
       "away_team": {
         "abbreviation": "MIA",
         "name": "Miami Heat",
-        "score": 0
+        "score": 28
       },
-      "clock": "0.0",
+      "clock": "3:58",
       "game_date": "2026-10-16",
       "game_id": "401898406",
       "home_team": {
         "abbreviation": "ORL",
         "name": "Orlando Magic",
-        "score": 0
+        "score": 17
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-16T18:04:44Z",
-      "period": 0,
+      "observed_at": "2026-10-16T23:30:39Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -33,36 +33,36 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 28,
+          "clock": "3:58",
           "game_date": "2026-10-16",
           "game_id": "401898406",
-          "home": 0,
-          "period": 0,
+          "home": 17,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/16 - 7:00 PM EDT"
+      "status": "live",
+      "status_text": "3:58 - 1st"
     },
     {
       "away_team": {
         "abbreviation": "BOS",
         "name": "Boston Celtics",
-        "score": 0
+        "score": 19
       },
-      "clock": "0.0",
+      "clock": "4:01",
       "game_date": "2026-10-16",
       "game_id": "401898407",
       "home_team": {
         "abbreviation": "PHI",
         "name": "Philadelphia 76ers",
-        "score": 0
+        "score": 20
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-16T18:04:44Z",
-      "period": 0,
+      "observed_at": "2026-10-16T23:30:39Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -70,36 +70,36 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 19,
+          "clock": "4:01",
           "game_date": "2026-10-16",
           "game_id": "401898407",
-          "home": 0,
-          "period": 0,
+          "home": 20,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/16 - 7:00 PM EDT"
+      "status": "live",
+      "status_text": "4:01 - 1st"
     },
     {
       "away_team": {
         "abbreviation": "TOR",
         "name": "Toronto Raptors",
-        "score": 0
+        "score": 19
       },
-      "clock": "0.0",
+      "clock": "4:55",
       "game_date": "2026-10-16",
       "game_id": "401908946",
       "home_team": {
         "abbreviation": "DET",
         "name": "Detroit Pistons",
-        "score": 0
+        "score": 18
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-16T18:04:44Z",
-      "period": 0,
+      "observed_at": "2026-10-16T23:30:39Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -107,36 +107,36 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 19,
+          "clock": "4:55",
           "game_date": "2026-10-16",
           "game_id": "401908946",
-          "home": 0,
-          "period": 0,
+          "home": 18,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/16 - 7:00 PM EDT"
+      "status": "live",
+      "status_text": "4:55 - 1st"
     },
     {
       "away_team": {
         "abbreviation": "MIL",
         "name": "Milwaukee Bucks",
-        "score": 0
+        "score": 21
       },
-      "clock": "0.0",
+      "clock": "3:24",
       "game_date": "2026-10-16",
       "game_id": "401914126",
       "home_team": {
         "abbreviation": "IND",
         "name": "Indiana Pacers",
-        "score": 0
+        "score": 16
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-16T18:04:44Z",
-      "period": 0,
+      "observed_at": "2026-10-16T23:30:39Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -144,18 +144,18 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 21,
+          "clock": "3:24",
           "game_date": "2026-10-16",
           "game_id": "401914126",
-          "home": 0,
-          "period": 0,
+          "home": 16,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/16 - 7:00 PM EDT"
+      "status": "live",
+      "status_text": "3:24 - 1st"
     },
     {
       "away_team": {
@@ -454,9 +454,9 @@
       "status_text": "10/16 - 10:30 PM EDT"
     }
   ],
-  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":39,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"a729af4006e915287fd71e56323a085648bd706df1b9caa17b7825afe5be3994\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[0,0],\"game_id\":\"401898406\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898407\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401908946\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401914126\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898408\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898843\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401901822\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401906509\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401908943\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898409\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401908948\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898719\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-16T04:52:44Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
+  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":39,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"7f45a822c727fe2c59cc2aa241c0d1464df4c711b4a433cce15aa2094ed7be14\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[28,17],\"game_id\":\"401898406\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[19,20],\"game_id\":\"401898407\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[19,18],\"game_id\":\"401908946\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[21,16],\"game_id\":\"401914126\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[0,0],\"game_id\":\"401898408\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898843\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401901822\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401906509\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401908943\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898409\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401908948\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401898719\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-16T04:52:44Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
   "last_state_change_at": "2026-10-16T04:52:44Z",
-  "last_updated_at": "2026-10-16T21:01:48Z",
+  "last_updated_at": "2026-10-16T23:30:39Z",
   "note": "NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.",
   "schema_version": 1,
   "source_diagnostics": {
@@ -467,7 +467,7 @@
         "last_modified": null,
         "outcome": "ok",
         "profile": "monitor",
-        "sha256": "a729af4006e915287fd71e56323a085648bd706df1b9caa17b7825afe5be3994"
+        "sha256": "7f45a822c727fe2c59cc2aa241c0d1464df4c711b4a433cce15aa2094ed7be14"
       }
     ],
     "nba": [
