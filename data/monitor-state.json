@@ -1146,7 +1146,7 @@
       "status": "consistent"
     },
     "espn:401909088": {
-      "checked_at": "2026-10-20T21:50:22Z",
+      "checked_at": "2026-10-21T04:58:09Z",
       "derived": [
         {
           "derived_points": 113,
@@ -1169,6 +1169,58 @@
       },
       "source_key": "espn",
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909088",
+      "status": "consistent"
+    },
+    "espn:401909089": {
+      "checked_at": "2026-10-21T04:58:09Z",
+      "derived": [
+        {
+          "derived_points": 106,
+          "provider_reported_final": 106,
+          "side": "away"
+        },
+        {
+          "derived_points": 100,
+          "provider_reported_final": 100,
+          "side": "home"
+        }
+      ],
+      "game_id": "401909089",
+      "game_key": "401909089",
+      "method": "2 * (FGM - 3PM) + 3 * 3PM + FTM, using the provider's own box-score components",
+      "note": "The provider's reported final matches the arithmetic of the box-score components it publishes for the same game. This check cannot detect an error the provider propagated consistently across both views.",
+      "provider_reported": {
+        "away": 106,
+        "home": 100
+      },
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909089",
+      "status": "consistent"
+    },
+    "espn:401909090": {
+      "checked_at": "2026-10-21T04:58:09Z",
+      "derived": [
+        {
+          "derived_points": 116,
+          "provider_reported_final": 116,
+          "side": "away"
+        },
+        {
+          "derived_points": 104,
+          "provider_reported_final": 104,
+          "side": "home"
+        }
+      ],
+      "game_id": "401909090",
+      "game_key": "401909090",
+      "method": "2 * (FGM - 3PM) + 3 * 3PM + FTM, using the provider's own box-score components",
+      "note": "The provider's reported final matches the arithmetic of the box-score components it publishes for the same game. This check cannot detect an error the provider propagated consistently across both views.",
+      "provider_reported": {
+        "away": 116,
+        "home": 104
+      },
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909090",
       "status": "consistent"
     },
     "espn:401914123": {
@@ -2030,6 +2082,36 @@
         "home": "DET"
       }
     },
+    "espn:401909089": {
+      "current_score": {
+        "away": 106,
+        "home": 100
+      },
+      "first_final_seen_at": "2026-10-21T04:58:09Z",
+      "game_date": "2026-10-20",
+      "game_id": "401909089",
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+      "team_codes": {
+        "away": "PHI",
+        "home": "NYK"
+      }
+    },
+    "espn:401909090": {
+      "current_score": {
+        "away": 116,
+        "home": 104
+      },
+      "first_final_seen_at": "2026-10-21T04:58:09Z",
+      "game_date": "2026-10-20",
+      "game_id": "401909090",
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+      "team_codes": {
+        "away": "OKC",
+        "home": "SAS"
+      }
+    },
     "espn:401914123": {
       "current_score": {
         "away": 112,
@@ -2137,7 +2219,7 @@
     }
   },
   "investigations": [],
-  "last_state_change_at": "2026-10-20T21:50:22Z",
+  "last_state_change_at": "2026-10-21T04:58:09Z",
   "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause. Source outages are recorded as coverage gaps because no comparison can run while a source is unavailable.",
   "schema_version": 1,
   "source_health": {
