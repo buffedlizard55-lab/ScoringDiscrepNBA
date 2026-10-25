@@ -306,9 +306,9 @@
       "status_text": "Final"
     }
   ],
-  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":87,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"8ae6a8fd2c22df8997e7147c8cdc563ef245645e712c8e8a0f635fc12f6d51cd\"}],\"espn_summary\":[{\"attempts\":[{\"duration_ms\":103,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"07d696b0b09eb8b26fc5fb56d37476c8e872aaa0727649f67940cacc2486626a\"}],\"game_id\":\"401909860\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[110,115],\"game_id\":\"401909853\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[121,125],\"game_id\":\"401909854\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[116,127],\"game_id\":\"401909855\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[124,120],\"game_id\":\"401909857\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[122,106],\"game_id\":\"401909858\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[121,114],\"game_id\":\"401909856\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[135,141],\"game_id\":\"401909859\",\"mismatch\":null,\"nba\":[null,null],\"period\":5,\"status\":\"final\"},{\"espn\":[122,131],\"game_id\":\"401909860\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-25T09:19:19Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
+  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":87,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"58e341a7334f0551f37ad9eb7cde61870d5a5ab19edb794f804eeea38c7c248d\"}],\"espn_summary\":[{\"attempts\":[{\"duration_ms\":214,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"a5abaf277245e70f25d85848883434261808bc5fa4f423eaa099158a13e35530\"}],\"game_id\":\"401909853\"},{\"attempts\":[{\"duration_ms\":121,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"0230f54d1c2c35c96cc0027b2881f05c3eca9ea20bd3a1178d13f906797fdb1c\"}],\"game_id\":\"401909854\"},{\"attempts\":[{\"duration_ms\":338,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"69bd0837f61af6f64e67da9bace09ca12c3c94aa87a8ab2b568e5ce9d0cbe462\"}],\"game_id\":\"401909855\"},{\"attempts\":[{\"duration_ms\":351,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"76c83fbb3870066dbd86d7c54def95469fe33a9bf66b85a0e2be44a475739097\"}],\"game_id\":\"401909857\"},{\"attempts\":[{\"duration_ms\":205,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"b32e36412b5e636dbb3d60735309ea0797fea6bec909c47773976b4d6950d7e6\"}],\"game_id\":\"401909858\"},{\"attempts\":[{\"duration_ms\":187,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"2ae0b331aa193945a860df080ed7ed3cd9870d0de58bd54326746a4dce43c6cc\"}],\"game_id\":\"401909856\"},{\"attempts\":[{\"duration_ms\":220,\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"c735e8ff61e3ae7388fbd3ffae7794a126fb50d529648c401620f4997d087df8\"}],\"game_id\":\"401909859\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[110,115],\"game_id\":\"401909853\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[121,125],\"game_id\":\"401909854\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[116,127],\"game_id\":\"401909855\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[124,120],\"game_id\":\"401909857\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[122,106],\"game_id\":\"401909858\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[121,114],\"game_id\":\"401909856\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"},{\"espn\":[135,141],\"game_id\":\"401909859\",\"mismatch\":null,\"nba\":[null,null],\"period\":5,\"status\":\"final\"},{\"espn\":[122,131],\"game_id\":\"401909860\",\"mismatch\":null,\"nba\":[null,null],\"period\":4,\"status\":\"final\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-25T09:19:19Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
   "last_state_change_at": "2026-10-25T09:19:19Z",
-  "last_updated_at": "2026-10-25T09:19:19Z",
+  "last_updated_at": "2026-10-25T13:54:36Z",
   "note": "NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.",
   "schema_version": 1,
   "source_diagnostics": {
@@ -319,23 +319,107 @@
         "last_modified": null,
         "outcome": "ok",
         "profile": "monitor",
-        "sha256": "8ae6a8fd2c22df8997e7147c8cdc563ef245645e712c8e8a0f635fc12f6d51cd"
+        "sha256": "58e341a7334f0551f37ad9eb7cde61870d5a5ab19edb794f804eeea38c7c248d"
       }
     ],
     "espn_summary": [
       {
         "attempts": [
           {
-            "duration_ms": 103,
+            "duration_ms": 214,
             "etag": null,
             "http_status": 200,
             "last_modified": null,
             "outcome": "ok",
             "profile": "monitor",
-            "sha256": "07d696b0b09eb8b26fc5fb56d37476c8e872aaa0727649f67940cacc2486626a"
+            "sha256": "a5abaf277245e70f25d85848883434261808bc5fa4f423eaa099158a13e35530"
           }
         ],
-        "game_id": "401909860"
+        "game_id": "401909853"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 121,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "0230f54d1c2c35c96cc0027b2881f05c3eca9ea20bd3a1178d13f906797fdb1c"
+          }
+        ],
+        "game_id": "401909854"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 338,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "69bd0837f61af6f64e67da9bace09ca12c3c94aa87a8ab2b568e5ce9d0cbe462"
+          }
+        ],
+        "game_id": "401909855"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 351,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "76c83fbb3870066dbd86d7c54def95469fe33a9bf66b85a0e2be44a475739097"
+          }
+        ],
+        "game_id": "401909857"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 205,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "b32e36412b5e636dbb3d60735309ea0797fea6bec909c47773976b4d6950d7e6"
+          }
+        ],
+        "game_id": "401909858"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 187,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "2ae0b331aa193945a860df080ed7ed3cd9870d0de58bd54326746a4dce43c6cc"
+          }
+        ],
+        "game_id": "401909856"
+      },
+      {
+        "attempts": [
+          {
+            "duration_ms": 220,
+            "etag": null,
+            "http_status": 200,
+            "last_modified": null,
+            "outcome": "ok",
+            "profile": "monitor",
+            "sha256": "c735e8ff61e3ae7388fbd3ffae7794a126fb50d529648c401620f4997d087df8"
+          }
+        ],
+        "game_id": "401909859"
       }
     ],
     "nba": [
