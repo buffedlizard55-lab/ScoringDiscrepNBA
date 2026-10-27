@@ -2471,6 +2471,32 @@
       "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909875",
       "status": "consistent"
     },
+    "espn:401909876": {
+      "checked_at": "2026-10-27T11:14:28Z",
+      "derived": [
+        {
+          "derived_points": 134,
+          "provider_reported_final": 134,
+          "side": "away"
+        },
+        {
+          "derived_points": 114,
+          "provider_reported_final": 114,
+          "side": "home"
+        }
+      ],
+      "game_id": "401909876",
+      "game_key": "401909876",
+      "method": "2 * (FGM - 3PM) + 3 * 3PM + FTM, using the provider's own box-score components",
+      "note": "The provider's reported final matches the arithmetic of the box-score components it publishes for the same game. This check cannot detect an error the provider propagated consistently across both views.",
+      "provider_reported": {
+        "away": 134,
+        "home": 114
+      },
+      "source_key": "espn",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909876",
+      "status": "consistent"
+    },
     "espn:401914123": {
       "checked_at": "2026-10-08T09:29:37Z",
       "derived": [
@@ -4202,7 +4228,7 @@
     }
   },
   "investigations": [],
-  "last_state_change_at": "2026-10-27T05:50:28Z",
+  "last_state_change_at": "2026-10-27T11:14:28Z",
   "note": "Automated detections are unverified leads, not confirmed NBA scoring errors. Feed convergence closes only an observed mismatch window; it does not establish cause. Source outages are recorded as coverage gaps because no comparison can run while a source is unavailable.",
   "schema_version": 1,
   "source_health": {
