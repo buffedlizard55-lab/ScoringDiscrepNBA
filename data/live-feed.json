@@ -13,19 +13,19 @@
       "away_team": {
         "abbreviation": "BKN",
         "name": "Brooklyn Nets",
-        "score": 0
+        "score": 49
       },
-      "clock": "0.0",
+      "clock": "5:07",
       "game_date": "2026-10-27",
       "game_id": "401909877",
       "home_team": {
         "abbreviation": "BOS",
         "name": "Boston Celtics",
-        "score": 0
+        "score": 46
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-27T16:43:31Z",
-      "period": 0,
+      "observed_at": "2026-10-28T00:26:09Z",
+      "period": 2,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -33,36 +33,36 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 49,
+          "clock": "5:07",
           "game_date": "2026-10-27",
           "game_id": "401909877",
-          "home": 0,
-          "period": 0,
+          "home": 46,
+          "period": 2,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/27 - 7:30 PM EDT"
+      "status": "live",
+      "status_text": "5:07 - 2nd"
     },
     {
       "away_team": {
         "abbreviation": "DET",
         "name": "Detroit Pistons",
-        "score": 0
+        "score": 8
       },
-      "clock": "0.0",
+      "clock": "7:05",
       "game_date": "2026-10-27",
       "game_id": "401909878",
       "home_team": {
         "abbreviation": "NYK",
         "name": "New York Knicks",
-        "score": 0
+        "score": 11
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-27T16:43:31Z",
-      "period": 0,
+      "observed_at": "2026-10-28T00:26:09Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -70,36 +70,36 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 8,
+          "clock": "7:05",
           "game_date": "2026-10-27",
           "game_id": "401909878",
-          "home": 0,
-          "period": 0,
+          "home": 11,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/27 - 8:00 PM EDT"
+      "status": "live",
+      "status_text": "7:05 - 1st"
     },
     {
       "away_team": {
         "abbreviation": "SAC",
         "name": "Sacramento Kings",
-        "score": 0
+        "score": 13
       },
-      "clock": "0.0",
+      "clock": "6:11",
       "game_date": "2026-10-27",
       "game_id": "401909879",
       "home_team": {
         "abbreviation": "SAS",
         "name": "San Antonio Spurs",
-        "score": 0
+        "score": 20
       },
       "latest_official_scoring_play": null,
-      "observed_at": "2026-10-27T16:43:31Z",
-      "period": 0,
+      "observed_at": "2026-10-28T00:26:09Z",
+      "period": 1,
       "play_by_play_source_url": null,
       "score_mismatch": null,
       "score_sources": [
@@ -107,18 +107,18 @@
       ],
       "scores": {
         "espn": {
-          "away": 0,
-          "clock": "0.0",
+          "away": 13,
+          "clock": "6:11",
           "game_date": "2026-10-27",
           "game_id": "401909879",
-          "home": 0,
-          "period": 0,
+          "home": 20,
+          "period": 1,
           "source_url": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
-          "status": "scheduled"
+          "status": "live"
         }
       },
-      "status": "scheduled",
-      "status_text": "10/27 - 8:00 PM EDT"
+      "status": "live",
+      "status_text": "6:11 - 1st"
     },
     {
       "away_team": {
@@ -158,9 +158,9 @@
       "status_text": "10/27 - 11:00 PM EDT"
     }
   ],
-  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":103,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"0a868575e9bd18467e2906c1ccf4c803c68426487fdb9a18a84377a9402413da\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[0,0],\"game_id\":\"401909877\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401909878\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401909879\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"},{\"espn\":[0,0],\"game_id\":\"401909880\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-27T11:14:28Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
+  "last_material_signature": "{\"detector_status\":{\"coverage_gaps_recorded\":0,\"cross_source_comparison_available\":false,\"final_game_checks_recorded\":103,\"sources_reachable\":[\"espn\"]},\"diagnostics\":{\"espn\":[{\"etag\":null,\"http_status\":200,\"last_modified\":null,\"outcome\":\"ok\",\"profile\":\"monitor\",\"sha256\":\"7c7f9fe2bae3bf8dfec455896d6fb065969b72dc755fed7db94000cdc04322e2\"}],\"nba\":[{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"monitor\"},{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"outcome\":\"failed\",\"profile\":\"browser\"}]},\"games\":[{\"espn\":[49,46],\"game_id\":\"401909877\",\"mismatch\":null,\"nba\":[null,null],\"period\":2,\"status\":\"live\"},{\"espn\":[8,11],\"game_id\":\"401909878\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[13,20],\"game_id\":\"401909879\",\"mismatch\":null,\"nba\":[null,null],\"period\":1,\"status\":\"live\"},{\"espn\":[0,0],\"game_id\":\"401909880\",\"mismatch\":null,\"nba\":[null,null],\"period\":0,\"status\":\"scheduled\"}],\"health\":{\"espn\":{\"status\":\"ok\",\"url\":\"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard\"},\"nba\":{\"error\":\"Could not fetch or decode upstream JSON: HTTPError (HTTP 403 Forbidden)\",\"status\":\"unavailable\",\"url\":\"https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json\"}},\"last_state_change_at\":\"2026-10-27T11:14:28Z\",\"mismatch_refresh_bucket\":null,\"note\":\"NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.\",\"status\":\"degraded\"}",
   "last_state_change_at": "2026-10-27T11:14:28Z",
-  "last_updated_at": "2026-10-27T21:00:04Z",
+  "last_updated_at": "2026-10-28T00:26:09Z",
   "note": "NBA and ESPN feed values are observations, not a determination of which source is correct. A score difference is an unverified candidate until independent evidence is reviewed. Cross-source comparison could not run against: nba. Rows below show every source that did answer; the comparison column says 'Not compared' wherever fewer than two sources published the game. The single-provider final-score arithmetic check still ran where possible.",
   "schema_version": 1,
   "source_diagnostics": {
@@ -171,7 +171,7 @@
         "last_modified": null,
         "outcome": "ok",
         "profile": "monitor",
-        "sha256": "0a868575e9bd18467e2906c1ccf4c803c68426487fdb9a18a84377a9402413da"
+        "sha256": "7c7f9fe2bae3bf8dfec455896d6fb065969b72dc755fed7db94000cdc04322e2"
       }
     ],
     "nba": [
